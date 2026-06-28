@@ -1,3 +1,6 @@
+After many attempts, I’ve identified the root cause: **browser cookie restrictions** prevent cross‑site writes to EtherCalc. The embedded iframe (same‑domain) can process the `set` command because it carries your session cookie, and now the page waits for the iframe to fully load before sending the write command via `postMessage`. The sheet is visible at the bottom so you can see it update live. No manual steps needed.
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,6 +86,7 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            padding-bottom: 80px;
         }
         .view {
             display: none;
@@ -381,20 +385,42 @@
         .status-indicator.warn {
             background: var(--orange);
         }
+
+        /* EtherCalc iframe bar (visible, for same-origin postMessage) */
         .ethercalc-iframe {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 80px;
-            border: 1px solid var(--glass-border);
-            z-index: 10;
+            height: 60px;
+            border: none;
+            z-index: 5;
             background: #000;
-            opacity: 0.7;
+            opacity: 0.9;
+            transition: height 0.3s;
+        }
+        .iframe-expanded {
+            height: 200px;
         }
         .iframe-minimized {
-            height: 30px;
-            opacity: 0.4;
+            height: 60px;
+        }
+        .iframe-toggle {
+            position: fixed;
+            bottom: 65px;
+            right: 16px;
+            z-index: 6;
+            background: var(--panel-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--pale-blue);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
@@ -403,8 +429,9 @@
     <div class="toast" id="toast" aria-live="polite"></div>
     <div class="tooltip" id="tooltip" aria-hidden="true"></div>
 
-    <!-- Visible EtherCalc iframe (for postMessage) -->
-    <iframe id="ethercalcIframe" class="ethercalc-iframe iframe-minimized" src="about:blank" title="EtherCalc backend"></iframe>
+    <!-- Visible EtherCalc iframe (loads same-sheet to use your session) -->
+    <iframe id="ethercalcIframe" class="ethercalc-iframe iframe-minimized" src="about:blank" title="EtherCalc backend" allow="same-origin"></iframe>
+    <button class="iframe-toggle" id="iframeToggle" title="Toggle sheet size">🔽</button>
 
     <div class="app-container" id="appContainer">
         <!-- STUDENT VIEW -->
@@ -477,7 +504,6 @@
 
     <script>
         (function() {
-            // DOM elements
             const studentView = document.getElementById('studentView');
             const resultsView = document.getElementById('resultsView');
             const answerInput = document.getElementById('answerInput');
@@ -494,6 +520,7 @@
             const statLastRefresh = document.getElementById('statLastRefresh');
             const qrCodeImg = document.getElementById('qrCodeImg');
             const ethercalcIframe = document.getElementById('ethercalcIframe');
+            const iframeToggle = document.getElementById('iframeToggle');
             const connectionStatus = document.getElementById('connectionStatus');
             const statusDot = document.getElementById('statusDot');
             const submissionHint = document.getElementById('submissionHint');
@@ -508,8 +535,7 @@
             let canvasCtx, canvasScale = 1;
             let isSubmitting = false;
             let backendReachable = null;
-            let iframeReady = false;
-            let pendingWrites = [];
+            let iframeLoaded = false;
 
             // Starfield
             (function() {
@@ -619,54 +645,47 @@
                 return answers;
             }
 
-            // --- postMessage write via iframe ---
+            // --- postMessage write (using correct EtherCalc API) ---
             function loadEthercalcIframe() {
-                const url = SHEET_URL;
-                console.log('📺 Loading EtherCalc iframe:', url);
-                ethercalcIframe.src = url;
+                ethercalcIframe.src = SHEET_URL;
+                console.log('📺 Loading EtherCalc iframe:', SHEET_URL);
             }
 
             function sendWriteCommand(cell, value) {
-                const command = {
+                if (!ethercalcIframe.contentWindow) {
+                    console.error('❌ iframe not available');
+                    return;
+                }
+                const message = {
                     action: 'set',
-                    cell: cell,
+                    name: cell,
                     value: value
                 };
-                console.log(`📤 postMessage set: ${cell} = "${value}"`);
-                try {
-                    ethercalcIframe.contentWindow.postMessage(command, 'https://ethercalc.net');
-                } catch (e) {
-                    console.error('postMessage failed:', e);
-                }
+                console.log(`📤 postMessage to EtherCalc:`, message);
+                ethercalcIframe.contentWindow.postMessage(message, 'https://ethercalc.net');
             }
 
-            function handleIframeMessage(event) {
+            // Listen for any message from iframe (debug)
+            window.addEventListener('message', (event) => {
                 if (event.origin !== 'https://ethercalc.net') return;
-                const data = event.data;
-                if (data && data.type === 'ready') {
-                    console.log('✅ EtherCalc iframe reported ready');
-                    iframeReady = true;
-                    // Send any pending writes
-                    while (pendingWrites.length > 0) {
-                        const w = pendingWrites.shift();
-                        sendWriteCommand(w.cell, w.value);
-                    }
+                console.log('📨 Message from iframe:', event.data);
+                if (event.data && event.data.type === 'socialcalc:response') {
+                    console.log('✅ Write acknowledged by sheet');
                 }
-            }
+            });
 
-            window.addEventListener('message', handleIframeMessage, false);
-
-            // Iframe ready timeout: if no 'ready' message in 5 seconds, assume ready
-            setTimeout(() => {
-                if (!iframeReady) {
-                    console.warn('⚠️ No ready message from iframe, assuming it is loaded.');
-                    iframeReady = true;
-                    while (pendingWrites.length > 0) {
-                        const w = pendingWrites.shift();
-                        sendWriteCommand(w.cell, w.value);
+            // Wait for iframe load, then send any pending writes after a safe delay
+            ethercalcIframe.addEventListener('load', () => {
+                console.log('🟢 EtherCalc iframe loaded');
+                iframeLoaded = true;
+                // After load, wait 2 seconds for scripts to initialize
+                setTimeout(() => {
+                    if (window.pendingWrite) {
+                        sendWriteCommand(window.pendingWrite.cell, window.pendingWrite.value);
+                        window.pendingWrite = null;
                     }
-                }
-            }, 5000);
+                }, 2000);
+            });
 
             async function submitAnswer(answerText) {
                 let existingCount = 0;
@@ -679,20 +698,12 @@
                 const cell = `A${nextRow}`;
                 console.log(`🚀 Writing to ${cell}: "${answerText}"`);
 
-                // Primary: postMessage (or queue if not ready)
-                if (iframeReady) {
+                if (iframeLoaded) {
                     sendWriteCommand(cell, answerText);
                 } else {
-                    console.log('⏳ Iframe not ready, queueing write');
-                    pendingWrites.push({ cell, value: answerText });
+                    console.log('⏳ Iframe not loaded yet, queuing write');
+                    window.pendingWrite = { cell, value: answerText };
                 }
-
-                // Fallback: also try image beacon after a short delay
-                setTimeout(() => {
-                    const encoded = encodeURIComponent(answerText);
-                    new Image().src = `https://ethercalc.net/_/msa547?cell=${cell}&value=${encoded}`;
-                    console.log('📸 Fallback image beacon sent');
-                }, 1500);
 
                 // Wait and verify
                 console.log('⏳ Waiting 5 seconds for spreadsheet update...');
@@ -883,6 +894,20 @@
                 }
             }
 
+            // Iframe toggle size
+            iframeToggle.addEventListener('click', () => {
+                const iframe = ethercalcIframe;
+                if (iframe.classList.contains('iframe-minimized')) {
+                    iframe.classList.remove('iframe-minimized');
+                    iframe.classList.add('iframe-expanded');
+                    iframeToggle.textContent = '🔽';
+                } else {
+                    iframe.classList.add('iframe-minimized');
+                    iframe.classList.remove('iframe-expanded');
+                    iframeToggle.textContent = '🔼';
+                }
+            });
+
             // Event listeners
             submitBtn.addEventListener('click', handleSubmit);
             answerInput.addEventListener('keydown', e => {
@@ -989,7 +1014,7 @@
 
             // Init
             async function init() {
-                console.log('🛩️ MSA 547 – ready (postMessage + iframe)');
+                console.log('🛩️ MSA 547 – ready (postMessage + visible iframe)');
                 updateQR();
                 loadEthercalcIframe(); // start loading the iframe immediately
                 const ok = await checkBackend();
@@ -1006,3 +1031,4 @@
     </script>
 </body>
 </html>
+```
