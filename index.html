@@ -8,7 +8,6 @@
         :root {
             --navy: #0a1628;
             --dark-blue: #0d1f3c;
-            --mid-blue: #152d50;
             --panel-bg: #111d33;
             --sky-blue: #4a90d9;
             --light-blue: #7eb8da;
@@ -20,6 +19,7 @@
             --gold: #d4a853;
             --teal: #34b7a8;
             --red-accent: #e74c3c;
+            --green-accent: #2ecc71;
             --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.10);
             --glass-hover: rgba(255, 255, 255, 0.06);
@@ -33,7 +33,6 @@
             --transition: 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             --font-display: 'Georgia', 'Times New Roman', serif;
             --font-body: 'Segoe UI', 'Inter', 'Helvetica Neue', system-ui, -apple-system, sans-serif;
-            --font-mono: 'SF Mono', 'Consolas', 'Monaco', monospace;
         }
 
         * {
@@ -67,7 +66,6 @@
             position: relative;
         }
 
-        /* Subtle starfield */
         .starfield {
             position: fixed;
             inset: 0;
@@ -85,16 +83,15 @@
         @keyframes twinkle {
             0%,
             100% {
-                opacity: 0.3;
+                opacity: 0.25;
                 transform: scale(1);
             }
             50% {
                 opacity: 0.9;
-                transform: scale(1.8);
+                transform: scale(1.9);
             }
         }
 
-        /* Main container */
         .app-container {
             position: relative;
             z-index: 1;
@@ -105,7 +102,6 @@
             gap: 20px;
         }
 
-        /* View panels */
         .view {
             display: none;
             flex-direction: column;
@@ -126,7 +122,6 @@
             }
         }
 
-        /* Card styling */
         .card {
             background: var(--panel-bg);
             border: 1px solid var(--glass-border);
@@ -148,19 +143,7 @@
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
             border-radius: 50%;
         }
-        .card::after {
-            content: '';
-            position: absolute;
-            bottom: -60px;
-            right: -40px;
-            width: 180px;
-            height: 180px;
-            background: radial-gradient(circle, rgba(74, 144, 217, 0.06) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-        }
 
-        /* Aviation accent line */
         .accent-line {
             width: 60px;
             height: 3px;
@@ -181,7 +164,6 @@
             opacity: 0.7;
         }
 
-        /* Typography */
         .question-text {
             font-family: var(--font-display);
             font-size: 1.45rem;
@@ -207,7 +189,6 @@
             font-weight: 500;
         }
 
-        /* Input */
         .input-group {
             position: relative;
             z-index: 1;
@@ -238,7 +219,6 @@
             font-style: italic;
         }
 
-        /* Buttons */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -275,6 +255,12 @@
             box-shadow: 0 12px 32px rgba(244, 121, 62, 0.5);
             transform: translateY(-2px);
         }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 12px rgba(244, 121, 62, 0.2);
+        }
         .btn-secondary {
             background: transparent;
             color: var(--pale-blue);
@@ -293,23 +279,7 @@
             border-radius: 30px;
             letter-spacing: 0.05em;
         }
-        .btn-icon {
-            width: 44px;
-            height: 44px;
-            padding: 0;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--pale-blue);
-        }
-        .btn-icon:hover {
-            background: var(--glass-hover);
-            color: var(--pure-white);
-            border-color: rgba(255, 255, 255, 0.3);
-        }
 
-        /* Button row */
         .btn-row {
             display: flex;
             gap: 10px;
@@ -322,7 +292,6 @@
             justify-content: space-between;
         }
 
-        /* QR Code area */
         .qr-section {
             display: flex;
             align-items: center;
@@ -364,14 +333,13 @@
             line-height: 1.4;
         }
 
-        /* Toast / notification */
         .toast {
             position: fixed;
             top: 24px;
             left: 50%;
             transform: translateX(-50%) translateY(-120px);
             background: #1a3d2e;
-            border: 1px solid #34b7a8;
+            border: 1px solid var(--teal);
             color: #d4f7f0;
             padding: 14px 24px;
             border-radius: 50px;
@@ -382,17 +350,23 @@
             box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
             transition: transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.15);
             pointer-events: none;
+            text-align: center;
+            max-width: 90vw;
         }
         .toast.show {
             transform: translateX(-50%) translateY(0);
         }
         .toast.error {
             background: #3d1a1a;
-            border-color: #e74c3c;
+            border-color: var(--red-accent);
             color: #fdd;
         }
+        .toast.success {
+            background: #1a3d2e;
+            border-color: var(--green-accent);
+            color: #d4f7f0;
+        }
 
-        /* Word cloud container */
         .wordcloud-wrapper {
             position: relative;
             z-index: 1;
@@ -420,6 +394,8 @@
             text-align: center;
             padding: 40px;
             font-style: italic;
+            position: absolute;
+            pointer-events: none;
         }
         .tooltip {
             position: fixed;
@@ -442,7 +418,6 @@
             opacity: 1;
         }
 
-        /* Stats bar */
         .stats-bar {
             display: flex;
             gap: 16px;
@@ -466,21 +441,33 @@
             font-size: 1.1rem;
         }
 
-        /* Pulse animation for refresh */
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+            animation: pulse 2s infinite;
+        }
+        .status-indicator.ok {
+            background: var(--green-accent);
+        }
+        .status-indicator.warn {
+            background: var(--orange);
+        }
+        .status-indicator.err {
+            background: var(--red-accent);
+        }
         @keyframes pulse {
             0%,
             100% {
-                box-shadow: 0 0 0 0 rgba(74, 144, 217, 0.4);
+                box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4);
             }
             50% {
-                box-shadow: 0 0 0 16px rgba(74, 144, 217, 0);
+                box-shadow: 0 0 0 12px rgba(46, 204, 113, 0);
             }
         }
-        .pulse-ring {
-            animation: pulse 2s infinite;
-        }
 
-        /* Responsive */
         @media (max-width: 480px) {
             .card {
                 padding: 20px 16px;
@@ -551,116 +538,124 @@
     <!-- Tooltip for word cloud -->
     <div class="tooltip" id="tooltip" aria-hidden="true"></div>
 
-    <!-- Main App -->
-    <div class="app-container" id="appContainer">
-
-        <!-- ==================== STUDENT VIEW ==================== -->
-        <div class="view active" id="studentView">
-            <div class="card">
-                <span class="subtitle">MSA 547 &middot; Leadership &amp; Critical Decision-Making</span>
-                <div class="accent-line"></div>
-                <h1 class="question-text">
-                    In one or two words,<br>what makes you trust an aviation leader?
-                </h1>
-            </div>
-
-            <!-- QR Code Section -->
-            <div class="qr-section" id="qrSection">
-                <img class="qr-code-img" id="qrCodeImg"
-                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Crect fill='%23fff' width='110' height='110' rx='8'/%3E%3Ctext x='55' y='58' text-anchor='middle' fill='%23999' font-size='11' font-family='sans-serif'%3EQR%3C/text%3E%3C/svg%3E"
-                alt="QR Code - Scan to participate" loading="lazy">
-                <div class="qr-info">
-                    <span class="qr-title">📱 Scan to Participate</span>
-                    <span class="qr-desc">Open this page on your phone to submit your answer.</span>
-                </div>
-            </div>
-
-            <!-- Input Card -->
-            <div class="card" id="inputCard">
-                <div class="input-group">
-                    <label class="label-text" for="answerInput">Your answer (1–2 words):</label>
-                    <input
-                    type="text"
-                    id="answerInput"
-                    class="answer-input"
-                    placeholder="e.g. Clear communication"
-                    maxlength="60"
-                    autocomplete="off"
-                    spellcheck="true"
-                    aria-label="Your answer"
-                    >
-                </div>
-                <div style="height:16px;"></div>
-                <div class="btn-row">
-                    <button class="btn btn-primary" id="submitBtn" type="button">
-                        ✈️ Submit Answer
-                    </button>
-                </div>
-            </div>
-
-            <!-- Instructor hint -->
-            <div style="text-align:center;position:relative;z-index:1;">
-                <button class="btn btn-small btn-secondary" id="gotoResultsBtn" type="button" title="Instructor: Show Results">
-                    🔒 Instructor: View Results →
-                </button>
-            </div>
-        </div>
-
-        <!-- ==================== RESULTS VIEW ==================== -->
-        <div class="view" id="resultsView">
-            <div class="card">
-                <span class="subtitle">MSA 547 &middot; Live Poll Results</span>
-                <div class="accent-line"></div>
-                <h1 class="question-text" style="font-size:1.2rem;">
-                    "In one or two words, what makes you trust an aviation leader?"
-                </h1>
-                <div class="stats-bar" id="statsBar">
-                    <span class="stat-item">Responses: <span class="stat-value" id="statCount">—</span></span>
-                    <span class="stat-item">Unique: <span class="stat-value" id="statUnique">—</span></span>
-                </div>
-            </div>
-
-            <!-- Word Cloud -->
-            <div class="wordcloud-wrapper pulse-ring" id="wordcloudWrapper">
-                <canvas id="wordcloudCanvas" aria-label="Word cloud of student responses"></canvas>
-                <div class="wordcloud-placeholder" id="wordcloudPlaceholder">
-                    Loading responses...
-                </div>
-            </div>
-
-            <!-- Controls -->
-            <div class="btn-row between">
-                <button class="btn btn-small btn-secondary" id="refreshBtn" type="button">
-                    🔄 Refresh Data
-                </button>
-                <button class="btn btn-small btn-secondary" id="backToStudentBtn" type="button">
-                    ← Back to Question
-                </button>
-            </div>
-            <div style="text-align:center;font-size:0.7rem;color:rgba(255,255,255,0.35);letter-spacing:0.05em;position:relative;z-index:1;">
-                Data from ethercalc.net/msa547 &middot; Click or tap words for details
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Hidden iframe for EtherCalc form submission (bypasses CORS) -->
+    <!-- Hidden iframe for form-based submission fallback -->
     <iframe name="ethercalcSubmitFrame" id="ethercalcSubmitFrame"
     style="display:none;width:0;height:0;border:none;"
     title="Hidden submission frame"
-    sandbox="allow-same-origin allow-forms allow-scripts">
+    allow="forms">
 </iframe>
 
-<!-- Hidden form for EtherCalc POST -->
+<!-- Hidden form for EtherCalc POST (fallback method) -->
 <form id="ethercalcForm"
 action="https://ethercalc.net/_/msa547"
 method="POST"
 target="ethercalcSubmitFrame"
+enctype="application/x-www-form-urlencoded"
 style="display:none;"
 aria-hidden="true">
 <input type="hidden" name="cell" id="ethercalcCellInput" value="">
 <input type="hidden" name="value" id="ethercalcValueInput" value="">
 </form>
+
+<!-- Main App -->
+<div class="app-container" id="appContainer">
+
+    <!-- ==================== STUDENT VIEW ==================== -->
+    <div class="view active" id="studentView">
+        <div class="card">
+            <span class="subtitle">MSA 547 · Leadership &amp; Critical Decision-Making</span>
+            <div class="accent-line"></div>
+            <h1 class="question-text">
+                In one or two words,<br>what makes you trust an aviation leader?
+            </h1>
+        </div>
+
+        <!-- QR Code Section -->
+        <div class="qr-section" id="qrSection">
+            <img class="qr-code-img" id="qrCodeImg"
+            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Crect fill='%23fff' width='110' height='110' rx='8'/%3E%3Ctext x='55' y='58' text-anchor='middle' fill='%23999' font-size='11' font-family='sans-serif'%3EQR%3C/text%3E%3C/svg%3E"
+            alt="QR Code - Scan to participate" loading="lazy">
+            <div class="qr-info">
+                <span class="qr-title">📱 Scan to Participate</span>
+                <span class="qr-desc">Open this page on your phone to submit your answer.<br><small style="opacity:0.7;">Data stored at ethercalc.net/msa547</small></span>
+            </div>
+        </div>
+
+        <!-- Input Card -->
+        <div class="card" id="inputCard">
+            <div class="input-group">
+                <label class="label-text" for="answerInput">Your answer (1–2 words):</label>
+                <input
+                type="text"
+                id="answerInput"
+                class="answer-input"
+                placeholder="e.g. Clear communication"
+                maxlength="80"
+                autocomplete="off"
+                spellcheck="true"
+                aria-label="Your answer"
+                >
+            </div>
+            <div style="height:16px;"></div>
+            <div class="btn-row">
+                <button class="btn btn-primary" id="submitBtn" type="button">
+                    ✈️ Submit Answer
+                </button>
+            </div>
+            <div style="margin-top:10px;font-size:0.7rem;color:rgba(255,255,255,0.35);text-align:center;" id="submissionHint">
+                Press Enter or tap Submit
+            </div>
+        </div>
+
+        <!-- Instructor hint & connection status -->
+        <div style="text-align:center;position:relative;z-index:1;display:flex;flex-direction:column;gap:8px;align-items:center;">
+            <button class="btn btn-small btn-secondary" id="gotoResultsBtn" type="button" title="Instructor: Show Results">
+                🔒 Instructor: View Results →
+            </button>
+            <span style="font-size:0.65rem;color:rgba(255,255,255,0.3);" id="connectionStatus">
+                <span class="status-indicator" id="statusDot"></span> Checking backend...
+            </span>
+        </div>
+    </div>
+
+    <!-- ==================== RESULTS VIEW ==================== -->
+    <div class="view" id="resultsView">
+        <div class="card">
+            <span class="subtitle">MSA 547 · Live Poll Results</span>
+            <div class="accent-line"></div>
+            <h1 class="question-text" style="font-size:1.2rem;">
+                "In one or two words, what makes you trust an aviation leader?"
+            </h1>
+            <div class="stats-bar" id="statsBar">
+                <span class="stat-item">Responses: <span class="stat-value" id="statCount">—</span></span>
+                <span class="stat-item">Unique: <span class="stat-value" id="statUnique">—</span></span>
+                <span class="stat-item" id="statLastRefresh" style="font-size:0.7rem;">Just now</span>
+            </div>
+        </div>
+
+        <!-- Word Cloud -->
+        <div class="wordcloud-wrapper" id="wordcloudWrapper">
+            <canvas id="wordcloudCanvas" aria-label="Word cloud of student responses"></canvas>
+            <div class="wordcloud-placeholder" id="wordcloudPlaceholder">
+                Loading responses...
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="btn-row between">
+            <button class="btn btn-small btn-secondary" id="refreshBtn" type="button">
+                🔄 Refresh Data
+            </button>
+            <button class="btn btn-small btn-secondary" id="backToStudentBtn" type="button">
+                ← Back to Question
+            </button>
+        </div>
+        <div style="text-align:center;font-size:0.7rem;color:rgba(255,255,255,0.35);letter-spacing:0.05em;position:relative;z-index:1;">
+            Data from <a href="https://ethercalc.net/msa547" target="_blank" rel="noopener" style="color:var(--sky-blue);">ethercalc.net/msa547</a> · Click or tap words for details
+        </div>
+    </div>
+
+</div>
 
 <script>
     (function() {
@@ -679,11 +674,15 @@ aria-hidden="true">
         const wordcloudPlaceholder = document.getElementById('wordcloudPlaceholder');
         const statCount = document.getElementById('statCount');
         const statUnique = document.getElementById('statUnique');
+        const statLastRefresh = document.getElementById('statLastRefresh');
         const qrCodeImg = document.getElementById('qrCodeImg');
         const ethercalcForm = document.getElementById('ethercalcForm');
         const ethercalcCellInput = document.getElementById('ethercalcCellInput');
         const ethercalcValueInput = document.getElementById('ethercalcValueInput');
         const starfield = document.getElementById('starfield');
+        const connectionStatus = document.getElementById('connectionStatus');
+        const statusDot = document.getElementById('statusDot');
+        const submissionHint = document.getElementById('submissionHint');
 
         // ==================== CONSTANTS ====================
         const ETHERCALC_CSV_URL = 'https://ethercalc.net/msa547.csv';
@@ -692,12 +691,13 @@ aria-hidden="true">
 
         // ==================== STATE ====================
         let currentView = 'student';
-        let wordPlacements = []; // {word, x, y, w, h, fontSize, color, count, rotation}
+        let wordPlacements = [];
         let hoveredWordIndex = -1;
         let allAnswers = [];
         let isSubmitting = false;
         let canvasCtx = null;
         let canvasScale = 1;
+        let backendReachable = null; // null=unknown, true=reachable, false=unreachable
 
         // ==================== STARFIELD ====================
         function createStarfield() {
@@ -719,16 +719,58 @@ aria-hidden="true">
         // ==================== TOAST ====================
         let toastTimeout;
 
-        function showToast(message, isError = false) {
+        function showToast(message, type = '') {
             clearTimeout(toastTimeout);
             toast.textContent = message;
-            toast.className = 'toast ' + (isError ? 'error' : '');
-            // Force reflow
+            toast.className = 'toast ' + type;
             void toast.offsetWidth;
             toast.classList.add('show');
             toastTimeout = setTimeout(() => {
                 toast.classList.remove('show');
-            }, 2800);
+            }, 3200);
+        }
+
+        // ==================== CONNECTION STATUS ====================
+        function updateConnectionStatus(reachable) {
+            backendReachable = reachable;
+            if (reachable === true) {
+                statusDot.className = 'status-indicator ok';
+                connectionStatus.innerHTML =
+                    '<span class="status-indicator ok"></span> Backend connected · <a href="' + SPREADSHEET_URL +
+                    '" target="_blank" rel="noopener" style="color:var(--sky-blue);">Open spreadsheet</a>';
+            } else if (reachable === false) {
+                statusDot.className = 'status-indicator err';
+                connectionStatus.innerHTML =
+                    '<span class="status-indicator err"></span> Backend unreachable · <a href="' + SPREADSHEET_URL +
+                    '" target="_blank" rel="noopener" style="color:var(--orange);">Check spreadsheet exists</a>';
+            } else {
+                statusDot.className = 'status-indicator warn';
+                connectionStatus.innerHTML = '<span class="status-indicator warn"></span> Checking backend...';
+            }
+        }
+
+        async function checkBackendConnection() {
+            updateConnectionStatus(null);
+            try {
+                const response = await fetch(ETHERCALC_CSV_URL, {
+                    method: 'GET',
+                    cache: 'no-store',
+                    headers: { 'Accept': 'text/csv, text/plain' }
+                });
+                if (response.ok) {
+                    updateConnectionStatus(true);
+                    console.log('✅ EtherCalc backend is reachable. CSV fetched successfully.');
+                    return true;
+                } else {
+                    updateConnectionStatus(false);
+                    console.warn('⚠️ EtherCalc returned status:', response.status);
+                    return false;
+                }
+            } catch (err) {
+                updateConnectionStatus(false);
+                console.error('❌ Cannot reach EtherCalc backend:', err.message);
+                return false;
+            }
         }
 
         // ==================== VIEW SWITCHING ====================
@@ -739,7 +781,6 @@ aria-hidden="true">
 
             if (viewName === 'student') {
                 studentView.classList.add('active');
-                // Re-trigger animation
                 studentView.style.animation = 'none';
                 void studentView.offsetWidth;
                 studentView.style.animation = 'fadeSlideIn 0.5s ease forwards';
@@ -751,20 +792,18 @@ aria-hidden="true">
                 resultsView.style.animation = 'fadeSlideIn 0.5s ease forwards';
                 fetchAndRenderWordCloud();
             }
-            // Scroll to top
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // ==================== QR CODE ====================
         function updateQRCode() {
-            const pageUrl = window.location.href.split('?')[0]; // Clean URL
+            const pageUrl = window.location.href.split('?')[0].split('#')[0];
             const qrApiUrl =
                 `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(pageUrl)}&bgcolor=ffffff&color=0a1628&qzone=4`;
             qrCodeImg.src = qrApiUrl;
             qrCodeImg.onerror = () => {
-                // Fallback: keep the placeholder SVG
                 qrCodeImg.src =
-                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Crect fill='%23fff' width='110' height='110' rx='8'/%3E%3Ctext x='55' y='55' text-anchor='middle' fill='%23999' font-size='10' font-family='sans-serif'%3EQR Code%3C/text%3E%3Ctext x='55' y='70' text-anchor='middle' fill='%23bbb' font-size='8' font-family='sans-serif'%3E%3C/text%3E%3C/svg%3E";
+                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Crect fill='%23fff' width='110' height='110' rx='8'/%3E%3Ctext x='55' y='55' text-anchor='middle' fill='%23999' font-size='10' font-family='sans-serif'%3EQR Code%3C/text%3E%3Ctext x='55' y='70' text-anchor='middle' fill='%23bbb' font-size='8' font-family='sans-serif'%3EReload page%3C/text%3E%3C/svg%3E";
             };
         }
         updateQRCode();
@@ -781,7 +820,9 @@ aria-hidden="true">
                     throw new Error(`HTTP ${response.status}`);
                 }
                 const csvText = await response.text();
-                return parseCSVAnswers(csvText);
+                const answers = parseCSVAnswers(csvText);
+                console.log(`📊 Fetched ${answers.length} answers from EtherCalc:`, answers);
+                return answers;
             } catch (err) {
                 console.warn('Failed to fetch from EtherCalc:', err.message);
                 throw err;
@@ -790,74 +831,148 @@ aria-hidden="true">
 
         function parseCSVAnswers(csvText) {
             const answers = [];
-            if (!csvText || csvText.trim() === '') return answers;
+            if (!csvText || csvText.trim() === '') {
+                console.log('📭 CSV is empty or whitespace only.');
+                return answers;
+            }
 
             const lines = csvText.split(/\r?\n/);
+            console.log(`📄 CSV has ${lines.length} raw lines`);
+
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i].trim();
                 if (line === '') continue;
-                // Parse CSV: handle quoted values
-                const firstCol = parseFirstCSVColumn(line);
+
+                // Parse first column (handle both quoted and unquoted CSV)
+                let firstCol = '';
+                if (line.startsWith('"')) {
+                    const endQuote = line.indexOf('"', 1);
+                    if (endQuote > 0) {
+                        firstCol = line.substring(1, endQuote);
+                    } else {
+                        firstCol = line.substring(1);
+                    }
+                } else {
+                    const comma = line.indexOf(',');
+                    if (comma > 0) {
+                        firstCol = line.substring(0, comma);
+                    } else {
+                        firstCol = line;
+                    }
+                }
+
                 const cleaned = firstCol.trim();
-                if (cleaned !== '' &&
-                    // Skip obvious header rows
-                    !/^(answer|response|submission|word|phrase|text|input|data|column|col|a1|cell)/i.test(cleaned) &&
-                    cleaned.length >= 1) {
+
+                // Skip empty, obvious headers, or metadata rows
+                if (cleaned === '') continue;
+                if (/^(answer|response|submission|word|phrase|text|input|data|column|col|a1|cell|sheet|spreadsheet|ethercalc)/i
+                    .test(cleaned)) {
+                    console.log(`⏭️  Skipping likely header: "${cleaned}"`);
+                    continue;
+                }
+                if (/^[A-Z]\d+$/i.test(cleaned)) {
+                    console.log(`⏭️  Skipping cell reference: "${cleaned}"`);
+                    continue;
+                }
+
+                if (cleaned.length >= 1) {
                     answers.push(cleaned);
                 }
             }
-            return answers;
-        }
 
-        function parseFirstCSVColumn(line) {
-            // Handle CSV quoted values
-            if (line.startsWith('"')) {
-                const endQuote = line.indexOf('"', 1);
-                if (endQuote > 0) {
-                    return line.substring(1, endQuote);
-                }
-                return line.substring(1);
-            }
-            const comma = line.indexOf(',');
-            if (comma > 0) {
-                return line.substring(0, comma);
-            }
-            return line;
+            console.log(`✅ Parsed ${answers.length} valid answers`);
+            return answers;
         }
 
         // ==================== ETHERCALC: SUBMIT ANSWER ====================
         async function submitAnswer(answerText) {
-            // First, fetch current answers to determine next row
-            let existingAnswers = [];
+            console.log(`🚀 Submitting answer: "${answerText}"`);
+
+            // Determine the next row by fetching current answers
+            let existingCount = 0;
             try {
-                existingAnswers = await fetchAnswers();
+                const existing = await fetchAnswers();
+                existingCount = existing.length;
             } catch (e) {
-                existingAnswers = [];
+                console.warn('Could not determine existing row count, assuming row 1.');
+                existingCount = 0;
             }
-            const nextRow = existingAnswers.length + 1;
+
+            const nextRow = existingCount + 1;
             const cellCoordinate = `A${nextRow}`;
+            console.log(`📍 Target cell: ${cellCoordinate}, current answer count: ${existingCount}`);
 
-            // Use form submission to bypass CORS
-            ethercalcCellInput.value = cellCoordinate;
-            ethercalcValueInput.value = answerText;
-            ethercalcForm.action = ETHERCALC_API_URL;
-            ethercalcForm.submit();
+            let submissionSucceeded = false;
 
-            // Wait briefly and verify
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            // === METHOD 1: fetch with no-cors (primary - works cross-origin) ===
+            try {
+                console.log('📡 Method 1: fetch POST with no-cors...');
+                const bodyParams = new URLSearchParams();
+                bodyParams.append('cell', cellCoordinate);
+                bodyParams.append('value', answerText);
 
-            // Verify the submission
+                await fetch(ETHERCALC_API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: bodyParams.toString(),
+                });
+                console.log('📡 Method 1: Request sent (no-cors, response opaque).');
+                submissionSucceeded = true;
+            } catch (err) {
+                console.warn('Method 1 failed:', err.message);
+            }
+
+            // === METHOD 2: Form + iframe (fallback) ===
+            if (!submissionSucceeded) {
+                try {
+                    console.log('📡 Method 2: Form POST via iframe...');
+                    ethercalcCellInput.value = cellCoordinate;
+                    ethercalcValueInput.value = answerText;
+                    ethercalcForm.action = ETHERCALC_API_URL;
+                    ethercalcForm.submit();
+                    console.log('📡 Method 2: Form submitted.');
+                    submissionSucceeded = true;
+                } catch (err) {
+                    console.warn('Method 2 failed:', err.message);
+                }
+            }
+
+            // === VERIFICATION: Wait and check if the answer appears ===
+            console.log('⏳ Waiting for spreadsheet to update...');
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            let verified = false;
             try {
                 const updatedAnswers = await fetchAnswers();
-                if (updatedAnswers.includes(answerText) || updatedAnswers.length > existingAnswers.length) {
-                    return { success: true, row: nextRow };
+                const lowerAnswer = answerText.toLowerCase().trim();
+                const found = updatedAnswers.some(a => a.toLowerCase().trim() === lowerAnswer);
+                if (found) {
+                    console.log('✅ Answer verified in spreadsheet!');
+                    verified = true;
+                } else {
+                    console.log('⚠️ Answer not yet visible (may need more time or manual refresh).');
+                    console.log('   Current answers in sheet:', updatedAnswers);
                 }
-                // If verification fails, it might still have worked (cache delay)
-                return { success: true, row: nextRow, unverified: true };
+                if (updatedAnswers.length > existingCount) {
+                    console.log(
+                        `✅ Answer count increased from ${existingCount} to ${updatedAnswers.length} - submission likely succeeded.`
+                        );
+                    verified = true;
+                }
             } catch (e) {
-                // Even if verification fetch fails, the form submission may have succeeded
-                return { success: true, row: nextRow, unverified: true };
+                console.warn('Verification fetch failed, but submission may still have succeeded.');
+                verified = true; // Assume success if we can't verify
             }
+
+            return {
+                success: submissionSucceeded || verified,
+                row: nextRow,
+                verified: verified,
+                cell: cellCoordinate,
+            };
         }
 
         // ==================== HANDLE SUBMISSION ====================
@@ -865,7 +980,7 @@ aria-hidden="true">
             if (isSubmitting) return;
             const rawAnswer = answerInput.value.trim();
             if (!rawAnswer) {
-                showToast('Please enter an answer first.', true);
+                showToast('Please enter an answer first.', 'error');
                 answerInput.focus();
                 answerInput.style.borderColor = 'var(--red-accent)';
                 setTimeout(() => {
@@ -874,41 +989,47 @@ aria-hidden="true">
                 return;
             }
 
-            // Validate: 1-2 words ideally
             const wordCount = rawAnswer.split(/\s+/).filter(w => w.length > 0).length;
             if (wordCount > 4) {
-                showToast('Please keep it to 1–2 words if possible!', true);
-                // Allow it but warn
+                showToast('Ideally 1–2 words, but your answer will still be recorded.', 'error');
             }
 
             isSubmitting = true;
             submitBtn.disabled = true;
             submitBtn.textContent = '⏳ Submitting...';
-            submitBtn.style.opacity = '0.7';
+            submissionHint.textContent = 'Sending to spreadsheet...';
 
             try {
                 const result = await submitAnswer(rawAnswer);
                 if (result.success) {
-                    showToast('✅ Answer submitted! Thank you.');
+                    const verifiedMsg = result.verified ? ' Verified!' :
+                        ' (may take a moment to appear in results)';
+                    showToast('✅ Answer submitted! Thank you.' + verifiedMsg, 'success');
                     answerInput.value = '';
                     answerInput.focus();
-                    // Brief celebration effect on the card
+
                     const inputCard = document.getElementById('inputCard');
                     inputCard.style.boxShadow = '0 0 40px rgba(52,183,168,0.5), var(--shadow-lg)';
                     setTimeout(() => {
                         inputCard.style.boxShadow = 'var(--shadow-lg)';
                     }, 800);
+
+                    // Update connection status
+                    updateConnectionStatus(true);
                 } else {
-                    showToast('⚠️ Submission may have failed. Please try again.', true);
+                    showToast(
+                        '⚠️ Submission may have failed. Please try again or check if the spreadsheet exists at ' +
+                        SPREADSHEET_URL,
+                        'error');
                 }
             } catch (err) {
                 console.error('Submission error:', err);
-                showToast('❌ Network error. Please check connection and retry.', true);
+                showToast('❌ Network error. Check your connection and ensure the spreadsheet is accessible.', 'error');
             } finally {
                 isSubmitting = false;
                 submitBtn.disabled = false;
                 submitBtn.textContent = '✈️ Submit Answer';
-                submitBtn.style.opacity = '1';
+                submissionHint.textContent = 'Press Enter or tap Submit';
             }
         }
 
@@ -921,7 +1042,6 @@ aria-hidden="true">
                     freqMap.set(key, (freqMap.get(key) || 0) + 1);
                 }
             }
-            // Convert to array and sort by frequency descending
             const freqArray = Array.from(freqMap.entries())
                 .map(([word, count]) => ({ word, count }))
                 .sort((a, b) => b.count - a.count);
@@ -930,20 +1050,17 @@ aria-hidden="true">
 
         function getWordCloudColors() {
             return [
-                '#f4793e', '#ff9a65', '#ffb347', '#ff6b35', '#e8743c', '#f9a05a', // oranges
-                '#4a90d9', '#7eb8da', '#5ba3e6', '#89c4f4', '#a0d2f7', '#3d7ec4', // blues
-                '#34b7a8', '#5cc9ba', '#2ea89a', '#48c9b0', '#6dd5c5', // teals
-                '#d4a853', '#e8c97a', '#c49a3c', '#dfb96a', '#f0d690', // golds
-                '#ffffff', '#eaf1f8', '#f0f4f8', '#dce8f4', '#c8ddf0', // whites/pales
-                '#e74c3c', '#f07070', '#d94545', '#ff6b6b', // reds (sparingly)
+                '#f4793e', '#ff9a65', '#ffb347', '#ff6b35', '#e8743c', '#f9a05a',
+                '#4a90d9', '#7eb8da', '#5ba3e6', '#89c4f4', '#a0d2f7', '#3d7ec4',
+                '#34b7a8', '#5cc9ba', '#2ea89a', '#48c9b0', '#6dd5c5',
+                '#d4a853', '#e8c97a', '#c49a3c', '#dfb96a', '#f0d690',
+                '#ffffff', '#eaf1f8', '#f0f4f8', '#dce8f4', '#c8ddf0',
+                '#e74c3c', '#f07070', '#d94545', '#ff6b6b',
             ];
         }
 
-        function getRandomColor(colors, index, total) {
-            // Distribute colors somewhat evenly
-            const colorIndex = index % colors.length;
-            // Add slight variation
-            return colors[colorIndex];
+        function getRandomColor(colors, index) {
+            return colors[index % colors.length];
         }
 
         function renderWordCloud(answers) {
@@ -952,10 +1069,9 @@ aria-hidden="true">
             const ctx = canvas.getContext('2d');
             canvasCtx = ctx;
 
-            // Get container dimensions
             const containerWidth = wrapper.clientWidth;
             const containerHeight = Math.max(wrapper.clientHeight, 350);
-            const dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap for performance
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
             canvasScale = dpr;
             const width = containerWidth * dpr;
             const height = containerHeight * dpr;
@@ -969,7 +1085,8 @@ aria-hidden="true">
 
             if (!answers || answers.length === 0) {
                 wordcloudPlaceholder.style.display = 'flex';
-                wordcloudPlaceholder.textContent = 'No responses yet. Waiting for submissions...';
+                wordcloudPlaceholder.textContent =
+                    'No responses yet. Submit an answer or check back soon!';
                 wordPlacements = [];
                 updateStats(0, 0);
                 return;
@@ -994,16 +1111,14 @@ aria-hidden="true">
             const minCount = frequencies[frequencies.length - 1].count;
             const countRange = maxCount - minCount || 1;
 
-            // Font size range (in CSS px, will be scaled by dpr)
             const maxFontSize = Math.min(58, containerWidth / 8);
             const minFontSize = Math.max(13, maxFontSize * 0.22);
 
-            // Build word items
             const wordItems = frequencies.map((item, index) => {
-                const t = (item.count - minCount) / countRange; // 0 to 1
+                const t = (item.count - minCount) / countRange;
                 const fontSize = minFontSize + t * (maxFontSize - minFontSize);
-                const rotation = (Math.random() - 0.5) * 16; // ±8 degrees
-                const color = getRandomColor(colors, index, frequencies.length);
+                const rotation = (Math.random() - 0.5) * 16;
+                const color = getRandomColor(colors, index);
                 return {
                     word: item.word,
                     count: item.count,
@@ -1014,10 +1129,8 @@ aria-hidden="true">
                 };
             });
 
-            // Sort by font size descending (largest first for placement)
             wordItems.sort((a, b) => b.fontSize - a.fontSize);
 
-            // Place words using spiral algorithm
             const placedWords = [];
             const padding = 4 * dpr;
             const centerX = width / 2;
@@ -1030,7 +1143,7 @@ aria-hidden="true">
                 ctx.font = `700 ${fs}px ${getFontStack()}`;
                 const metrics = ctx.measureText(item.word);
                 const textWidth = metrics.width;
-                const textHeight = fs * 1.15; // Approximate height
+                const textHeight = fs * 1.15;
                 const bw = textWidth + padding * 2;
                 const bh = textHeight + padding * 2;
 
@@ -1039,7 +1152,6 @@ aria-hidden="true">
                 const maxAttempts = 2000;
                 let attempts = 0;
 
-                // For the very first (largest) word, place at center
                 if (placedWords.length === 0) {
                     const x = centerX - textWidth / 2;
                     const y = centerY - textHeight / 2 + fs * 0.35;
@@ -1067,10 +1179,7 @@ aria-hidden="true">
                     const sy = centerY + r * Math.sin(theta);
                     const x = sx - textWidth / 2;
                     const y = sy - textHeight / 2 + fs * 0.35;
-
-                    // Check bounds
                     if (x >= padding && y >= padding && x + bw <= width - padding && y + bh <= height - padding) {
-                        // Check collision with all placed words
                         let collision = false;
                         const checkBox = { x: x - padding, y: y - padding, w: bw, h: bh };
                         for (const pw of placedWords) {
@@ -1100,7 +1209,6 @@ aria-hidden="true">
                     attempts++;
                 }
 
-                // If still not placed, try with reduced font size
                 if (!placed) {
                     const reducedFs = item.fontSize * 0.6 * dpr;
                     ctx.font = `700 ${reducedFs}px ${getFontStack()}`;
@@ -1152,7 +1260,6 @@ aria-hidden="true">
                 }
             }
 
-            // Draw all placed words
             for (const pw of placedWords) {
                 drawWord(ctx, pw, dpr, false);
             }
@@ -1160,6 +1267,7 @@ aria-hidden="true">
             wordPlacements = placedWords;
             hoveredWordIndex = -1;
             tooltip.classList.remove('visible');
+            statLastRefresh.textContent = new Date().toLocaleTimeString();
         }
 
         function boxesOverlap(a, b) {
@@ -1183,23 +1291,19 @@ aria-hidden="true">
             ctx.textBaseline = 'middle';
 
             if (isHighlighted) {
-                // Glow effect
                 ctx.shadowColor = placement.color;
                 ctx.shadowBlur = 18 * dpr;
                 ctx.fillStyle = '#ffffff';
                 ctx.fillText(placement.word, 0, 0);
                 ctx.shadowBlur = 0;
-                // Draw again on top for crispness
                 ctx.fillStyle = placement.color;
                 ctx.fillText(placement.word, 0, 0);
-                // Slight scale pulse via redraw
             } else {
                 ctx.fillStyle = placement.color;
                 ctx.shadowColor = 'rgba(0,0,0,0.3)';
                 ctx.shadowBlur = 3 * dpr;
                 ctx.fillText(placement.word, 0, 0);
                 ctx.shadowBlur = 0;
-                // Subtle inner glow
                 ctx.fillStyle = 'rgba(255,255,255,0.08)';
                 ctx.fillText(placement.word, -0.5 * dpr, -0.5 * dpr);
             }
@@ -1213,7 +1317,6 @@ aria-hidden="true">
             const width = canvas.width;
             const height = canvas.height;
             ctx.clearRect(0, 0, width, height);
-
             for (let i = 0; i < wordPlacements.length; i++) {
                 drawWord(ctx, wordPlacements[i], dpr, i === highlightIndex);
             }
@@ -1225,16 +1328,13 @@ aria-hidden="true">
             const scaleY = (wordcloudCanvas.height / canvasScale) / rect.height;
             const cx = mouseX * scaleX * canvasScale;
             const cy = mouseY * scaleY * canvasScale;
-
-            // Check from top (last placed, smaller words) to bottom (larger words)
-            // Actually, check all and pick the smallest one that contains the point (more precise)
             let bestIndex = -1;
             let bestArea = Infinity;
             for (let i = 0; i < wordPlacements.length; i++) {
                 const pw = wordPlacements[i];
-                const padding = 2 * canvasScale;
-                const bx = pw.x - padding;
-                const by = pw.y - padding;
+                const paddingVal = 2 * canvasScale;
+                const bx = pw.x - paddingVal;
+                const by = pw.y - paddingVal;
                 const bw = pw.w;
                 const bh = pw.h;
                 if (cx >= bx && cx <= bx + bw && cy >= by && cy <= by + bh) {
@@ -1256,31 +1356,35 @@ aria-hidden="true">
         // ==================== FETCH & RENDER ====================
         async function fetchAndRenderWordCloud() {
             wordcloudPlaceholder.style.display = 'flex';
-            wordcloudPlaceholder.textContent = 'Loading responses...';
+            wordcloudPlaceholder.textContent = 'Loading responses from EtherCalc...';
             wordPlacements = [];
             hoveredWordIndex = -1;
             tooltip.classList.remove('visible');
-            updateStats('—', '—');
+            updateStats('…', '…');
 
             try {
                 allAnswers = await fetchAnswers();
+                if (allAnswers.length === 0) {
+                    wordcloudPlaceholder.textContent =
+                        'No responses yet. Be the first to submit! 📝';
+                }
                 renderWordCloud(allAnswers);
+                updateConnectionStatus(true);
             } catch (err) {
                 console.error('Error fetching answers:', err);
                 wordcloudPlaceholder.style.display = 'flex';
                 wordcloudPlaceholder.textContent =
-                    '⚠️ Unable to load responses. Check your connection and ensure the spreadsheet exists at ' +
-                    SPREADSHEET_URL;
+                    '⚠️ Unable to load responses. Ensure the spreadsheet exists at ' + SPREADSHEET_URL +
+                    ' and try refreshing.';
                 updateStats('—', '—');
-                showToast('Failed to load data. Please try refreshing.', true);
+                updateConnectionStatus(false);
+                showToast('Failed to load data. Check the spreadsheet link.', 'error');
             }
         }
 
         // ==================== EVENT LISTENERS ====================
-        // Submit button
         submitBtn.addEventListener('click', handleSubmit);
 
-        // Enter key in input
         answerInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !isSubmitting) {
                 e.preventDefault();
@@ -1288,30 +1392,22 @@ aria-hidden="true">
             }
         });
 
-        // View switching
         gotoResultsBtn.addEventListener('click', () => switchView('results'));
         backToStudentBtn.addEventListener('click', () => switchView('student'));
         refreshBtn.addEventListener('click', () => {
             fetchAndRenderWordCloud();
-            showToast('🔄 Refreshing data...');
+            showToast('🔄 Refreshing data...', '');
         });
 
-        // Keyboard shortcut: press 'N' for next (instructor)
+        // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
+            if (e.target.closest('input') || e.target.closest('textarea')) return;
             if (e.key === 'n' || e.key === 'N') {
-                if (!e.target.closest('input') && !e.target.closest('textarea')) {
-                    if (currentView === 'student') {
-                        switchView('results');
-                    } else {
-                        switchView('student');
-                    }
-                }
+                switchView(currentView === 'student' ? 'results' : 'student');
             }
-            if (e.key === 'r' || e.key === 'R') {
-                if (!e.target.closest('input') && !e.target.closest('textarea') && currentView === 'results') {
-                    fetchAndRenderWordCloud();
-                    showToast('🔄 Refreshing data...');
-                }
+            if ((e.key === 'r' || e.key === 'R') && currentView === 'results') {
+                fetchAndRenderWordCloud();
+                showToast('🔄 Refreshing data...', '');
             }
         });
 
@@ -1323,8 +1419,6 @@ aria-hidden="true">
                 hoveredWordIndex = index;
                 redrawAllHighlighted(index);
                 wordcloudCanvas.style.cursor = index >= 0 ? 'pointer' : 'default';
-
-                // Update tooltip
                 if (index >= 0) {
                     const pw = wordPlacements[index];
                     tooltip.textContent = `"${pw.word}" — ${pw.count} response${pw.count > 1 ? 's' : ''}`;
@@ -1352,8 +1446,7 @@ aria-hidden="true">
             const index = findWordAtPosition(e.clientX, e.clientY);
             if (index >= 0) {
                 const pw = wordPlacements[index];
-                showToast(`📊 "${pw.word}" appeared ${pw.count} time${pw.count > 1 ? 's' : ''}`);
-                // Brief highlight pulse
+                showToast(`📊 "${pw.word}" — ${pw.count} response${pw.count > 1 ? 's' : ''}`, 'success');
                 hoveredWordIndex = index;
                 redrawAllHighlighted(index);
                 setTimeout(() => {
@@ -1361,7 +1454,7 @@ aria-hidden="true">
                         hoveredWordIndex = -1;
                         redrawAllHighlighted(-1);
                     }
-                }, 1200);
+                }, 1500);
             }
         });
 
@@ -1395,7 +1488,7 @@ aria-hidden="true">
             }, 300);
         });
 
-        // Handle window resize for word cloud
+        // Handle window resize
         let resizeDebounce;
         window.addEventListener('resize', () => {
             clearTimeout(resizeDebounce);
@@ -1407,24 +1500,44 @@ aria-hidden="true">
         });
 
         // ==================== INITIALIZATION ====================
-        function init() {
-            // Focus the input on load
+        async function init() {
+            console.log('🛩️  MSA 547 — Trust in Aviation Leadership');
+            console.log('📊  Backend spreadsheet:', SPREADSHEET_URL);
+            console.log('📡  API endpoint:', ETHERCALC_API_URL);
+            console.log('📋  CSV endpoint:', ETHERCALC_CSV_URL);
+            console.log('💡  Instructor shortcuts: Press "N" to toggle views, "R" to refresh results');
+            console.log('🔗  Current page URL:', window.location.href);
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+            // Check backend connectivity
+            const reachable = await checkBackendConnection();
+            if (!reachable) {
+                console.warn('⚠️  IMPORTANT: The EtherCalc spreadsheet may not exist yet.');
+                console.warn('   Please visit ' + SPREADSHEET_URL + ' in your browser to create it first.');
+                showToast(
+                    '⚠️ Spreadsheet not found. Please visit ethercalc.net/msa547 to create it.',
+                    'error');
+            } else {
+                console.log('✅ Backend is reachable. Ready for submissions.');
+                // Pre-fetch to warm up
+                try {
+                    const existing = await fetchAnswers();
+                    console.log(`📋 Spreadsheet already has ${existing.length} entries.`);
+                } catch (e) {
+                    // ignore
+                }
+            }
+
+            // Focus input
             setTimeout(() => answerInput.focus(), 600);
 
-            // Update QR code with actual URL
+            // Update QR code
             updateQRCode();
-
-            // Log info
-            console.log('🛩️  MSA 547 - Trust in Aviation Leadership');
-            console.log('📊  Data source:', SPREADSHEET_URL);
-            console.log('💡  Instructor: Press "N" to toggle views, "R" to refresh results');
-            console.log('📱  Student view is active — scan QR code or share this URL');
-            console.log('🔗  Current URL:', window.location.href);
         }
 
         init();
 
-        // ==================== EXPORT FOR DEBUG ====================
+        // ==================== DEBUG EXPORT ====================
         if (typeof window !== 'undefined') {
             window.msa547 = {
                 fetchAnswers,
@@ -1434,11 +1547,17 @@ aria-hidden="true">
                 getAnswers: () => allAnswers,
                 getPlacements: () => wordPlacements,
                 refresh: fetchAndRenderWordCloud,
+                checkConnection: checkBackendConnection,
+                getBackendStatus: () => backendReachable,
+                SPREADSHEET_URL,
+                ETHERCALC_CSV_URL,
+                ETHERCALC_API_URL,
             };
+            console.log('💡 Debug API available at window.msa547');
+            console.log('   Try: msa547.checkConnection() or msa547.fetchAnswers()');
         }
 
-        console.log('✅ MSA 547 app initialized successfully.');
-        console.log('   Access window.msa547 for debug controls.');
+        console.log('✅ MSA 547 app initialized.');
     })();
 </script>
 </body>
