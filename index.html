@@ -7,29 +7,20 @@
     <style>
         :root {
             --navy: #0a1628;
-            --dark-blue: #0d1f3c;
             --panel-bg: #111d33;
             --sky-blue: #4a90d9;
-            --light-blue: #7eb8da;
             --pale-blue: #b8d4f0;
-            --white: #eaf1f8;
             --pure-white: #ffffff;
             --orange: #f4793e;
-            --orange-glow: #ff9a65;
-            --gold: #d4a853;
             --teal: #34b7a8;
             --red-accent: #e74c3c;
             --green-accent: #2ecc71;
-            --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.10);
-            --glass-hover: rgba(255, 255, 255, 0.06);
             --shadow-lg: 0 25px 60px rgba(0, 0, 0, 0.5);
             --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.4);
-            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
             --radius-xl: 24px;
             --radius-lg: 18px;
             --radius-md: 12px;
-            --radius-sm: 8px;
             --transition: 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             --font-display: 'Georgia', 'Times New Roman', serif;
             --font-body: 'Segoe UI', 'Inter', 'Helvetica Neue', system-ui, -apple-system, sans-serif;
@@ -53,19 +44,17 @@
             background-image:
                 radial-gradient(ellipse at 30% 20%, rgba(74, 144, 217, 0.12) 0%, transparent 60%),
                 radial-gradient(ellipse at 70% 60%, rgba(244, 121, 62, 0.07) 0%, transparent 55%),
-                radial-gradient(ellipse at 50% 80%, rgba(52, 183, 168, 0.06) 0%, transparent 50%),
-                radial-gradient(ellipse at 20% 70%, rgba(212, 168, 83, 0.05) 0%, transparent 45%);
+                radial-gradient(ellipse at 50% 80%, rgba(52, 183, 168, 0.06) 0%, transparent 50%);
             min-height: 100vh;
-            min-height: 100dvh;
-            color: var(--white);
+            color: var(--pure-white);
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 16px;
             overflow-x: hidden;
-            position: relative;
         }
 
+        /* Starfield */
         .starfield {
             position: fixed;
             inset: 0;
@@ -88,7 +77,7 @@
             }
             50% {
                 opacity: 0.9;
-                transform: scale(1.9);
+                transform: scale(1.8);
             }
         }
 
@@ -150,18 +139,6 @@
             border-radius: 3px;
             background: var(--orange);
             margin: 6px 0 14px;
-            position: relative;
-        }
-        .accent-line::after {
-            content: '';
-            position: absolute;
-            right: -20px;
-            top: 0;
-            width: 6px;
-            height: 3px;
-            border-radius: 3px;
-            background: var(--sky-blue);
-            opacity: 0.7;
         }
 
         .question-text {
@@ -171,8 +148,6 @@
             line-height: 1.35;
             color: var(--pure-white);
             letter-spacing: 0.01em;
-            position: relative;
-            z-index: 1;
         }
         .subtitle {
             font-size: 0.8rem;
@@ -189,13 +164,6 @@
             font-weight: 500;
         }
 
-        .input-group {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
         .answer-input {
             width: 100%;
             padding: 16px 18px;
@@ -207,12 +175,11 @@
             color: var(--pure-white);
             outline: none;
             transition: var(--transition);
-            letter-spacing: 0.02em;
         }
         .answer-input:focus {
             border-color: var(--sky-blue);
             background: rgba(74, 144, 217, 0.08);
-            box-shadow: 0 0 0 8px rgba(74, 144, 217, 0.06), 0 0 30px rgba(74, 144, 217, 0.1);
+            box-shadow: 0 0 0 8px rgba(74, 144, 217, 0.06);
         }
         .answer-input::placeholder {
             color: rgba(255, 255, 255, 0.3);
@@ -227,17 +194,12 @@
             padding: 14px 28px;
             font-size: 1rem;
             font-weight: 600;
-            font-family: var(--font-body);
             letter-spacing: 0.03em;
             border-radius: 50px;
             cursor: pointer;
             border: none;
             transition: var(--transition);
-            position: relative;
-            z-index: 1;
-            text-decoration: none;
             white-space: nowrap;
-            -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
         .btn:active {
@@ -252,14 +214,12 @@
         }
         .btn-primary:hover {
             background: #ff8c55;
-            box-shadow: 0 12px 32px rgba(244, 121, 62, 0.5);
             transform: translateY(-2px);
         }
         .btn-primary:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
-            box-shadow: 0 4px 12px rgba(244, 121, 62, 0.2);
         }
         .btn-secondary {
             background: transparent;
@@ -269,15 +229,14 @@
             font-size: 0.9rem;
         }
         .btn-secondary:hover {
-            background: var(--glass-hover);
-            border-color: rgba(255, 255, 255, 0.25);
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.25);
             color: var(--pure-white);
         }
         .btn-small {
             padding: 8px 16px;
             font-size: 0.8rem;
             border-radius: 30px;
-            letter-spacing: 0.05em;
         }
 
         .btn-row {
@@ -285,15 +244,14 @@
             gap: 10px;
             flex-wrap: wrap;
             align-items: center;
-            position: relative;
-            z-index: 1;
         }
         .btn-row.between {
             justify-content: space-between;
         }
 
+        /* QR code – visible only on larger screens (instructor) */
         .qr-section {
-            display: flex;
+            display: none; /* hidden on mobile */
             align-items: center;
             gap: 18px;
             padding: 16px 18px;
@@ -302,7 +260,11 @@
             border: 1px dashed var(--glass-border);
             position: relative;
             z-index: 1;
-            flex-wrap: wrap;
+        }
+        @media (min-width: 769px) {
+            .qr-section {
+                display: flex;
+            }
         }
         .qr-code-img {
             width: 110px;
@@ -311,26 +273,11 @@
             background: #fff;
             padding: 6px;
             flex-shrink: 0;
-            box-shadow: var(--shadow-sm);
-        }
-        .qr-info {
-            flex: 1;
-            min-width: 140px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
+            box-shadow: var(--shadow-md);
         }
         .qr-info .qr-title {
             font-weight: 700;
             font-size: 0.9rem;
-            color: var(--pure-white);
-            letter-spacing: 0.03em;
-        }
-        .qr-info .qr-desc {
-            font-size: 0.75rem;
-            color: var(--pale-blue);
-            opacity: 0.8;
-            line-height: 1.4;
         }
 
         .toast {
@@ -345,13 +292,11 @@
             border-radius: 50px;
             font-weight: 600;
             font-size: 0.9rem;
-            letter-spacing: 0.03em;
             z-index: 100;
             box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
             transition: transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.15);
             pointer-events: none;
             text-align: center;
-            max-width: 90vw;
         }
         .toast.show {
             transform: translateX(-50%) translateY(0);
@@ -364,19 +309,16 @@
         .toast.success {
             background: #1a3d2e;
             border-color: var(--green-accent);
-            color: #d4f7f0;
         }
 
         .wordcloud-wrapper {
             position: relative;
-            z-index: 1;
             width: 100%;
             border-radius: var(--radius-lg);
             overflow: hidden;
             background: rgba(0, 0, 0, 0.25);
             border: 1px solid var(--glass-border);
             box-shadow: var(--shadow-md);
-            cursor: default;
             min-height: 350px;
             display: flex;
             align-items: center;
@@ -386,7 +328,6 @@
             display: block;
             width: 100%;
             height: auto;
-            transition: opacity 0.6s ease;
         }
         .wordcloud-placeholder {
             color: rgba(255, 255, 255, 0.4);
@@ -407,11 +348,9 @@
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 600;
-            letter-spacing: 0.03em;
             z-index: 50;
             opacity: 0;
-            transition: opacity 0.2s ease;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+            transition: opacity 0.2s;
             white-space: nowrap;
         }
         .tooltip.visible {
@@ -424,16 +363,12 @@
             flex-wrap: wrap;
             font-size: 0.8rem;
             color: var(--pale-blue);
-            letter-spacing: 0.04em;
-            position: relative;
-            z-index: 1;
         }
         .stat-item {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 8px 14px;
+            background: rgba(255,255,255,0.03);
+            padding: 6px 14px;
             border-radius: 20px;
             border: 1px solid var(--glass-border);
-            font-weight: 500;
         }
         .stat-value {
             color: var(--pure-white);
@@ -441,1124 +376,490 @@
             font-size: 1.1rem;
         }
 
+        .connection-status {
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            justify-content: center;
+        }
         .status-indicator {
-            display: inline-block;
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            margin-right: 6px;
-            animation: pulse 2s infinite;
+            display: inline-block;
         }
-        .status-indicator.ok {
-            background: var(--green-accent);
-        }
-        .status-indicator.warn {
-            background: var(--orange);
-        }
-        .status-indicator.err {
-            background: var(--red-accent);
-        }
-        @keyframes pulse {
-            0%,
-            100% {
-                box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4);
-            }
-            50% {
-                box-shadow: 0 0 0 12px rgba(46, 204, 113, 0);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .card {
-                padding: 20px 16px;
-                border-radius: var(--radius-lg);
-            }
-            .question-text {
-                font-size: 1.2rem;
-            }
-            .btn-primary {
-                padding: 14px 28px;
-                font-size: 0.95rem;
-                width: 100%;
-            }
-            .btn-row {
-                flex-direction: column;
-                width: 100%;
-            }
-            .btn-row .btn {
-                width: 100%;
-                text-align: center;
-            }
-            .qr-section {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-            }
-            .qr-code-img {
-                width: 90px;
-                height: 90px;
-            }
-            .wordcloud-wrapper {
-                min-height: 280px;
-                border-radius: var(--radius-md);
-            }
-            .stats-bar {
-                justify-content: center;
-            }
-        }
-        @media (min-width: 768px) {
-            .app-container {
-                max-width: 620px;
-            }
-            .question-text {
-                font-size: 1.6rem;
-            }
-            .wordcloud-wrapper {
-                min-height: 420px;
-            }
-        }
-        @media (min-width: 1024px) {
-            .app-container {
-                max-width: 700px;
-            }
-            .wordcloud-wrapper {
-                min-height: 480px;
-            }
-        }
+        .status-indicator.ok { background: var(--green-accent); }
+        .status-indicator.err { background: var(--red-accent); }
+        .status-indicator.warn { background: var(--orange); }
     </style>
 </head>
 <body>
-
     <!-- Starfield background -->
     <div class="starfield" id="starfield" aria-hidden="true"></div>
-
     <!-- Toast notification -->
     <div class="toast" id="toast" aria-live="polite"></div>
-
     <!-- Tooltip for word cloud -->
     <div class="tooltip" id="tooltip" aria-hidden="true"></div>
+    <!-- Hidden iframe for submission (GET navigation, no sandbox) -->
+    <iframe id="ethercalcSubmitFrame" style="display:none;width:0;height:0;border:none;" title="hidden submission frame"></iframe>
 
-    <!-- Hidden iframe for form-based submission fallback -->
-    <iframe name="ethercalcSubmitFrame" id="ethercalcSubmitFrame"
-    style="display:none;width:0;height:0;border:none;"
-    title="Hidden submission frame"
-    allow="forms">
-</iframe>
+    <div class="app-container" id="appContainer">
+        <!-- STUDENT VIEW -->
+        <div class="view active" id="studentView">
+            <div class="card">
+                <span class="subtitle">MSA 547 · Leadership &amp; Critical Decision-Making</span>
+                <div class="accent-line"></div>
+                <h1 class="question-text">In one or two words,<br>what makes you trust an aviation leader?</h1>
+            </div>
 
-<!-- Hidden form for EtherCalc POST (fallback method) -->
-<form id="ethercalcForm"
-action="https://ethercalc.net/_/msa547"
-method="POST"
-target="ethercalcSubmitFrame"
-enctype="application/x-www-form-urlencoded"
-style="display:none;"
-aria-hidden="true">
-<input type="hidden" name="cell" id="ethercalcCellInput" value="">
-<input type="hidden" name="value" id="ethercalcValueInput" value="">
-</form>
+            <!-- QR Code section (visible only on large screens) -->
+            <div class="qr-section" id="qrSection">
+                <img class="qr-code-img" id="qrCodeImg"
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Crect fill='%23fff' width='110' height='110' rx='8'/%3E%3Ctext x='55' y='58' text-anchor='middle' fill='%23999' font-size='11' font-family='sans-serif'%3EQR%3C/text%3E%3C/svg%3E"
+                alt="QR Code" loading="lazy">
+                <div class="qr-info">
+                    <span class="qr-title">📱 Scan to participate</span>
+                    <span style="font-size:0.7rem;opacity:0.8;">(visible on instructor screen)</span>
+                </div>
+            </div>
 
-<!-- Main App -->
-<div class="app-container" id="appContainer">
+            <!-- Answer card -->
+            <div class="card" id="inputCard">
+                <div class="input-group" style="display:flex;flex-direction:column;gap:8px;">
+                    <label class="label-text" for="answerInput">Your answer (1–2 words):</label>
+                    <input type="text" id="answerInput" class="answer-input" placeholder="e.g. Clear communication" maxlength="80" autocomplete="off">
+                </div>
+                <div style="height:16px;"></div>
+                <button class="btn btn-primary" id="submitBtn">✈️ Submit Answer</button>
+                <div id="submissionHint" style="margin-top:10px;font-size:0.7rem;color:rgba(255,255,255,0.35);text-align:center;">
+                    Press Enter or tap Submit
+                </div>
+            </div>
 
-    <!-- ==================== STUDENT VIEW ==================== -->
-    <div class="view active" id="studentView">
-        <div class="card">
-            <span class="subtitle">MSA 547 · Leadership &amp; Critical Decision-Making</span>
-            <div class="accent-line"></div>
-            <h1 class="question-text">
-                In one or two words,<br>what makes you trust an aviation leader?
-            </h1>
-        </div>
-
-        <!-- QR Code Section -->
-        <div class="qr-section" id="qrSection">
-            <img class="qr-code-img" id="qrCodeImg"
-            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Crect fill='%23fff' width='110' height='110' rx='8'/%3E%3Ctext x='55' y='58' text-anchor='middle' fill='%23999' font-size='11' font-family='sans-serif'%3EQR%3C/text%3E%3C/svg%3E"
-            alt="QR Code - Scan to participate" loading="lazy">
-            <div class="qr-info">
-                <span class="qr-title">📱 Scan to Participate</span>
-                <span class="qr-desc">Open this page on your phone to submit your answer.<br><small style="opacity:0.7;">Data stored at ethercalc.net/msa547</small></span>
+            <div style="text-align:center;">
+                <button class="btn btn-small btn-secondary" id="gotoResultsBtn">🔒 Instructor: View Results →</button>
+                <div class="connection-status" id="connectionStatus">
+                    <span class="status-indicator warn" id="statusDot"></span> Checking backend...
+                </div>
             </div>
         </div>
 
-        <!-- Input Card -->
-        <div class="card" id="inputCard">
-            <div class="input-group">
-                <label class="label-text" for="answerInput">Your answer (1–2 words):</label>
-                <input
-                type="text"
-                id="answerInput"
-                class="answer-input"
-                placeholder="e.g. Clear communication"
-                maxlength="80"
-                autocomplete="off"
-                spellcheck="true"
-                aria-label="Your answer"
-                >
+        <!-- RESULTS VIEW -->
+        <div class="view" id="resultsView">
+            <div class="card">
+                <span class="subtitle">MSA 547 · Live Poll Results</span>
+                <div class="accent-line"></div>
+                <h1 class="question-text" style="font-size:1.2rem;">"In one or two words, what makes you trust an aviation leader?"</h1>
+                <div class="stats-bar" id="statsBar">
+                    <span class="stat-item">Responses: <span class="stat-value" id="statCount">—</span></span>
+                    <span class="stat-item">Unique: <span class="stat-value" id="statUnique">—</span></span>
+                    <span class="stat-item" id="statLastRefresh" style="font-size:0.7rem;">just now</span>
+                </div>
             </div>
-            <div style="height:16px;"></div>
-            <div class="btn-row">
-                <button class="btn btn-primary" id="submitBtn" type="button">
-                    ✈️ Submit Answer
-                </button>
-            </div>
-            <div style="margin-top:10px;font-size:0.7rem;color:rgba(255,255,255,0.35);text-align:center;" id="submissionHint">
-                Press Enter or tap Submit
-            </div>
-        </div>
 
-        <!-- Instructor hint & connection status -->
-        <div style="text-align:center;position:relative;z-index:1;display:flex;flex-direction:column;gap:8px;align-items:center;">
-            <button class="btn btn-small btn-secondary" id="gotoResultsBtn" type="button" title="Instructor: Show Results">
-                🔒 Instructor: View Results →
-            </button>
-            <span style="font-size:0.65rem;color:rgba(255,255,255,0.3);" id="connectionStatus">
-                <span class="status-indicator" id="statusDot"></span> Checking backend...
-            </span>
+            <div class="wordcloud-wrapper" id="wordcloudWrapper">
+                <canvas id="wordcloudCanvas" aria-label="Word cloud"></canvas>
+                <div class="wordcloud-placeholder" id="wordcloudPlaceholder">Loading responses...</div>
+            </div>
+
+            <div class="btn-row between">
+                <button class="btn btn-small btn-secondary" id="refreshBtn">🔄 Refresh Data</button>
+                <button class="btn btn-small btn-secondary" id="backToStudentBtn">← Back to Question</button>
+            </div>
+            <div style="text-align:center;font-size:0.7rem;color:rgba(255,255,255,0.35);margin-top:4px;">
+                Data from <a href="https://ethercalc.net/msa547" target="_blank" rel="noopener" style="color:var(--sky-blue);">ethercalc.net/msa547</a>
+            </div>
         </div>
     </div>
 
-    <!-- ==================== RESULTS VIEW ==================== -->
-    <div class="view" id="resultsView">
-        <div class="card">
-            <span class="subtitle">MSA 547 · Live Poll Results</span>
-            <div class="accent-line"></div>
-            <h1 class="question-text" style="font-size:1.2rem;">
-                "In one or two words, what makes you trust an aviation leader?"
-            </h1>
-            <div class="stats-bar" id="statsBar">
-                <span class="stat-item">Responses: <span class="stat-value" id="statCount">—</span></span>
-                <span class="stat-item">Unique: <span class="stat-value" id="statUnique">—</span></span>
-                <span class="stat-item" id="statLastRefresh" style="font-size:0.7rem;">Just now</span>
-            </div>
-        </div>
+    <script>
+        (function() {
+            // DOM elements
+            const studentView = document.getElementById('studentView');
+            const resultsView = document.getElementById('resultsView');
+            const answerInput = document.getElementById('answerInput');
+            const submitBtn = document.getElementById('submitBtn');
+            const gotoResultsBtn = document.getElementById('gotoResultsBtn');
+            const backToStudentBtn = document.getElementById('backToStudentBtn');
+            const refreshBtn = document.getElementById('refreshBtn');
+            const toast = document.getElementById('toast');
+            const tooltip = document.getElementById('tooltip');
+            const wordcloudCanvas = document.getElementById('wordcloudCanvas');
+            const wordcloudPlaceholder = document.getElementById('wordcloudPlaceholder');
+            const statCount = document.getElementById('statCount');
+            const statUnique = document.getElementById('statUnique');
+            const statLastRefresh = document.getElementById('statLastRefresh');
+            const qrCodeImg = document.getElementById('qrCodeImg');
+            const submitFrame = document.getElementById('ethercalcSubmitFrame');
+            const connectionStatus = document.getElementById('connectionStatus');
+            const statusDot = document.getElementById('statusDot');
+            const submissionHint = document.getElementById('submissionHint');
 
-        <!-- Word Cloud -->
-        <div class="wordcloud-wrapper" id="wordcloudWrapper">
-            <canvas id="wordcloudCanvas" aria-label="Word cloud of student responses"></canvas>
-            <div class="wordcloud-placeholder" id="wordcloudPlaceholder">
-                Loading responses...
-            </div>
-        </div>
+            const ETHERCALC_CSV = 'https://ethercalc.net/msa547.csv';
+            const ETHERCALC_API = 'https://ethercalc.net/_/msa547';
+            const SHEET_URL = 'https://ethercalc.net/msa547';
 
-        <!-- Controls -->
-        <div class="btn-row between">
-            <button class="btn btn-small btn-secondary" id="refreshBtn" type="button">
-                🔄 Refresh Data
-            </button>
-            <button class="btn btn-small btn-secondary" id="backToStudentBtn" type="button">
-                ← Back to Question
-            </button>
-        </div>
-        <div style="text-align:center;font-size:0.7rem;color:rgba(255,255,255,0.35);letter-spacing:0.05em;position:relative;z-index:1;">
-            Data from <a href="https://ethercalc.net/msa547" target="_blank" rel="noopener" style="color:var(--sky-blue);">ethercalc.net/msa547</a> · Click or tap words for details
-        </div>
-    </div>
+            let currentView = 'student';
+            let allAnswers = [];
+            let wordPlacements = [];
+            let hoveredIndex = -1;
+            let canvasCtx, canvasScale = 1;
+            let isSubmitting = false;
+            let backendReachable = null;
 
-</div>
-
-<script>
-    (function() {
-        // ==================== DOM ELEMENTS ====================
-        const studentView = document.getElementById('studentView');
-        const resultsView = document.getElementById('resultsView');
-        const answerInput = document.getElementById('answerInput');
-        const submitBtn = document.getElementById('submitBtn');
-        const gotoResultsBtn = document.getElementById('gotoResultsBtn');
-        const backToStudentBtn = document.getElementById('backToStudentBtn');
-        const refreshBtn = document.getElementById('refreshBtn');
-        const toast = document.getElementById('toast');
-        const tooltip = document.getElementById('tooltip');
-        const wordcloudWrapper = document.getElementById('wordcloudWrapper');
-        const wordcloudCanvas = document.getElementById('wordcloudCanvas');
-        const wordcloudPlaceholder = document.getElementById('wordcloudPlaceholder');
-        const statCount = document.getElementById('statCount');
-        const statUnique = document.getElementById('statUnique');
-        const statLastRefresh = document.getElementById('statLastRefresh');
-        const qrCodeImg = document.getElementById('qrCodeImg');
-        const ethercalcForm = document.getElementById('ethercalcForm');
-        const ethercalcCellInput = document.getElementById('ethercalcCellInput');
-        const ethercalcValueInput = document.getElementById('ethercalcValueInput');
-        const starfield = document.getElementById('starfield');
-        const connectionStatus = document.getElementById('connectionStatus');
-        const statusDot = document.getElementById('statusDot');
-        const submissionHint = document.getElementById('submissionHint');
-
-        // ==================== CONSTANTS ====================
-        const ETHERCALC_CSV_URL = 'https://ethercalc.net/msa547.csv';
-        const ETHERCALC_API_URL = 'https://ethercalc.net/_/msa547';
-        const SPREADSHEET_URL = 'https://ethercalc.net/msa547';
-
-        // ==================== STATE ====================
-        let currentView = 'student';
-        let wordPlacements = [];
-        let hoveredWordIndex = -1;
-        let allAnswers = [];
-        let isSubmitting = false;
-        let canvasCtx = null;
-        let canvasScale = 1;
-        let backendReachable = null; // null=unknown, true=reachable, false=unreachable
-
-        // ==================== STARFIELD ====================
-        function createStarfield() {
-            const count = 80;
-            let html = '';
-            for (let i = 0; i < count; i++) {
-                const size = Math.random() * 2.2 + 0.6;
-                const x = Math.random() * 100;
-                const y = Math.random() * 100;
-                const dur = Math.random() * 3 + 2.5;
-                const delay = Math.random() * 4;
-                html +=
-                    `<div class="star" style="left:${x}%;top:${y}%;width:${size}px;height:${size}px;--dur:${dur}s;--delay:${delay}s;"></div>`;
-            }
-            starfield.innerHTML = html;
-        }
-        createStarfield();
-
-        // ==================== TOAST ====================
-        let toastTimeout;
-
-        function showToast(message, type = '') {
-            clearTimeout(toastTimeout);
-            toast.textContent = message;
-            toast.className = 'toast ' + type;
-            void toast.offsetWidth;
-            toast.classList.add('show');
-            toastTimeout = setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3200);
-        }
-
-        // ==================== CONNECTION STATUS ====================
-        function updateConnectionStatus(reachable) {
-            backendReachable = reachable;
-            if (reachable === true) {
-                statusDot.className = 'status-indicator ok';
-                connectionStatus.innerHTML =
-                    '<span class="status-indicator ok"></span> Backend connected · <a href="' + SPREADSHEET_URL +
-                    '" target="_blank" rel="noopener" style="color:var(--sky-blue);">Open spreadsheet</a>';
-            } else if (reachable === false) {
-                statusDot.className = 'status-indicator err';
-                connectionStatus.innerHTML =
-                    '<span class="status-indicator err"></span> Backend unreachable · <a href="' + SPREADSHEET_URL +
-                    '" target="_blank" rel="noopener" style="color:var(--orange);">Check spreadsheet exists</a>';
-            } else {
-                statusDot.className = 'status-indicator warn';
-                connectionStatus.innerHTML = '<span class="status-indicator warn"></span> Checking backend...';
-            }
-        }
-
-        async function checkBackendConnection() {
-            updateConnectionStatus(null);
-            try {
-                const response = await fetch(ETHERCALC_CSV_URL, {
-                    method: 'GET',
-                    cache: 'no-store',
-                    headers: { 'Accept': 'text/csv, text/plain' }
-                });
-                if (response.ok) {
-                    updateConnectionStatus(true);
-                    console.log('✅ EtherCalc backend is reachable. CSV fetched successfully.');
-                    return true;
-                } else {
-                    updateConnectionStatus(false);
-                    console.warn('⚠️ EtherCalc returned status:', response.status);
-                    return false;
+            // Starfield
+            (function() {
+                const sf = document.getElementById('starfield');
+                let html = '';
+                for (let i = 0; i < 80; i++) {
+                    const size = Math.random() * 2.2 + 0.6;
+                    const x = Math.random() * 100;
+                    const y = Math.random() * 100;
+                    const dur = Math.random() * 3 + 2.5;
+                    const delay = Math.random() * 4;
+                    html += `<div class="star" style="left:${x}%;top:${y}%;width:${size}px;height:${size}px;--dur:${dur}s;--delay:${delay}s;"></div>`;
                 }
-            } catch (err) {
+                sf.innerHTML = html;
+            })();
+
+            // Toast
+            let toastTimeout;
+            function showToast(msg, type = '') {
+                clearTimeout(toastTimeout);
+                toast.textContent = msg;
+                toast.className = 'toast ' + type;
+                void toast.offsetWidth;
+                toast.classList.add('show');
+                toastTimeout = setTimeout(() => toast.classList.remove('show'), 3000);
+            }
+
+            // Connection status indicator
+            function updateConnectionStatus(reachable) {
+                backendReachable = reachable;
+                if (reachable === true) {
+                    statusDot.className = 'status-indicator ok';
+                    connectionStatus.innerHTML = '<span class="status-indicator ok"></span> Backend connected';
+                } else if (reachable === false) {
+                    statusDot.className = 'status-indicator err';
+                    connectionStatus.innerHTML = '<span class="status-indicator err"></span> Spreadsheet not found – <a href="'+SHEET_URL+'" target="_blank" style="color:var(--orange);">create it here</a>';
+                } else {
+                    statusDot.className = 'status-indicator warn';
+                    connectionStatus.innerHTML = '<span class="status-indicator warn"></span> Checking backend...';
+                }
+            }
+
+            async function checkBackend() {
+                updateConnectionStatus(null);
+                try {
+                    const resp = await fetch(ETHERCALC_CSV, { cache: 'no-store' });
+                    if (resp.ok) {
+                        updateConnectionStatus(true);
+                        return true;
+                    }
+                } catch (e) {}
                 updateConnectionStatus(false);
-                console.error('❌ Cannot reach EtherCalc backend:', err.message);
                 return false;
             }
-        }
 
-        // ==================== VIEW SWITCHING ====================
-        function switchView(viewName) {
-            currentView = viewName;
-            studentView.classList.remove('active');
-            resultsView.classList.remove('active');
-
-            if (viewName === 'student') {
-                studentView.classList.add('active');
-                studentView.style.animation = 'none';
-                void studentView.offsetWidth;
-                studentView.style.animation = 'fadeSlideIn 0.5s ease forwards';
-                setTimeout(() => answerInput.focus(), 400);
-            } else if (viewName === 'results') {
-                resultsView.classList.add('active');
-                resultsView.style.animation = 'none';
-                void resultsView.offsetWidth;
-                resultsView.style.animation = 'fadeSlideIn 0.5s ease forwards';
-                fetchAndRenderWordCloud();
-            }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // ==================== QR CODE ====================
-        function updateQRCode() {
-            const pageUrl = window.location.href.split('?')[0].split('#')[0];
-            const qrApiUrl =
-                `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(pageUrl)}&bgcolor=ffffff&color=0a1628&qzone=4`;
-            qrCodeImg.src = qrApiUrl;
-            qrCodeImg.onerror = () => {
-                qrCodeImg.src =
-                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Crect fill='%23fff' width='110' height='110' rx='8'/%3E%3Ctext x='55' y='55' text-anchor='middle' fill='%23999' font-size='10' font-family='sans-serif'%3EQR Code%3C/text%3E%3Ctext x='55' y='70' text-anchor='middle' fill='%23bbb' font-size='8' font-family='sans-serif'%3EReload page%3C/text%3E%3C/svg%3E";
-            };
-        }
-        updateQRCode();
-
-        // ==================== ETHERCALC: FETCH ANSWERS ====================
-        async function fetchAnswers() {
-            try {
-                const response = await fetch(ETHERCALC_CSV_URL, {
-                    method: 'GET',
-                    cache: 'no-store',
-                    headers: { 'Accept': 'text/csv, text/plain' }
-                });
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                const csvText = await response.text();
-                const answers = parseCSVAnswers(csvText);
-                console.log(`📊 Fetched ${answers.length} answers from EtherCalc:`, answers);
-                return answers;
-            } catch (err) {
-                console.warn('Failed to fetch from EtherCalc:', err.message);
-                throw err;
-            }
-        }
-
-        function parseCSVAnswers(csvText) {
-            const answers = [];
-            if (!csvText || csvText.trim() === '') {
-                console.log('📭 CSV is empty or whitespace only.');
-                return answers;
+            // View switching
+            function switchView(view) {
+                currentView = view;
+                studentView.classList.toggle('active', view === 'student');
+                resultsView.classList.toggle('active', view === 'results');
+                if (view === 'student') setTimeout(() => answerInput.focus(), 300);
+                if (view === 'results') fetchAndRenderWordCloud();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
-            const lines = csvText.split(/\r?\n/);
-            console.log(`📄 CSV has ${lines.length} raw lines`);
+            // QR code update
+            function updateQR() {
+                const url = window.location.href.split('?')[0].split('#')[0];
+                qrCodeImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(url)}&bgcolor=ffffff&color=0a1628&qzone=4`;
+                qrCodeImg.onerror = () => qrCodeImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Crect fill='%23fff' width='110' height='110' rx='8'/%3E%3Ctext x='55' y='55' text-anchor='middle' fill='%23999' font-size='10'%3EQR%3C/text%3E%3C/svg%3E";
+            }
 
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (line === '') continue;
+            // Fetch answers from EtherCalc CSV
+            async function fetchAnswers() {
+                const resp = await fetch(ETHERCALC_CSV, { cache: 'no-store' });
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                const csv = await resp.text();
+                return parseCSV(csv);
+            }
 
-                // Parse first column (handle both quoted and unquoted CSV)
-                let firstCol = '';
-                if (line.startsWith('"')) {
-                    const endQuote = line.indexOf('"', 1);
-                    if (endQuote > 0) {
-                        firstCol = line.substring(1, endQuote);
+            function parseCSV(csvText) {
+                const answers = [];
+                const lines = csvText.split(/\r?\n/);
+                for (let line of lines) {
+                    line = line.trim();
+                    if (!line) continue;
+                    let firstCol = '';
+                    if (line.startsWith('"')) {
+                        const end = line.indexOf('"', 1);
+                        firstCol = end > 0 ? line.substring(1, end) : line.substring(1);
                     } else {
-                        firstCol = line.substring(1);
+                        const comma = line.indexOf(',');
+                        firstCol = comma > 0 ? line.substring(0, comma) : line;
                     }
-                } else {
-                    const comma = line.indexOf(',');
-                    if (comma > 0) {
-                        firstCol = line.substring(0, comma);
-                    } else {
-                        firstCol = line;
-                    }
-                }
-
-                const cleaned = firstCol.trim();
-
-                // Skip empty, obvious headers, or metadata rows
-                if (cleaned === '') continue;
-                if (/^(answer|response|submission|word|phrase|text|input|data|column|col|a1|cell|sheet|spreadsheet|ethercalc)/i
-                    .test(cleaned)) {
-                    console.log(`⏭️  Skipping likely header: "${cleaned}"`);
-                    continue;
-                }
-                if (/^[A-Z]\d+$/i.test(cleaned)) {
-                    console.log(`⏭️  Skipping cell reference: "${cleaned}"`);
-                    continue;
-                }
-
-                if (cleaned.length >= 1) {
+                    const cleaned = firstCol.trim();
+                    if (!cleaned || /^(answer|response|submission|word|cell|sheet|ethercalc)/i.test(cleaned) || /^[A-Z]\d+$/i.test(cleaned)) continue;
                     answers.push(cleaned);
                 }
+                return answers;
             }
 
-            console.log(`✅ Parsed ${answers.length} valid answers`);
-            return answers;
-        }
+            // Submit answer via iframe GET navigation
+            async function submitAnswer(answerText) {
+                let existing = [];
+                try { existing = await fetchAnswers(); } catch (e) {}
+                const nextRow = existing.length + 1;
+                const cell = `A${nextRow}`;
+                const encoded = encodeURIComponent(answerText);
+                const url = `${ETHERCALC_API}?cell=${cell}&value=${encoded}`;
+                console.log(`📡 Submitting to: ${url}`);
+                // Navigate hidden iframe – this triggers the cell write
+                submitFrame.src = url;
 
-        // ==================== ETHERCALC: SUBMIT ANSWER ====================
-        async function submitAnswer(answerText) {
-            console.log(`🚀 Submitting answer: "${answerText}"`);
-
-            // Determine the next row by fetching current answers
-            let existingCount = 0;
-            try {
-                const existing = await fetchAnswers();
-                existingCount = existing.length;
-            } catch (e) {
-                console.warn('Could not determine existing row count, assuming row 1.');
-                existingCount = 0;
-            }
-
-            const nextRow = existingCount + 1;
-            const cellCoordinate = `A${nextRow}`;
-            console.log(`📍 Target cell: ${cellCoordinate}, current answer count: ${existingCount}`);
-
-            let submissionSucceeded = false;
-
-            // === METHOD 1: fetch with no-cors (primary - works cross-origin) ===
-            try {
-                console.log('📡 Method 1: fetch POST with no-cors...');
-                const bodyParams = new URLSearchParams();
-                bodyParams.append('cell', cellCoordinate);
-                bodyParams.append('value', answerText);
-
-                await fetch(ETHERCALC_API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: bodyParams.toString(),
-                });
-                console.log('📡 Method 1: Request sent (no-cors, response opaque).');
-                submissionSucceeded = true;
-            } catch (err) {
-                console.warn('Method 1 failed:', err.message);
-            }
-
-            // === METHOD 2: Form + iframe (fallback) ===
-            if (!submissionSucceeded) {
+                // Wait and verify
+                await new Promise(r => setTimeout(r, 2500));
                 try {
-                    console.log('📡 Method 2: Form POST via iframe...');
-                    ethercalcCellInput.value = cellCoordinate;
-                    ethercalcValueInput.value = answerText;
-                    ethercalcForm.action = ETHERCALC_API_URL;
-                    ethercalcForm.submit();
-                    console.log('📡 Method 2: Form submitted.');
-                    submissionSucceeded = true;
-                } catch (err) {
-                    console.warn('Method 2 failed:', err.message);
+                    const updated = await fetchAnswers();
+                    const lower = answerText.toLowerCase().trim();
+                    const found = updated.some(a => a.toLowerCase().trim() === lower);
+                    return { success: found || updated.length > existing.length, row: nextRow, verified: found };
+                } catch (e) {
+                    return { success: true, row: nextRow, verified: false };
                 }
             }
 
-            // === VERIFICATION: Wait and check if the answer appears ===
-            console.log('⏳ Waiting for spreadsheet to update...');
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-            let verified = false;
-            try {
-                const updatedAnswers = await fetchAnswers();
-                const lowerAnswer = answerText.toLowerCase().trim();
-                const found = updatedAnswers.some(a => a.toLowerCase().trim() === lowerAnswer);
-                if (found) {
-                    console.log('✅ Answer verified in spreadsheet!');
-                    verified = true;
-                } else {
-                    console.log('⚠️ Answer not yet visible (may need more time or manual refresh).');
-                    console.log('   Current answers in sheet:', updatedAnswers);
-                }
-                if (updatedAnswers.length > existingCount) {
-                    console.log(
-                        `✅ Answer count increased from ${existingCount} to ${updatedAnswers.length} - submission likely succeeded.`
-                        );
-                    verified = true;
-                }
-            } catch (e) {
-                console.warn('Verification fetch failed, but submission may still have succeeded.');
-                verified = true; // Assume success if we can't verify
-            }
-
-            return {
-                success: submissionSucceeded || verified,
-                row: nextRow,
-                verified: verified,
-                cell: cellCoordinate,
-            };
-        }
-
-        // ==================== HANDLE SUBMISSION ====================
-        async function handleSubmit() {
-            if (isSubmitting) return;
-            const rawAnswer = answerInput.value.trim();
-            if (!rawAnswer) {
-                showToast('Please enter an answer first.', 'error');
-                answerInput.focus();
-                answerInput.style.borderColor = 'var(--red-accent)';
-                setTimeout(() => {
-                    answerInput.style.borderColor = 'var(--glass-border)';
-                }, 1500);
-                return;
-            }
-
-            const wordCount = rawAnswer.split(/\s+/).filter(w => w.length > 0).length;
-            if (wordCount > 4) {
-                showToast('Ideally 1–2 words, but your answer will still be recorded.', 'error');
-            }
-
-            isSubmitting = true;
-            submitBtn.disabled = true;
-            submitBtn.textContent = '⏳ Submitting...';
-            submissionHint.textContent = 'Sending to spreadsheet...';
-
-            try {
-                const result = await submitAnswer(rawAnswer);
-                if (result.success) {
-                    const verifiedMsg = result.verified ? ' Verified!' :
-                        ' (may take a moment to appear in results)';
-                    showToast('✅ Answer submitted! Thank you.' + verifiedMsg, 'success');
-                    answerInput.value = '';
+            async function handleSubmit() {
+                if (isSubmitting) return;
+                const answer = answerInput.value.trim();
+                if (!answer) {
+                    showToast('Please enter an answer first.', 'error');
                     answerInput.focus();
+                    return;
+                }
+                isSubmitting = true;
+                submitBtn.disabled = true;
+                submitBtn.textContent = '⏳ Submitting...';
+                submissionHint.textContent = 'Sending to spreadsheet...';
 
-                    const inputCard = document.getElementById('inputCard');
-                    inputCard.style.boxShadow = '0 0 40px rgba(52,183,168,0.5), var(--shadow-lg)';
-                    setTimeout(() => {
-                        inputCard.style.boxShadow = 'var(--shadow-lg)';
-                    }, 800);
+                try {
+                    const result = await submitAnswer(answer);
+                    if (result.success) {
+                        showToast('✅ Answer submitted!', 'success');
+                        answerInput.value = '';
+                        answerInput.focus();
+                        updateConnectionStatus(true);
+                    } else {
+                        showToast('⚠️ Submission may have failed – please try again.', 'error');
+                    }
+                } catch (e) {
+                    showToast('❌ Network error – check your connection.', 'error');
+                } finally {
+                    isSubmitting = false;
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '✈️ Submit Answer';
+                    submissionHint.textContent = 'Press Enter or tap Submit';
+                }
+            }
 
-                    // Update connection status
+            // Word cloud engine (unchanged from before, just compact)
+            function computeFrequencies(answers) {
+                const map = new Map();
+                answers.forEach(a => { const k = a.toLowerCase().trim(); if (k) map.set(k, (map.get(k) || 0) + 1); });
+                return Array.from(map.entries()).map(([w, c]) => ({ word: w, count: c })).sort((a, b) => b.count - a.count);
+            }
+            const colors = ['#f4793e','#ff9a65','#ffb347','#4a90d9','#7eb8da','#5ba3e6','#34b7a8','#5cc9ba','#d4a853','#e8c97a','#ffffff','#eaf1f8','#e74c3c','#f07070'];
+            function renderWordCloud(answers) {
+                const canvas = wordcloudCanvas, wrapper = canvas.parentElement;
+                const ctx = canvas.getContext('2d'); canvasCtx = ctx;
+                const cw = wrapper.clientWidth, ch = Math.max(wrapper.clientHeight, 350);
+                const dpr = Math.min(window.devicePixelRatio || 1, 2); canvasScale = dpr;
+                canvas.width = cw * dpr; canvas.height = ch * dpr;
+                canvas.style.width = cw + 'px'; canvas.style.height = ch + 'px';
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                if (!answers.length) {
+                    wordcloudPlaceholder.style.display = 'flex';
+                    wordcloudPlaceholder.textContent = 'No responses yet. Be the first!';
+                    wordPlacements = [];
+                    updateStats(0, 0);
+                    return;
+                }
+                wordcloudPlaceholder.style.display = 'none';
+                const freqs = computeFrequencies(answers);
+                updateStats(answers.length, freqs.length);
+                const maxC = freqs[0].count, minC = freqs[freqs.length-1].count, range = maxC - minC || 1;
+                const maxFont = Math.min(58, cw/8), minFont = Math.max(13, maxFont*0.22);
+                const items = freqs.map((f, i) => ({
+                    word: f.word, count: f.count,
+                    fontSize: minFont + ((f.count - minC)/range) * (maxFont - minFont),
+                    rotation: (Math.random()-0.5)*16,
+                    color: colors[i % colors.length]
+                })).sort((a,b) => b.fontSize - a.fontSize);
+                const placed = [], pad = 4*dpr, centerX = canvas.width/2, centerY = canvas.height/2, spiralA = 0.8*dpr, step = 0.25;
+                function overlap(a,b) { return !(a.x+a.w <= b.x || b.x+b.w <= a.x || a.y+a.h <= b.y || b.y+b.h <= a.y); }
+                const font = "'Georgia','Segoe UI','Inter',sans-serif";
+                items.forEach(item => {
+                    const fs = item.fontSize*dpr;
+                    ctx.font = `700 ${fs}px ${font}`;
+                    const tw = ctx.measureText(item.word).width, th = fs*1.15;
+                    const bw = tw+pad*2, bh = th+pad*2;
+                    let done = false, theta = 0;
+                    if (!placed.length) {
+                        const x = centerX - tw/2, y = centerY - th/2 + fs*0.35;
+                        if (x>=pad && y>=pad && x+bw<=canvas.width-pad && y+bh<=canvas.height-pad) {
+                            placed.push({ word:item.word, count:item.count, x, y, w:bw, h:bh, fontSize:item.fontSize, color:item.color, rotation:item.rotation, cx:x+bw/2, cy:y+bh/2 });
+                            done = true;
+                        }
+                    }
+                    while (!done && theta < 500) {
+                        const r = spiralA*theta;
+                        const sx = centerX + r*Math.cos(theta), sy = centerY + r*Math.sin(theta);
+                        const x = sx - tw/2, y = sy - th/2 + fs*0.35;
+                        if (x>=pad && y>=pad && x+bw<=canvas.width-pad && y+bh<=canvas.height-pad) {
+                            const box = {x:x-pad, y:y-pad, w:bw, h:bh};
+                            if (!placed.some(p => overlap(box, {x:p.x-pad, y:p.y-pad, w:p.w, h:p.h}))) {
+                                placed.push({ word:item.word, count:item.count, x, y, w:bw, h:bh, fontSize:item.fontSize, color:item.color, rotation:item.rotation, cx:x+bw/2, cy:y+bh/2 });
+                                done = true;
+                            }
+                        }
+                        theta += step;
+                    }
+                });
+                placed.forEach(p => {
+                    ctx.save();
+                    ctx.translate(p.cx, p.cy);
+                    if (p.rotation) ctx.rotate(p.rotation*Math.PI/180);
+                    ctx.font = `700 ${p.fontSize*dpr}px ${font}`;
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillStyle = p.color;
+                    ctx.shadowColor = 'rgba(0,0,0,0.3)'; ctx.shadowBlur = 3*dpr;
+                    ctx.fillText(p.word, 0, 0);
+                    ctx.restore();
+                });
+                wordPlacements = placed;
+                hoveredIndex = -1;
+                tooltip.classList.remove('visible');
+                statLastRefresh.textContent = new Date().toLocaleTimeString();
+            }
+            function updateStats(total, unique) { statCount.textContent = total; statUnique.textContent = unique; }
+
+            async function fetchAndRenderWordCloud() {
+                wordcloudPlaceholder.style.display = 'flex';
+                wordcloudPlaceholder.textContent = 'Loading responses...';
+                try {
+                    allAnswers = await fetchAnswers();
+                    renderWordCloud(allAnswers);
                     updateConnectionStatus(true);
-                } else {
-                    showToast(
-                        '⚠️ Submission may have failed. Please try again or check if the spreadsheet exists at ' +
-                        SPREADSHEET_URL,
-                        'error');
-                }
-            } catch (err) {
-                console.error('Submission error:', err);
-                showToast('❌ Network error. Check your connection and ensure the spreadsheet is accessible.', 'error');
-            } finally {
-                isSubmitting = false;
-                submitBtn.disabled = false;
-                submitBtn.textContent = '✈️ Submit Answer';
-                submissionHint.textContent = 'Press Enter or tap Submit';
-            }
-        }
-
-        // ==================== WORD CLOUD ENGINE ====================
-        function computeFrequencies(answers) {
-            const freqMap = new Map();
-            for (const answer of answers) {
-                const key = answer.toLowerCase().trim();
-                if (key) {
-                    freqMap.set(key, (freqMap.get(key) || 0) + 1);
+                } catch (e) {
+                    wordcloudPlaceholder.textContent = '⚠️ Unable to load data. Check spreadsheet.';
+                    updateStats('—','—');
+                    updateConnectionStatus(false);
                 }
             }
-            const freqArray = Array.from(freqMap.entries())
-                .map(([word, count]) => ({ word, count }))
-                .sort((a, b) => b.count - a.count);
-            return freqArray;
-        }
 
-        function getWordCloudColors() {
-            return [
-                '#f4793e', '#ff9a65', '#ffb347', '#ff6b35', '#e8743c', '#f9a05a',
-                '#4a90d9', '#7eb8da', '#5ba3e6', '#89c4f4', '#a0d2f7', '#3d7ec4',
-                '#34b7a8', '#5cc9ba', '#2ea89a', '#48c9b0', '#6dd5c5',
-                '#d4a853', '#e8c97a', '#c49a3c', '#dfb96a', '#f0d690',
-                '#ffffff', '#eaf1f8', '#f0f4f8', '#dce8f4', '#c8ddf0',
-                '#e74c3c', '#f07070', '#d94545', '#ff6b6b',
-            ];
-        }
+            // Event listeners
+            submitBtn.addEventListener('click', handleSubmit);
+            answerInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); handleSubmit(); } });
+            gotoResultsBtn.addEventListener('click', () => switchView('results'));
+            backToStudentBtn.addEventListener('click', () => switchView('student'));
+            refreshBtn.addEventListener('click', () => { fetchAndRenderWordCloud(); showToast('🔄 Refreshed'); });
 
-        function getRandomColor(colors, index) {
-            return colors[index % colors.length];
-        }
-
-        function renderWordCloud(answers) {
-            const canvas = wordcloudCanvas;
-            const wrapper = wordcloudWrapper;
-            const ctx = canvas.getContext('2d');
-            canvasCtx = ctx;
-
-            const containerWidth = wrapper.clientWidth;
-            const containerHeight = Math.max(wrapper.clientHeight, 350);
-            const dpr = Math.min(window.devicePixelRatio || 1, 2);
-            canvasScale = dpr;
-            const width = containerWidth * dpr;
-            const height = containerHeight * dpr;
-
-            canvas.width = width;
-            canvas.height = height;
-            canvas.style.width = containerWidth + 'px';
-            canvas.style.height = containerHeight + 'px';
-
-            ctx.clearRect(0, 0, width, height);
-
-            if (!answers || answers.length === 0) {
-                wordcloudPlaceholder.style.display = 'flex';
-                wordcloudPlaceholder.textContent =
-                    'No responses yet. Submit an answer or check back soon!';
-                wordPlacements = [];
-                updateStats(0, 0);
-                return;
-            }
-
-            wordcloudPlaceholder.style.display = 'none';
-
-            const frequencies = computeFrequencies(answers);
-            const totalResponses = answers.length;
-            const uniqueCount = frequencies.length;
-            updateStats(totalResponses, uniqueCount);
-
-            if (frequencies.length === 0) {
-                wordcloudPlaceholder.style.display = 'flex';
-                wordcloudPlaceholder.textContent = 'No valid responses yet.';
-                wordPlacements = [];
-                return;
-            }
-
-            const colors = getWordCloudColors();
-            const maxCount = frequencies[0].count;
-            const minCount = frequencies[frequencies.length - 1].count;
-            const countRange = maxCount - minCount || 1;
-
-            const maxFontSize = Math.min(58, containerWidth / 8);
-            const minFontSize = Math.max(13, maxFontSize * 0.22);
-
-            const wordItems = frequencies.map((item, index) => {
-                const t = (item.count - minCount) / countRange;
-                const fontSize = minFontSize + t * (maxFontSize - minFontSize);
-                const rotation = (Math.random() - 0.5) * 16;
-                const color = getRandomColor(colors, index);
-                return {
-                    word: item.word,
-                    count: item.count,
-                    fontSize: fontSize,
-                    color: color,
-                    rotation: rotation,
-                    originalIndex: index,
-                };
+            document.addEventListener('keydown', e => {
+                if (e.target.closest('input')) return;
+                if (e.key === 'n' || e.key === 'N') switchView(currentView === 'student' ? 'results' : 'student');
+                if ((e.key === 'r' || e.key === 'R') && currentView === 'results') { fetchAndRenderWordCloud(); showToast('🔄 Refreshed'); }
             });
 
-            wordItems.sort((a, b) => b.fontSize - a.fontSize);
-
-            const placedWords = [];
-            const padding = 4 * dpr;
-            const centerX = width / 2;
-            const centerY = height / 2;
-            const spiralA = 0.8 * dpr;
-            const spiralStep = 0.25;
-
-            for (const item of wordItems) {
-                const fs = item.fontSize * dpr;
-                ctx.font = `700 ${fs}px ${getFontStack()}`;
-                const metrics = ctx.measureText(item.word);
-                const textWidth = metrics.width;
-                const textHeight = fs * 1.15;
-                const bw = textWidth + padding * 2;
-                const bh = textHeight + padding * 2;
-
-                let placed = false;
-                let theta = 0;
-                const maxAttempts = 2000;
-                let attempts = 0;
-
-                if (placedWords.length === 0) {
-                    const x = centerX - textWidth / 2;
-                    const y = centerY - textHeight / 2 + fs * 0.35;
-                    if (x >= padding && y >= padding && x + bw <= width - padding && y + bh <= height - padding) {
-                        placedWords.push({
-                            word: item.word,
-                            count: item.count,
-                            x: x,
-                            y: y,
-                            w: bw,
-                            h: bh,
-                            fontSize: item.fontSize,
-                            color: item.color,
-                            rotation: item.rotation,
-                            cx: x + bw / 2,
-                            cy: y + bh / 2,
-                        });
-                        placed = true;
-                    }
-                }
-
-                while (!placed && attempts < maxAttempts) {
-                    const r = spiralA * theta;
-                    const sx = centerX + r * Math.cos(theta);
-                    const sy = centerY + r * Math.sin(theta);
-                    const x = sx - textWidth / 2;
-                    const y = sy - textHeight / 2 + fs * 0.35;
-                    if (x >= padding && y >= padding && x + bw <= width - padding && y + bh <= height - padding) {
-                        let collision = false;
-                        const checkBox = { x: x - padding, y: y - padding, w: bw, h: bh };
-                        for (const pw of placedWords) {
-                            if (boxesOverlap(checkBox, { x: pw.x - padding, y: pw.y - padding, w: pw.w, h: pw.h })) {
-                                collision = true;
-                                break;
-                            }
-                        }
-                        if (!collision) {
-                            placedWords.push({
-                                word: item.word,
-                                count: item.count,
-                                x: x,
-                                y: y,
-                                w: bw,
-                                h: bh,
-                                fontSize: item.fontSize,
-                                color: item.color,
-                                rotation: item.rotation,
-                                cx: x + bw / 2,
-                                cy: y + bh / 2,
-                            });
-                            placed = true;
-                        }
-                    }
-                    theta += spiralStep;
-                    attempts++;
-                }
-
-                if (!placed) {
-                    const reducedFs = item.fontSize * 0.6 * dpr;
-                    ctx.font = `700 ${reducedFs}px ${getFontStack()}`;
-                    const rMetrics = ctx.measureText(item.word);
-                    const rTextWidth = rMetrics.width;
-                    const rTextHeight = reducedFs * 1.15;
-                    const rbw = rTextWidth + padding * 2;
-                    const rbh = rTextHeight + padding * 2;
-                    let rTheta = 0;
-                    let rAttempts = 0;
-                    const rMaxAttempts = 1500;
-                    while (!placed && rAttempts < rMaxAttempts) {
-                        const r = spiralA * rTheta;
-                        const sx = centerX + r * Math.cos(rTheta);
-                        const sy = centerY + r * Math.sin(rTheta);
-                        const x = sx - rTextWidth / 2;
-                        const y = sy - rTextHeight / 2 + reducedFs * 0.35;
-                        if (x >= padding && y >= padding && x + rbw <= width - padding && y + rbh <= height -
-                            padding) {
-                            let collision = false;
-                            const checkBox = { x: x - padding, y: y - padding, w: rbw, h: rbh };
-                            for (const pw of placedWords) {
-                                if (boxesOverlap(checkBox, { x: pw.x - padding, y: pw.y - padding, w: pw.w, h: pw
-                                        .h })) {
-                                    collision = true;
-                                    break;
-                                }
-                            }
-                            if (!collision) {
-                                placedWords.push({
-                                    word: item.word,
-                                    count: item.count,
-                                    x: x,
-                                    y: y,
-                                    w: rbw,
-                                    h: rbh,
-                                    fontSize: item.fontSize * 0.6,
-                                    color: item.color,
-                                    rotation: item.rotation,
-                                    cx: x + rbw / 2,
-                                    cy: y + rbh / 2,
-                                });
-                                placed = true;
-                            }
-                        }
-                        rTheta += spiralStep;
-                        rAttempts++;
-                    }
-                }
-            }
-
-            for (const pw of placedWords) {
-                drawWord(ctx, pw, dpr, false);
-            }
-
-            wordPlacements = placedWords;
-            hoveredWordIndex = -1;
-            tooltip.classList.remove('visible');
-            statLastRefresh.textContent = new Date().toLocaleTimeString();
-        }
-
-        function boxesOverlap(a, b) {
-            return !(a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y);
-        }
-
-        function getFontStack() {
-            return "'Georgia','Segoe UI','Inter','Helvetica Neue',sans-serif";
-        }
-
-        function drawWord(ctx, placement, dpr, isHighlighted) {
-            const fs = placement.fontSize * dpr;
-            const fontStack = getFontStack();
-            ctx.save();
-            ctx.translate(placement.cx, placement.cy);
-            if (placement.rotation !== 0) {
-                ctx.rotate(placement.rotation * Math.PI / 180);
-            }
-            ctx.font = `700 ${fs}px ${fontStack}`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-
-            if (isHighlighted) {
-                ctx.shadowColor = placement.color;
-                ctx.shadowBlur = 18 * dpr;
-                ctx.fillStyle = '#ffffff';
-                ctx.fillText(placement.word, 0, 0);
-                ctx.shadowBlur = 0;
-                ctx.fillStyle = placement.color;
-                ctx.fillText(placement.word, 0, 0);
-            } else {
-                ctx.fillStyle = placement.color;
-                ctx.shadowColor = 'rgba(0,0,0,0.3)';
-                ctx.shadowBlur = 3 * dpr;
-                ctx.fillText(placement.word, 0, 0);
-                ctx.shadowBlur = 0;
-                ctx.fillStyle = 'rgba(255,255,255,0.08)';
-                ctx.fillText(placement.word, -0.5 * dpr, -0.5 * dpr);
-            }
-            ctx.restore();
-        }
-
-        function redrawAllHighlighted(highlightIndex) {
-            const canvas = wordcloudCanvas;
-            const ctx = canvasCtx || canvas.getContext('2d');
-            const dpr = canvasScale;
-            const width = canvas.width;
-            const height = canvas.height;
-            ctx.clearRect(0, 0, width, height);
-            for (let i = 0; i < wordPlacements.length; i++) {
-                drawWord(ctx, wordPlacements[i], dpr, i === highlightIndex);
-            }
-        }
-
-        function findWordAtPosition(mouseX, mouseY) {
-            const rect = wordcloudCanvas.getBoundingClientRect();
-            const scaleX = (wordcloudCanvas.width / canvasScale) / rect.width;
-            const scaleY = (wordcloudCanvas.height / canvasScale) / rect.height;
-            const cx = mouseX * scaleX * canvasScale;
-            const cy = mouseY * scaleY * canvasScale;
-            let bestIndex = -1;
-            let bestArea = Infinity;
-            for (let i = 0; i < wordPlacements.length; i++) {
-                const pw = wordPlacements[i];
-                const paddingVal = 2 * canvasScale;
-                const bx = pw.x - paddingVal;
-                const by = pw.y - paddingVal;
-                const bw = pw.w;
-                const bh = pw.h;
-                if (cx >= bx && cx <= bx + bw && cy >= by && cy <= by + bh) {
-                    const area = bw * bh;
-                    if (area < bestArea) {
-                        bestArea = area;
-                        bestIndex = i;
-                    }
-                }
-            }
-            return bestIndex;
-        }
-
-        function updateStats(total, unique) {
-            statCount.textContent = total;
-            statUnique.textContent = unique;
-        }
-
-        // ==================== FETCH & RENDER ====================
-        async function fetchAndRenderWordCloud() {
-            wordcloudPlaceholder.style.display = 'flex';
-            wordcloudPlaceholder.textContent = 'Loading responses from EtherCalc...';
-            wordPlacements = [];
-            hoveredWordIndex = -1;
-            tooltip.classList.remove('visible');
-            updateStats('…', '…');
-
-            try {
-                allAnswers = await fetchAnswers();
-                if (allAnswers.length === 0) {
-                    wordcloudPlaceholder.textContent =
-                        'No responses yet. Be the first to submit! 📝';
-                }
-                renderWordCloud(allAnswers);
-                updateConnectionStatus(true);
-            } catch (err) {
-                console.error('Error fetching answers:', err);
-                wordcloudPlaceholder.style.display = 'flex';
-                wordcloudPlaceholder.textContent =
-                    '⚠️ Unable to load responses. Ensure the spreadsheet exists at ' + SPREADSHEET_URL +
-                    ' and try refreshing.';
-                updateStats('—', '—');
-                updateConnectionStatus(false);
-                showToast('Failed to load data. Check the spreadsheet link.', 'error');
-            }
-        }
-
-        // ==================== EVENT LISTENERS ====================
-        submitBtn.addEventListener('click', handleSubmit);
-
-        answerInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !isSubmitting) {
-                e.preventDefault();
-                handleSubmit();
-            }
-        });
-
-        gotoResultsBtn.addEventListener('click', () => switchView('results'));
-        backToStudentBtn.addEventListener('click', () => switchView('student'));
-        refreshBtn.addEventListener('click', () => {
-            fetchAndRenderWordCloud();
-            showToast('🔄 Refreshing data...', '');
-        });
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.target.closest('input') || e.target.closest('textarea')) return;
-            if (e.key === 'n' || e.key === 'N') {
-                switchView(currentView === 'student' ? 'results' : 'student');
-            }
-            if ((e.key === 'r' || e.key === 'R') && currentView === 'results') {
-                fetchAndRenderWordCloud();
-                showToast('🔄 Refreshing data...', '');
-            }
-        });
-
-        // Word cloud interaction
-        wordcloudCanvas.addEventListener('mousemove', (e) => {
-            if (wordPlacements.length === 0) return;
-            const index = findWordAtPosition(e.clientX, e.clientY);
-            if (index !== hoveredWordIndex) {
-                hoveredWordIndex = index;
-                redrawAllHighlighted(index);
-                wordcloudCanvas.style.cursor = index >= 0 ? 'pointer' : 'default';
-                if (index >= 0) {
-                    const pw = wordPlacements[index];
-                    tooltip.textContent = `"${pw.word}" — ${pw.count} response${pw.count > 1 ? 's' : ''}`;
-                    tooltip.classList.add('visible');
-                    tooltip.style.left = (e.clientX + 18) + 'px';
-                    tooltip.style.top = (e.clientY - 40) + 'px';
-                } else {
-                    tooltip.classList.remove('visible');
-                }
-            } else if (index >= 0) {
-                tooltip.style.left = (e.clientX + 18) + 'px';
-                tooltip.style.top = (e.clientY - 40) + 'px';
-            }
-        });
-
-        wordcloudCanvas.addEventListener('mouseleave', () => {
-            hoveredWordIndex = -1;
-            redrawAllHighlighted(-1);
-            wordcloudCanvas.style.cursor = 'default';
-            tooltip.classList.remove('visible');
-        });
-
-        wordcloudCanvas.addEventListener('click', (e) => {
-            if (wordPlacements.length === 0) return;
-            const index = findWordAtPosition(e.clientX, e.clientY);
-            if (index >= 0) {
-                const pw = wordPlacements[index];
-                showToast(`📊 "${pw.word}" — ${pw.count} response${pw.count > 1 ? 's' : ''}`, 'success');
-                hoveredWordIndex = index;
-                redrawAllHighlighted(index);
-                setTimeout(() => {
-                    if (hoveredWordIndex === index) {
-                        hoveredWordIndex = -1;
-                        redrawAllHighlighted(-1);
-                    }
-                }, 1500);
-            }
-        });
-
-        // Touch events for mobile
-        wordcloudCanvas.addEventListener('touchmove', (e) => {
-            if (wordPlacements.length === 0) return;
-            if (e.touches.length === 1) {
-                const touch = e.touches[0];
-                const index = findWordAtPosition(touch.clientX, touch.clientY);
-                if (index !== hoveredWordIndex) {
-                    hoveredWordIndex = index;
-                    redrawAllHighlighted(index);
-                    if (index >= 0) {
-                        const pw = wordPlacements[index];
-                        tooltip.textContent = `"${pw.word}" — ${pw.count} response${pw.count > 1 ? 's' : ''}`;
+            // Word cloud hover/click
+            wordcloudCanvas.addEventListener('mousemove', e => {
+                if (!wordPlacements.length) return;
+                const idx = findWordAt(e.clientX, e.clientY);
+                if (idx !== hoveredIndex) {
+                    hoveredIndex = idx;
+                    redrawHighlighted(idx);
+                    wordcloudCanvas.style.cursor = idx >= 0 ? 'pointer' : 'default';
+                    if (idx >= 0) {
+                        const p = wordPlacements[idx];
+                        tooltip.textContent = `"${p.word}" — ${p.count} response${p.count>1?'s':''}`;
                         tooltip.classList.add('visible');
-                        tooltip.style.left = (touch.clientX + 18) + 'px';
-                        tooltip.style.top = (touch.clientY - 50) + 'px';
-                    } else {
-                        tooltip.classList.remove('visible');
+                        tooltip.style.left = (e.clientX+18)+'px';
+                        tooltip.style.top = (e.clientY-40)+'px';
+                    } else tooltip.classList.remove('visible');
+                }
+            });
+            wordcloudCanvas.addEventListener('mouseleave', () => { hoveredIndex = -1; redrawHighlighted(-1); tooltip.classList.remove('visible'); });
+            wordcloudCanvas.addEventListener('click', e => {
+                const idx = findWordAt(e.clientX, e.clientY);
+                if (idx >= 0) showToast(`📊 "${wordPlacements[idx].word}" — ${wordPlacements[idx].count} response(s)`, 'success');
+            });
+            wordcloudCanvas.addEventListener('touchmove', e => {
+                if (e.touches.length === 1) {
+                    const t = e.touches[0];
+                    const idx = findWordAt(t.clientX, t.clientY);
+                    if (idx !== hoveredIndex) { hoveredIndex = idx; redrawHighlighted(idx); }
+                }
+            }, {passive: true});
+            wordcloudCanvas.addEventListener('touchend', () => setTimeout(() => { hoveredIndex = -1; redrawHighlighted(-1); }, 300));
+
+            function findWordAt(mx, my) {
+                const rect = wordcloudCanvas.getBoundingClientRect();
+                const sx = (canvas.width/canvasScale) / rect.width;
+                const sy = (canvas.height/canvasScale) / rect.height;
+                const cx = mx * sx * canvasScale, cy = my * sy * canvasScale;
+                let best = -1, bestArea = Infinity;
+                wordPlacements.forEach((p, i) => {
+                    const bx = p.x - 2*canvasScale, by = p.y - 2*canvasScale;
+                    if (cx >= bx && cx <= bx+p.w && cy >= by && cy <= by+p.h && p.w*p.h < bestArea) {
+                        bestArea = p.w*p.h; best = i;
                     }
-                }
+                });
+                return best;
             }
-        }, { passive: true });
-
-        wordcloudCanvas.addEventListener('touchend', () => {
-            setTimeout(() => {
-                hoveredWordIndex = -1;
-                redrawAllHighlighted(-1);
-                tooltip.classList.remove('visible');
-            }, 300);
-        });
-
-        // Handle window resize
-        let resizeDebounce;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeDebounce);
-            resizeDebounce = setTimeout(() => {
-                if (currentView === 'results' && allAnswers.length > 0) {
-                    renderWordCloud(allAnswers);
-                }
-            }, 400);
-        });
-
-        // ==================== INITIALIZATION ====================
-        async function init() {
-            console.log('🛩️  MSA 547 — Trust in Aviation Leadership');
-            console.log('📊  Backend spreadsheet:', SPREADSHEET_URL);
-            console.log('📡  API endpoint:', ETHERCALC_API_URL);
-            console.log('📋  CSV endpoint:', ETHERCALC_CSV_URL);
-            console.log('💡  Instructor shortcuts: Press "N" to toggle views, "R" to refresh results');
-            console.log('🔗  Current page URL:', window.location.href);
-            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-
-            // Check backend connectivity
-            const reachable = await checkBackendConnection();
-            if (!reachable) {
-                console.warn('⚠️  IMPORTANT: The EtherCalc spreadsheet may not exist yet.');
-                console.warn('   Please visit ' + SPREADSHEET_URL + ' in your browser to create it first.');
-                showToast(
-                    '⚠️ Spreadsheet not found. Please visit ethercalc.net/msa547 to create it.',
-                    'error');
-            } else {
-                console.log('✅ Backend is reachable. Ready for submissions.');
-                // Pre-fetch to warm up
-                try {
-                    const existing = await fetchAnswers();
-                    console.log(`📋 Spreadsheet already has ${existing.length} entries.`);
-                } catch (e) {
-                    // ignore
-                }
+            function redrawHighlighted(hi) {
+                const ctx = canvasCtx || wordcloudCanvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                wordPlacements.forEach((p, i) => {
+                    ctx.save();
+                    ctx.translate(p.cx, p.cy);
+                    if (p.rotation) ctx.rotate(p.rotation*Math.PI/180);
+                    ctx.font = `700 ${p.fontSize*canvasScale}px 'Georgia','Segoe UI',sans-serif`;
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    if (i === hi) {
+                        ctx.shadowColor = p.color; ctx.shadowBlur = 18*canvasScale;
+                        ctx.fillStyle = '#fff'; ctx.fillText(p.word, 0, 0);
+                        ctx.shadowBlur = 0; ctx.fillStyle = p.color; ctx.fillText(p.word, 0, 0);
+                    } else {
+                        ctx.fillStyle = p.color;
+                        ctx.shadowColor = 'rgba(0,0,0,0.3)'; ctx.shadowBlur = 3*canvasScale;
+                        ctx.fillText(p.word, 0, 0);
+                    }
+                    ctx.restore();
+                });
             }
 
-            // Focus input
-            setTimeout(() => answerInput.focus(), 600);
+            window.addEventListener('resize', () => {
+                if (currentView === 'results' && allAnswers.length) renderWordCloud(allAnswers);
+            });
 
-            // Update QR code
-            updateQRCode();
-        }
-
-        init();
-
-        // ==================== DEBUG EXPORT ====================
-        if (typeof window !== 'undefined') {
-            window.msa547 = {
-                fetchAnswers,
-                submitAnswer,
-                renderWordCloud,
-                switchView,
-                getAnswers: () => allAnswers,
-                getPlacements: () => wordPlacements,
-                refresh: fetchAndRenderWordCloud,
-                checkConnection: checkBackendConnection,
-                getBackendStatus: () => backendReachable,
-                SPREADSHEET_URL,
-                ETHERCALC_CSV_URL,
-                ETHERCALC_API_URL,
-            };
-            console.log('💡 Debug API available at window.msa547');
-            console.log('   Try: msa547.checkConnection() or msa547.fetchAnswers()');
-        }
-
-        console.log('✅ MSA 547 app initialized.');
-    })();
-</script>
+            // Init
+            async function init() {
+                console.log('🛩️ MSA 547 – ready');
+                updateQR();
+                const ok = await checkBackend();
+                if (!ok) {
+                    showToast('⚠️ Spreadsheet not found – please visit ' + SHEET_URL + ' to create it.', 'error');
+                } else {
+                    try { allAnswers = await fetchAnswers(); console.log('Existing entries:', allAnswers.length); } catch(e){}
+                }
+                setTimeout(() => answerInput.focus(), 500);
+            }
+            init();
+        })();
+    </script>
 </body>
 </html>
