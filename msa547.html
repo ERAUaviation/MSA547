@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>MSA 547 - Trust in Aviation Leadership</title>
+    <style>
+        :root {
+            --navy: #0a1628;
+            --dark-blue: #0d1f3c;
+            --mid-blue: #152d50;
+            --panel-bg: #111d33;
+            --sky-blue: #4a90d9;
+            --light-blue: #7eb8da;
+            --pale-blue: #b8d4f0;
+            --white: #eaf1f8;
+            --pure-white: #ffffff;
+            --orange: #f4793e;
+            --orange-glow: #ff9a65;
+            --gold: #d4a853;
+            --teal: #34b7a8;
+            --red-accent: #e74c3c;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.10);
+            --glass-hover: rgba(255, 255, 255, 0.06);
+            --shadow-lg: 0 25px 60px rgba(0, 0, 0, 0.5);
+            --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.4);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --radius-xl: 24px;
+            --radius-lg: 18px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --transition: 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --font-display: 'Georgia', 'Times New Roman', serif;
+            --font-body: 'Segoe UI', 'Inter', 'Helvetica Neue', system-ui, -apple-system, sans-serif;
+            --font-mono: 'SF Mono', 'Consolas', 'Monaco', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--navy);
+            background-image:
+                radial-gradient(ellipse at 30% 20%, rgba(74, 144, 217, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 60%, rgba(244, 121, 62, 0.07) 0%, transparent 55%),
+                radial-gradient(ellipse at 50% 80%, rgba(52, 183, 168, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 20% 70%, rgba(212, 168, 83, 0.05) 0%, transparent 45%);
+            min-height: 100vh;
+            min-height: 100dvh;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Subtle starfield */
+        .starfield {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.5;
+        }
+        .star {
+            position: absolute;
+            background: var(--pure-white);
+            border-radius: 50%;
+            animation: twinkle var(--dur) ease-in-out infinite;
+            animation-delay: var(--delay);
+        }
+        @keyframes twinkle {
+            0%,
+            100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.9;
+                transform: scale(1.8);
+            }
+        }
+
+        /* Main container */
+        .app-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 560px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* View panels */
+        .view {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeSlideIn 0.5s ease forwards;
+        }
+        .view.active {
+            display: flex;
+        }
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Card styling */
+        .card {
+            background: var(--panel-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            padding: 28px 24px;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 30px;
+            right: 30px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            border-radius: 50%;
+        }
+        .card::after {
+            content: '';
+            position: absolute;
+            bottom: -60px;
+            right: -40px;
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, rgba(74, 144, 217, 0.06) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        /* Aviation accent line */
+        .accent-line {
+            width: 60px;
+            height: 3px;
+            border-radius: 3px;
+            background: var(--orange);
+            margin: 6px 0 14px;
+            position: relative;
+        }
+        .accent-line::after {
+            content: '';
+            position: absolute;
+            right: -20px;
+            top: 0;
+            width: 6px;
+            height: 3px;
+            border-radius: 3px;
+            background: var(--sky-blue);
+            opacity: 0.7;
+        }
+
+        /* Typography */
+        .question-text {
+            font-family: var(--font-display);
+            font-size: 1.45rem;
+            font-weight: 400;
+            line-height: 1.35;
+            color: var(--pure-white);
+            letter-spacing: 0.01em;
+            position: relative;
+            z-index: 1;
+        }
+        .subtitle {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--sky-blue);
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .label-text {
+            font-size: 0.85rem;
+            color: var(--pale-blue);
+            letter-spacing: 0.03em;
+            font-weight: 500;
+        }
+
+        /* Input */
+        .input-group {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .answer-input {
+            width: 100%;
+            padding: 16px 18px;
+            font-size: 1.1rem;
+            font-family: var(--font-body);
+            background: rgba(255, 255, 255, 0.04);
+            border: 2px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            color: var(--pure-white);
+            outline: none;
+            transition: var(--transition);
+            letter-spacing: 0.02em;
+        }
+        .answer-input:focus {
+            border-color: var(--sky-blue);
+            background: rgba(74, 144, 217, 0.08);
+            box-shadow: 0 0 0 8px rgba(74, 144, 217, 0.06), 0 0 30px rgba(74, 144, 217, 0.1);
+        }
+        .answer-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+            font-style: italic;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: var(--font-body);
+            letter-spacing: 0.03em;
+            border-radius: 50px;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            position: relative;
+            z-index: 1;
+            text-decoration: none;
+            white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .btn:active {
+            transform: scale(0.96);
+        }
+        .btn-primary {
+            background: var(--orange);
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(244, 121, 62, 0.35);
+            font-size: 1.05rem;
+            padding: 16px 36px;
+        }
+        .btn-primary:hover {
+            background: #ff8c55;
+            box-shadow: 0 12px 32px rgba(244, 121, 62, 0.5);
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: transparent;
+            color: var(--pale-blue);
+            border: 2px solid var(--glass-border);
+            padding: 10px 22px;
+            font-size: 0.9rem;
+        }
+        .btn-secondary:hover {
+            background: var(--glass-hover);
+            border-color: rgba(255, 255, 255, 0.25);
+            color: var(--pure-white);
+        }
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            border-radius: 30px;
+            letter-spacing: 0.05em;
+        }
+        .btn-icon {
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--pale-blue);
+        }
+        .btn-icon:hover {
+            background: var(--glass-hover);
+            color: var(--pure-white);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Button row */
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        .btn-row.between {
+            justify-content: space-between;
+        }
+
+        /* QR Code area */
+        .qr-section {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 16px 18px;
+            background: rgba(255, 255, 255, 0.025);
+            border-radius: var(--radius-lg);
+            border: 1px dashed var(--glass-border);
+            position: relative;
+            z-index: 1;
+            flex-wrap: wrap;
+        }
+        .qr-code-img {
+            width: 110px;
+            height: 110px;
+            border-radius: var(--radius-sm);
+            background: #fff;
+            padding: 6px;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-sm);
+        }
+        .qr-info {
+            flex: 1;
+            min-width: 140px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .qr-info .qr-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--pure-white);
+            letter-spacing: 0.03em;
+        }
+        .qr-info .qr-desc {
+            font-size: 0.75rem;
+            color: var(--pale-blue);
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+
+        /* Toast / notification */
+        .toast {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-120px);
+            background: #1a3d2e;
+            border: 1px solid #34b7a8;
+            color: #d4f7f0;
+            padding: 14px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 0.03em;
+            z-index: 100;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+            transition: transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.15);
+            pointer-events: none;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast.error {
+            background: #3d1a1a;
+            border-color: #e74c3c;
+            color: #fdd;
+        }
+
+        /* Word cloud container */
+        .wordcloud-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-md);
+            cursor: default;
+            min-height: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .wordcloud-wrapper canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            transition: opacity 0.6s ease;
+        }
+        .wordcloud-placeholder {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 1.1rem;
+            text-align: center;
+            padding: 40px;
+            font-style: italic;
+        }
+        .tooltip {
+            position: fixed;
+            pointer-events: none;
+            background: rgba(15, 25, 45, 0.95);
+            border: 1px solid var(--sky-blue);
+            color: var(--pure-white);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            z-index: 50;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+            white-space: nowrap;
+        }
+        .tooltip.visible {
+            opacity: 1;
+        }
+
+        /* Stats bar */
+        .stats-bar {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+            color: var(--pale-blue);
+            letter-spacing: 0.04em;
+            position: relative;
+            z-index: 1;
+        }
+        .stat-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 8px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            font-weight: 500;
+        }
+        .stat-value {
+            color: var(--pure-white);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        /* Pulse animation for refresh */
+        @keyframes pulse {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(74, 144, 217, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 16px rgba(74, 144, 217, 0);
+            }
+        }
+        .pulse-ring {
+            animation: pulse 2s infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .card {
+                padding: 20px 16px;
+                border-radius: var(--radius-lg);
+            }
+            .question-text {
+                font-size: 1.2rem;
+            }
+            .btn-primary {
+                padding: 14px 28px;
+                font-size: 0.95rem;
+                width: 100%;
+            }
+            .btn-row {
+                flex-direction: column;
+                width: 100%;
+            }
+            .btn-row .btn {
+                width: 100%;
+                text-align: center;
+            }
+            .qr-section {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .qr-code-img {
+                width: 90px;
+                height: 90px;
+            }
+            .wordcloud-wrapper {
+                min-height: 280px;
+                border-radius: var(--radius-md);
+            }
+            .stats-bar {
+                justify-content: center;
+            }
+        }
+        @media (min-width: 768px) {
+            .app-container {
+                max-width: 620px;
+            }
+            .question-text {
+                font-size: 1.6rem;
+            }
+            .wordcloud-wrapper {
+                min-height: 420px;
+            }
+        }
+        @media (min-width: 1024px) {
+            .app-container {
+                max-width: 700px;
+            }
+            .wordcloud-wrapper {
+                min-height: 480px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Starfield background -->
+    <div class="starfield" id="starfield" aria-hidden="true"></div>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast" aria-live="polite"></div>
+
+    <!-- Tooltip for word cloud -->
+    <div class="tooltip" id="tooltip" aria-hidden="true"></div>
+
+    <!-- Main App -->
+    <div class="app-container" id="appContainer">
+
+        <!-- ==================== STUDENT VIEW ==================== -->
+        <div class="view active" id="studentView">
+            <div class="card">
+                <span class="subtitle">MSA 547 &middot; Leadership &amp; Critical Decision-Making</span>
+                <div class="accent-line"></div>
+                <h1 class="question-text">
+                    In one or two words,<br>what makes you trust an aviation leader?
+                </h1>
+            </div>
+
+            <!-- QR Code Section -->
+            <div class="qr-section" id="qrSection">
+                <img class="qr-code-img" id="qrCodeImg"
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Crect fill='%23fff' width='110' height='110' rx='8'/%3E%3Ctext x='55' y='58' text-anchor='middle' fill='%23999' font-size='11' font-family='sans-serif'%3EQR%3C/text%3E%3C/svg%3E"
+                alt="QR Code - Scan to participate" loading="lazy">
+                <div class="qr-info">
+                    <span class="qr-title">📱 Scan to Participate</span>
+                    <span class="qr-desc">Open this page on your phone to submit your answer.</span>
+                </div>
+            </div>
+
+            <!-- Input Card -->
+            <div class="card" id="inputCard">
+                <div class="input-group">
+                    <label class="label-text" for="answerInput">Your answer (1–2 words):</label>
+                    <input
+                    type="text"
+                    id="answerInput"
+                    class="answer-input"
+                    placeholder="e.g. Clear communication"
+                    maxlength="60"
+                    autocomplete="off"
+                    spellcheck="true"
+                    aria-label="Your answer"
+                    >
+                </div>
+                <div style="height:16px;"></div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" id="submitBtn" type="button">
+                        ✈️ Submit Answer
+                    </button>
+                </div>
+            </div>
+
+            <!-- Instructor hint -->
+            <div style="text-align:center;position:relative;z-index:1;">
+                <button class="btn btn-small btn-secondary" id="gotoResultsBtn" type="button" title="Instructor: Show Results">
+                    🔒 Instructor: View Results →
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== RESULTS VIEW ==================== -->
+        <div class="view" id="resultsView">
+            <div class="card">
+                <span class="subtitle">MSA 547 &middot; Live Poll Results</span>
+                <div class="accent-line"></div>
+                <h1 class="question-text" style="font-size:1.2rem;">
+                    "In one or two words, what makes you trust an aviation leader?"
+                </h1>
+                <div class="stats-bar" id="statsBar">
+                    <span class="stat-item">Responses: <span class="stat-value" id="statCount">—</span></span>
+                    <span class="stat-item">Unique: <span class="stat-value" id="statUnique">—</span></span>
+                </div>
+            </div>
+
+            <!-- Word Cloud -->
+            <div class="wordcloud-wrapper pulse-ring" id="wordcloudWrapper">
+                <canvas id="wordcloudCanvas" aria-label="Word cloud of student responses"></canvas>
+                <div class="wordcloud-placeholder" id="wordcloudPlaceholder">
+                    Loading responses...
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="btn-row between">
+                <button class="btn btn-small btn-secondary" id="refreshBtn" type="button">
+                    🔄 Refresh Data
+                </button>
+                <button class="btn btn-small btn-secondary" id="backToStudentBtn" type="button">
+                    ← Back to Question
+                </button>
+            </div>
+            <div style="text-align:center;font-size:0.7rem;color:rgba(255,255,255,0.35);letter-spacing:0.05em;position:relative;z-index:1;">
+                Data from ethercalc.net/msa547 &middot; Click or tap words for details
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Hidden iframe for EtherCalc form submission (bypasses CORS) -->
+    <iframe name="ethercalcSubmitFrame" id="ethercalcSubmitFrame"
+    style="display:none;width:0;height:0;border:none;"
+    title="Hidden submission frame"
+    sandbox="allow-same-origin allow-forms allow-scripts">
+</iframe>
+
+<!-- Hidden form for EtherCalc POST -->
+<form id="ethercalcForm"
+action="https://ethercalc.net/_/msa547"
+method="POST"
+target="ethercalcSubmitFrame"
+style="display:none;"
+aria-hidden="true">
+<input type="hidden" name="cell" id="ethercalcCellInput" value="">
+<input type="hidden" name="value" id="ethercalcValueInput" value="">
+</form>
+
+<script>
+    (function() {
+        // ==================== DOM ELEMENTS ====================
+        const studentView = document.getElementById('studentView');
+        const resultsView = document.getElementById('resultsView');
+        const answerInput = document.getElementById('answerInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const gotoResultsBtn = document.getElementById('gotoResultsBtn');
+        const backToStudentBtn = document.getElementById('backToStudentBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const toast = document.getElementById('toast');
+        const tooltip = document.getElementById('tooltip');
+        const wordcloudWrapper = document.getElementById('wordcloudWrapper');
+        const wordcloudCanvas = document.getElementById('wordcloudCanvas');
+        const wordcloudPlaceholder = document.getElementById('wordcloudPlaceholder');
+        const statCount = document.getElementById('statCount');
+        const statUnique = document.getElementById('statUnique');
+        const qrCodeImg = document.getElementById('qrCodeImg');
+        const ethercalcForm = document.getElementById('ethercalcForm');
+        const ethercalcCellInput = document.getElementById('ethercalcCellInput');
+        const ethercalcValueInput = document.getElementById('ethercalcValueInput');
+        const starfield = document.getElementById('starfield');
+
+        // ==================== CONSTANTS ====================
+        const ETHERCALC_CSV_URL = 'https://ethercalc.net/msa547.csv';
+        const ETHERCALC_API_URL = 'https://ethercalc.net/_/msa547';
+        const SPREADSHEET_URL = 'https://ethercalc.net/msa547';
+
+        // ==================== STATE ====================
+        let currentView = 'student';
+        let wordPlacements = []; // {word, x, y, w, h, fontSize, color, count, rotation}
+        let hoveredWordIndex = -1;
+        let allAnswers = [];
+        let isSubmitting = false;
+        let canvasCtx = null;
+        let canvasScale = 1;
+
+        // ==================== STARFIELD ====================
+        function createStarfield() {
+            const count = 80;
+            let html = '';
+            for (let i = 0; i < count; i++) {
+                const size = Math.random() * 2.2 + 0.6;
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const dur = Math.random() * 3 + 2.5;
+                const delay = Math.random() * 4;
+                html +=
+                    `<div class="star" style="left:${x}%;top:${y}%;width:${size}px;height:${size}px;--dur:${dur}s;--delay:${delay}s;"></div>`;
+            }
+            starfield.innerHTML = html;
+        }
+        createStarfield();
+
+        // ==================== TOAST ====================
+        let toastTimeout;
+
+        function showToast(message, isError = false) {
+            clearTimeout(toastTimeout);
+            toast.textContent = message;
+            toast.className = 'toast ' + (isError ? 'error' : '');
+            // Force reflow
+            void toast.offsetWidth;
+            toast.classList.add('show');
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2800);
+        }
+
+        // ==================== VIEW SWITCHING ====================
+        function switchView(viewName) {
+            currentView = viewName;
+            studentView.classList.remove('active');
+            resultsView.classList.remove('active');
+
+            if (viewName === 'student') {
+                studentView.classList.add('active');
+                // Re-trigger animation
+                studentView.style.animation = 'none';
+                void studentView.offsetWidth;
+                studentView.style.animation = 'fadeSlideIn 0.5s ease forwards';
+                setTimeout(() => answerInput.focus(), 400);
+            } else if (viewName === 'results') {
+                resultsView.classList.add('active');
+                resultsView.style.animation = 'none';
+                void resultsView.offsetWidth;
+                resultsView.style.animation = 'fadeSlideIn 0.5s ease forwards';
+                fetchAndRenderWordCloud();
+            }
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ==================== QR CODE ====================
+        function updateQRCode() {
+            const pageUrl = window.location.href.split('?')[0]; // Clean URL
+            const qrApiUrl =
+                `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(pageUrl)}&bgcolor=ffffff&color=0a1628&qzone=4`;
+            qrCodeImg.src = qrApiUrl;
+            qrCodeImg.onerror = () => {
+                // Fallback: keep the placeholder SVG
+                qrCodeImg.src =
+                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Crect fill='%23fff' width='110' height='110' rx='8'/%3E%3Ctext x='55' y='55' text-anchor='middle' fill='%23999' font-size='10' font-family='sans-serif'%3EQR Code%3C/text%3E%3Ctext x='55' y='70' text-anchor='middle' fill='%23bbb' font-size='8' font-family='sans-serif'%3E%3C/text%3E%3C/svg%3E";
+            };
+        }
+        updateQRCode();
+
+        // ==================== ETHERCALC: FETCH ANSWERS ====================
+        async function fetchAnswers() {
+            try {
+                const response = await fetch(ETHERCALC_CSV_URL, {
+                    method: 'GET',
+                    cache: 'no-store',
+                    headers: { 'Accept': 'text/csv, text/plain' }
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                const csvText = await response.text();
+                return parseCSVAnswers(csvText);
+            } catch (err) {
+                console.warn('Failed to fetch from EtherCalc:', err.message);
+                throw err;
+            }
+        }
+
+        function parseCSVAnswers(csvText) {
+            const answers = [];
+            if (!csvText || csvText.trim() === '') return answers;
+
+            const lines = csvText.split(/\r?\n/);
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line === '') continue;
+                // Parse CSV: handle quoted values
+                const firstCol = parseFirstCSVColumn(line);
+                const cleaned = firstCol.trim();
+                if (cleaned !== '' &&
+                    // Skip obvious header rows
+                    !/^(answer|response|submission|word|phrase|text|input|data|column|col|a1|cell)/i.test(cleaned) &&
+                    cleaned.length >= 1) {
+                    answers.push(cleaned);
+                }
+            }
+            return answers;
+        }
+
+        function parseFirstCSVColumn(line) {
+            // Handle CSV quoted values
+            if (line.startsWith('"')) {
+                const endQuote = line.indexOf('"', 1);
+                if (endQuote > 0) {
+                    return line.substring(1, endQuote);
+                }
+                return line.substring(1);
+            }
+            const comma = line.indexOf(',');
+            if (comma > 0) {
+                return line.substring(0, comma);
+            }
+            return line;
+        }
+
+        // ==================== ETHERCALC: SUBMIT ANSWER ====================
+        async function submitAnswer(answerText) {
+            // First, fetch current answers to determine next row
+            let existingAnswers = [];
+            try {
+                existingAnswers = await fetchAnswers();
+            } catch (e) {
+                existingAnswers = [];
+            }
+            const nextRow = existingAnswers.length + 1;
+            const cellCoordinate = `A${nextRow}`;
+
+            // Use form submission to bypass CORS
+            ethercalcCellInput.value = cellCoordinate;
+            ethercalcValueInput.value = answerText;
+            ethercalcForm.action = ETHERCALC_API_URL;
+            ethercalcForm.submit();
+
+            // Wait briefly and verify
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            // Verify the submission
+            try {
+                const updatedAnswers = await fetchAnswers();
+                if (updatedAnswers.includes(answerText) || updatedAnswers.length > existingAnswers.length) {
+                    return { success: true, row: nextRow };
+                }
+                // If verification fails, it might still have worked (cache delay)
+                return { success: true, row: nextRow, unverified: true };
+            } catch (e) {
+                // Even if verification fetch fails, the form submission may have succeeded
+                return { success: true, row: nextRow, unverified: true };
+            }
+        }
+
+        // ==================== HANDLE SUBMISSION ====================
+        async function handleSubmit() {
+            if (isSubmitting) return;
+            const rawAnswer = answerInput.value.trim();
+            if (!rawAnswer) {
+                showToast('Please enter an answer first.', true);
+                answerInput.focus();
+                answerInput.style.borderColor = 'var(--red-accent)';
+                setTimeout(() => {
+                    answerInput.style.borderColor = 'var(--glass-border)';
+                }, 1500);
+                return;
+            }
+
+            // Validate: 1-2 words ideally
+            const wordCount = rawAnswer.split(/\s+/).filter(w => w.length > 0).length;
+            if (wordCount > 4) {
+                showToast('Please keep it to 1–2 words if possible!', true);
+                // Allow it but warn
+            }
+
+            isSubmitting = true;
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Submitting...';
+            submitBtn.style.opacity = '0.7';
+
+            try {
+                const result = await submitAnswer(rawAnswer);
+                if (result.success) {
+                    showToast('✅ Answer submitted! Thank you.');
+                    answerInput.value = '';
+                    answerInput.focus();
+                    // Brief celebration effect on the card
+                    const inputCard = document.getElementById('inputCard');
+                    inputCard.style.boxShadow = '0 0 40px rgba(52,183,168,0.5), var(--shadow-lg)';
+                    setTimeout(() => {
+                        inputCard.style.boxShadow = 'var(--shadow-lg)';
+                    }, 800);
+                } else {
+                    showToast('⚠️ Submission may have failed. Please try again.', true);
+                }
+            } catch (err) {
+                console.error('Submission error:', err);
+                showToast('❌ Network error. Please check connection and retry.', true);
+            } finally {
+                isSubmitting = false;
+                submitBtn.disabled = false;
+                submitBtn.textContent = '✈️ Submit Answer';
+                submitBtn.style.opacity = '1';
+            }
+        }
+
+        // ==================== WORD CLOUD ENGINE ====================
+        function computeFrequencies(answers) {
+            const freqMap = new Map();
+            for (const answer of answers) {
+                const key = answer.toLowerCase().trim();
+                if (key) {
+                    freqMap.set(key, (freqMap.get(key) || 0) + 1);
+                }
+            }
+            // Convert to array and sort by frequency descending
+            const freqArray = Array.from(freqMap.entries())
+                .map(([word, count]) => ({ word, count }))
+                .sort((a, b) => b.count - a.count);
+            return freqArray;
+        }
+
+        function getWordCloudColors() {
+            return [
+                '#f4793e', '#ff9a65', '#ffb347', '#ff6b35', '#e8743c', '#f9a05a', // oranges
+                '#4a90d9', '#7eb8da', '#5ba3e6', '#89c4f4', '#a0d2f7', '#3d7ec4', // blues
+                '#34b7a8', '#5cc9ba', '#2ea89a', '#48c9b0', '#6dd5c5', // teals
+                '#d4a853', '#e8c97a', '#c49a3c', '#dfb96a', '#f0d690', // golds
+                '#ffffff', '#eaf1f8', '#f0f4f8', '#dce8f4', '#c8ddf0', // whites/pales
+                '#e74c3c', '#f07070', '#d94545', '#ff6b6b', // reds (sparingly)
+            ];
+        }
+
+        function getRandomColor(colors, index, total) {
+            // Distribute colors somewhat evenly
+            const colorIndex = index % colors.length;
+            // Add slight variation
+            return colors[colorIndex];
+        }
+
+        function renderWordCloud(answers) {
+            const canvas = wordcloudCanvas;
+            const wrapper = wordcloudWrapper;
+            const ctx = canvas.getContext('2d');
+            canvasCtx = ctx;
+
+            // Get container dimensions
+            const containerWidth = wrapper.clientWidth;
+            const containerHeight = Math.max(wrapper.clientHeight, 350);
+            const dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap for performance
+            canvasScale = dpr;
+            const width = containerWidth * dpr;
+            const height = containerHeight * dpr;
+
+            canvas.width = width;
+            canvas.height = height;
+            canvas.style.width = containerWidth + 'px';
+            canvas.style.height = containerHeight + 'px';
+
+            ctx.clearRect(0, 0, width, height);
+
+            if (!answers || answers.length === 0) {
+                wordcloudPlaceholder.style.display = 'flex';
+                wordcloudPlaceholder.textContent = 'No responses yet. Waiting for submissions...';
+                wordPlacements = [];
+                updateStats(0, 0);
+                return;
+            }
+
+            wordcloudPlaceholder.style.display = 'none';
+
+            const frequencies = computeFrequencies(answers);
+            const totalResponses = answers.length;
+            const uniqueCount = frequencies.length;
+            updateStats(totalResponses, uniqueCount);
+
+            if (frequencies.length === 0) {
+                wordcloudPlaceholder.style.display = 'flex';
+                wordcloudPlaceholder.textContent = 'No valid responses yet.';
+                wordPlacements = [];
+                return;
+            }
+
+            const colors = getWordCloudColors();
+            const maxCount = frequencies[0].count;
+            const minCount = frequencies[frequencies.length - 1].count;
+            const countRange = maxCount - minCount || 1;
+
+            // Font size range (in CSS px, will be scaled by dpr)
+            const maxFontSize = Math.min(58, containerWidth / 8);
+            const minFontSize = Math.max(13, maxFontSize * 0.22);
+
+            // Build word items
+            const wordItems = frequencies.map((item, index) => {
+                const t = (item.count - minCount) / countRange; // 0 to 1
+                const fontSize = minFontSize + t * (maxFontSize - minFontSize);
+                const rotation = (Math.random() - 0.5) * 16; // ±8 degrees
+                const color = getRandomColor(colors, index, frequencies.length);
+                return {
+                    word: item.word,
+                    count: item.count,
+                    fontSize: fontSize,
+                    color: color,
+                    rotation: rotation,
+                    originalIndex: index,
+                };
+            });
+
+            // Sort by font size descending (largest first for placement)
+            wordItems.sort((a, b) => b.fontSize - a.fontSize);
+
+            // Place words using spiral algorithm
+            const placedWords = [];
+            const padding = 4 * dpr;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const spiralA = 0.8 * dpr;
+            const spiralStep = 0.25;
+
+            for (const item of wordItems) {
+                const fs = item.fontSize * dpr;
+                ctx.font = `700 ${fs}px ${getFontStack()}`;
+                const metrics = ctx.measureText(item.word);
+                const textWidth = metrics.width;
+                const textHeight = fs * 1.15; // Approximate height
+                const bw = textWidth + padding * 2;
+                const bh = textHeight + padding * 2;
+
+                let placed = false;
+                let theta = 0;
+                const maxAttempts = 2000;
+                let attempts = 0;
+
+                // For the very first (largest) word, place at center
+                if (placedWords.length === 0) {
+                    const x = centerX - textWidth / 2;
+                    const y = centerY - textHeight / 2 + fs * 0.35;
+                    if (x >= padding && y >= padding && x + bw <= width - padding && y + bh <= height - padding) {
+                        placedWords.push({
+                            word: item.word,
+                            count: item.count,
+                            x: x,
+                            y: y,
+                            w: bw,
+                            h: bh,
+                            fontSize: item.fontSize,
+                            color: item.color,
+                            rotation: item.rotation,
+                            cx: x + bw / 2,
+                            cy: y + bh / 2,
+                        });
+                        placed = true;
+                    }
+                }
+
+                while (!placed && attempts < maxAttempts) {
+                    const r = spiralA * theta;
+                    const sx = centerX + r * Math.cos(theta);
+                    const sy = centerY + r * Math.sin(theta);
+                    const x = sx - textWidth / 2;
+                    const y = sy - textHeight / 2 + fs * 0.35;
+
+                    // Check bounds
+                    if (x >= padding && y >= padding && x + bw <= width - padding && y + bh <= height - padding) {
+                        // Check collision with all placed words
+                        let collision = false;
+                        const checkBox = { x: x - padding, y: y - padding, w: bw, h: bh };
+                        for (const pw of placedWords) {
+                            if (boxesOverlap(checkBox, { x: pw.x - padding, y: pw.y - padding, w: pw.w, h: pw.h })) {
+                                collision = true;
+                                break;
+                            }
+                        }
+                        if (!collision) {
+                            placedWords.push({
+                                word: item.word,
+                                count: item.count,
+                                x: x,
+                                y: y,
+                                w: bw,
+                                h: bh,
+                                fontSize: item.fontSize,
+                                color: item.color,
+                                rotation: item.rotation,
+                                cx: x + bw / 2,
+                                cy: y + bh / 2,
+                            });
+                            placed = true;
+                        }
+                    }
+                    theta += spiralStep;
+                    attempts++;
+                }
+
+                // If still not placed, try with reduced font size
+                if (!placed) {
+                    const reducedFs = item.fontSize * 0.6 * dpr;
+                    ctx.font = `700 ${reducedFs}px ${getFontStack()}`;
+                    const rMetrics = ctx.measureText(item.word);
+                    const rTextWidth = rMetrics.width;
+                    const rTextHeight = reducedFs * 1.15;
+                    const rbw = rTextWidth + padding * 2;
+                    const rbh = rTextHeight + padding * 2;
+                    let rTheta = 0;
+                    let rAttempts = 0;
+                    const rMaxAttempts = 1500;
+                    while (!placed && rAttempts < rMaxAttempts) {
+                        const r = spiralA * rTheta;
+                        const sx = centerX + r * Math.cos(rTheta);
+                        const sy = centerY + r * Math.sin(rTheta);
+                        const x = sx - rTextWidth / 2;
+                        const y = sy - rTextHeight / 2 + reducedFs * 0.35;
+                        if (x >= padding && y >= padding && x + rbw <= width - padding && y + rbh <= height -
+                            padding) {
+                            let collision = false;
+                            const checkBox = { x: x - padding, y: y - padding, w: rbw, h: rbh };
+                            for (const pw of placedWords) {
+                                if (boxesOverlap(checkBox, { x: pw.x - padding, y: pw.y - padding, w: pw.w, h: pw
+                                        .h })) {
+                                    collision = true;
+                                    break;
+                                }
+                            }
+                            if (!collision) {
+                                placedWords.push({
+                                    word: item.word,
+                                    count: item.count,
+                                    x: x,
+                                    y: y,
+                                    w: rbw,
+                                    h: rbh,
+                                    fontSize: item.fontSize * 0.6,
+                                    color: item.color,
+                                    rotation: item.rotation,
+                                    cx: x + rbw / 2,
+                                    cy: y + rbh / 2,
+                                });
+                                placed = true;
+                            }
+                        }
+                        rTheta += spiralStep;
+                        rAttempts++;
+                    }
+                }
+            }
+
+            // Draw all placed words
+            for (const pw of placedWords) {
+                drawWord(ctx, pw, dpr, false);
+            }
+
+            wordPlacements = placedWords;
+            hoveredWordIndex = -1;
+            tooltip.classList.remove('visible');
+        }
+
+        function boxesOverlap(a, b) {
+            return !(a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y);
+        }
+
+        function getFontStack() {
+            return "'Georgia','Segoe UI','Inter','Helvetica Neue',sans-serif";
+        }
+
+        function drawWord(ctx, placement, dpr, isHighlighted) {
+            const fs = placement.fontSize * dpr;
+            const fontStack = getFontStack();
+            ctx.save();
+            ctx.translate(placement.cx, placement.cy);
+            if (placement.rotation !== 0) {
+                ctx.rotate(placement.rotation * Math.PI / 180);
+            }
+            ctx.font = `700 ${fs}px ${fontStack}`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            if (isHighlighted) {
+                // Glow effect
+                ctx.shadowColor = placement.color;
+                ctx.shadowBlur = 18 * dpr;
+                ctx.fillStyle = '#ffffff';
+                ctx.fillText(placement.word, 0, 0);
+                ctx.shadowBlur = 0;
+                // Draw again on top for crispness
+                ctx.fillStyle = placement.color;
+                ctx.fillText(placement.word, 0, 0);
+                // Slight scale pulse via redraw
+            } else {
+                ctx.fillStyle = placement.color;
+                ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                ctx.shadowBlur = 3 * dpr;
+                ctx.fillText(placement.word, 0, 0);
+                ctx.shadowBlur = 0;
+                // Subtle inner glow
+                ctx.fillStyle = 'rgba(255,255,255,0.08)';
+                ctx.fillText(placement.word, -0.5 * dpr, -0.5 * dpr);
+            }
+            ctx.restore();
+        }
+
+        function redrawAllHighlighted(highlightIndex) {
+            const canvas = wordcloudCanvas;
+            const ctx = canvasCtx || canvas.getContext('2d');
+            const dpr = canvasScale;
+            const width = canvas.width;
+            const height = canvas.height;
+            ctx.clearRect(0, 0, width, height);
+
+            for (let i = 0; i < wordPlacements.length; i++) {
+                drawWord(ctx, wordPlacements[i], dpr, i === highlightIndex);
+            }
+        }
+
+        function findWordAtPosition(mouseX, mouseY) {
+            const rect = wordcloudCanvas.getBoundingClientRect();
+            const scaleX = (wordcloudCanvas.width / canvasScale) / rect.width;
+            const scaleY = (wordcloudCanvas.height / canvasScale) / rect.height;
+            const cx = mouseX * scaleX * canvasScale;
+            const cy = mouseY * scaleY * canvasScale;
+
+            // Check from top (last placed, smaller words) to bottom (larger words)
+            // Actually, check all and pick the smallest one that contains the point (more precise)
+            let bestIndex = -1;
+            let bestArea = Infinity;
+            for (let i = 0; i < wordPlacements.length; i++) {
+                const pw = wordPlacements[i];
+                const padding = 2 * canvasScale;
+                const bx = pw.x - padding;
+                const by = pw.y - padding;
+                const bw = pw.w;
+                const bh = pw.h;
+                if (cx >= bx && cx <= bx + bw && cy >= by && cy <= by + bh) {
+                    const area = bw * bh;
+                    if (area < bestArea) {
+                        bestArea = area;
+                        bestIndex = i;
+                    }
+                }
+            }
+            return bestIndex;
+        }
+
+        function updateStats(total, unique) {
+            statCount.textContent = total;
+            statUnique.textContent = unique;
+        }
+
+        // ==================== FETCH & RENDER ====================
+        async function fetchAndRenderWordCloud() {
+            wordcloudPlaceholder.style.display = 'flex';
+            wordcloudPlaceholder.textContent = 'Loading responses...';
+            wordPlacements = [];
+            hoveredWordIndex = -1;
+            tooltip.classList.remove('visible');
+            updateStats('—', '—');
+
+            try {
+                allAnswers = await fetchAnswers();
+                renderWordCloud(allAnswers);
+            } catch (err) {
+                console.error('Error fetching answers:', err);
+                wordcloudPlaceholder.style.display = 'flex';
+                wordcloudPlaceholder.textContent =
+                    '⚠️ Unable to load responses. Check your connection and ensure the spreadsheet exists at ' +
+                    SPREADSHEET_URL;
+                updateStats('—', '—');
+                showToast('Failed to load data. Please try refreshing.', true);
+            }
+        }
+
+        // ==================== EVENT LISTENERS ====================
+        // Submit button
+        submitBtn.addEventListener('click', handleSubmit);
+
+        // Enter key in input
+        answerInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !isSubmitting) {
+                e.preventDefault();
+                handleSubmit();
+            }
+        });
+
+        // View switching
+        gotoResultsBtn.addEventListener('click', () => switchView('results'));
+        backToStudentBtn.addEventListener('click', () => switchView('student'));
+        refreshBtn.addEventListener('click', () => {
+            fetchAndRenderWordCloud();
+            showToast('🔄 Refreshing data...');
+        });
+
+        // Keyboard shortcut: press 'N' for next (instructor)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'n' || e.key === 'N') {
+                if (!e.target.closest('input') && !e.target.closest('textarea')) {
+                    if (currentView === 'student') {
+                        switchView('results');
+                    } else {
+                        switchView('student');
+                    }
+                }
+            }
+            if (e.key === 'r' || e.key === 'R') {
+                if (!e.target.closest('input') && !e.target.closest('textarea') && currentView === 'results') {
+                    fetchAndRenderWordCloud();
+                    showToast('🔄 Refreshing data...');
+                }
+            }
+        });
+
+        // Word cloud interaction
+        wordcloudCanvas.addEventListener('mousemove', (e) => {
+            if (wordPlacements.length === 0) return;
+            const index = findWordAtPosition(e.clientX, e.clientY);
+            if (index !== hoveredWordIndex) {
+                hoveredWordIndex = index;
+                redrawAllHighlighted(index);
+                wordcloudCanvas.style.cursor = index >= 0 ? 'pointer' : 'default';
+
+                // Update tooltip
+                if (index >= 0) {
+                    const pw = wordPlacements[index];
+                    tooltip.textContent = `"${pw.word}" — ${pw.count} response${pw.count > 1 ? 's' : ''}`;
+                    tooltip.classList.add('visible');
+                    tooltip.style.left = (e.clientX + 18) + 'px';
+                    tooltip.style.top = (e.clientY - 40) + 'px';
+                } else {
+                    tooltip.classList.remove('visible');
+                }
+            } else if (index >= 0) {
+                tooltip.style.left = (e.clientX + 18) + 'px';
+                tooltip.style.top = (e.clientY - 40) + 'px';
+            }
+        });
+
+        wordcloudCanvas.addEventListener('mouseleave', () => {
+            hoveredWordIndex = -1;
+            redrawAllHighlighted(-1);
+            wordcloudCanvas.style.cursor = 'default';
+            tooltip.classList.remove('visible');
+        });
+
+        wordcloudCanvas.addEventListener('click', (e) => {
+            if (wordPlacements.length === 0) return;
+            const index = findWordAtPosition(e.clientX, e.clientY);
+            if (index >= 0) {
+                const pw = wordPlacements[index];
+                showToast(`📊 "${pw.word}" appeared ${pw.count} time${pw.count > 1 ? 's' : ''}`);
+                // Brief highlight pulse
+                hoveredWordIndex = index;
+                redrawAllHighlighted(index);
+                setTimeout(() => {
+                    if (hoveredWordIndex === index) {
+                        hoveredWordIndex = -1;
+                        redrawAllHighlighted(-1);
+                    }
+                }, 1200);
+            }
+        });
+
+        // Touch events for mobile
+        wordcloudCanvas.addEventListener('touchmove', (e) => {
+            if (wordPlacements.length === 0) return;
+            if (e.touches.length === 1) {
+                const touch = e.touches[0];
+                const index = findWordAtPosition(touch.clientX, touch.clientY);
+                if (index !== hoveredWordIndex) {
+                    hoveredWordIndex = index;
+                    redrawAllHighlighted(index);
+                    if (index >= 0) {
+                        const pw = wordPlacements[index];
+                        tooltip.textContent = `"${pw.word}" — ${pw.count} response${pw.count > 1 ? 's' : ''}`;
+                        tooltip.classList.add('visible');
+                        tooltip.style.left = (touch.clientX + 18) + 'px';
+                        tooltip.style.top = (touch.clientY - 50) + 'px';
+                    } else {
+                        tooltip.classList.remove('visible');
+                    }
+                }
+            }
+        }, { passive: true });
+
+        wordcloudCanvas.addEventListener('touchend', () => {
+            setTimeout(() => {
+                hoveredWordIndex = -1;
+                redrawAllHighlighted(-1);
+                tooltip.classList.remove('visible');
+            }, 300);
+        });
+
+        // Handle window resize for word cloud
+        let resizeDebounce;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeDebounce);
+            resizeDebounce = setTimeout(() => {
+                if (currentView === 'results' && allAnswers.length > 0) {
+                    renderWordCloud(allAnswers);
+                }
+            }, 400);
+        });
+
+        // ==================== INITIALIZATION ====================
+        function init() {
+            // Focus the input on load
+            setTimeout(() => answerInput.focus(), 600);
+
+            // Update QR code with actual URL
+            updateQRCode();
+
+            // Log info
+            console.log('🛩️  MSA 547 - Trust in Aviation Leadership');
+            console.log('📊  Data source:', SPREADSHEET_URL);
+            console.log('💡  Instructor: Press "N" to toggle views, "R" to refresh results');
+            console.log('📱  Student view is active — scan QR code or share this URL');
+            console.log('🔗  Current URL:', window.location.href);
+        }
+
+        init();
+
+        // ==================== EXPORT FOR DEBUG ====================
+        if (typeof window !== 'undefined') {
+            window.msa547 = {
+                fetchAnswers,
+                submitAnswer,
+                renderWordCloud,
+                switchView,
+                getAnswers: () => allAnswers,
+                getPlacements: () => wordPlacements,
+                refresh: fetchAndRenderWordCloud,
+            };
+        }
+
+        console.log('✅ MSA 547 app initialized successfully.');
+        console.log('   Access window.msa547 for debug controls.');
+    })();
+</script>
+</body>
+</html>
