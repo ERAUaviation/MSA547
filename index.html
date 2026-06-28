@@ -404,7 +404,7 @@
     <div class="toast" id="toast" aria-live="polite"></div>
     <div class="tooltip" id="tooltip" aria-hidden="true"></div>
 
-    <!-- Hidden iframe for GET form submission -->
+    <!-- Hidden iframe for GET form submission (backup) -->
     <iframe name="ethercalcSubmitFrame" id="ethercalcSubmitFrame" style="display:none;width:0;height:0;border:none;" title="hidden submission frame"></iframe>
 
     <div class="app-container" id="appContainer">
@@ -619,7 +619,17 @@
                 return answers;
             }
 
-            // SUBMISSION: uses a GET form to write the cell (EtherCalc API standard)
+            // SUBMISSION: Primary method - image beacon (GET request to set cell)
+            function writeCellViaImage(cell, value) {
+                const encoded = encodeURIComponent(value);
+                const url = `${ETHERCALC_API}?cell=${cell}&value=${encoded}`;
+                console.log(`📸 Image beacon: ${url}`);
+                const img = new Image();
+                img.src = url;
+                // No need to append to DOM; browser will still load it
+            }
+
+            // Backup: hidden GET form submission
             function writeCellViaGetForm(cell, value) {
                 const form = document.createElement('form');
                 form.method = 'GET';
@@ -641,11 +651,10 @@
 
                 document.body.appendChild(form);
                 form.submit();
-                // Remove after a short delay to ensure request is sent
                 setTimeout(() => {
                     if (form.parentNode) form.remove();
-                }, 500);
-                console.log(`📝 GET form submitted for ${cell} = "${value}"`);
+                }, 1000);
+                console.log(`📋 Backup form submitted for ${cell} = "${value}"`);
             }
 
             async function submitAnswer(answerText) {
@@ -659,16 +668,15 @@
                 const cell = `A${nextRow}`;
                 console.log(`🚀 Submitting answer to ${cell}: "${answerText}"`);
 
-                // Primary: GET form submission
-                writeCellViaGetForm(cell, answerText);
+                // Primary: image beacon
+                writeCellViaImage(cell, answerText);
 
-                // Secondary: direct iframe src change as backup
-                const encoded = encodeURIComponent(answerText);
-                submitFrame.src = `${ETHERCALC_API}?cell=${cell}&value=${encoded}`;
+                // Backup: form submission (slight delay to avoid race condition)
+                setTimeout(() => writeCellViaGetForm(cell, answerText), 200);
 
-                // Wait for potential write to propagate (EtherCalc may have a small delay)
-                console.log('⏳ Waiting 4 seconds for spreadsheet update...');
-                await new Promise(r => setTimeout(r, 4000));
+                // Wait for propagation
+                console.log('⏳ Waiting 5 seconds for spreadsheet update...');
+                await new Promise(r => setTimeout(r, 5000));
 
                 // Verify
                 let verified = false;
@@ -680,7 +688,7 @@
                         verified = true;
                         console.log('✅ Answer verified in spreadsheet');
                     } else {
-                        console.warn('⚠️ Answer not yet visible – might need a few more seconds or a refresh');
+                        console.warn('⚠️ Answer not yet visible – might need a refresh');
                     }
                 } catch (e) {
                     console.warn('Verification fetch failed, assuming submission succeeded');
@@ -962,7 +970,7 @@
 
             // Init
             async function init() {
-                console.log('🛩️ MSA 547 – ready');
+                console.log('🛩️ MSA 547 – ready (image beacon method)');
                 updateQR();
                 const ok = await checkBackend();
                 if (!ok) {
