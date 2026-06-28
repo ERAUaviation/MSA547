@@ -397,21 +397,6 @@
         .status-indicator.warn {
             background: var(--orange);
         }
-
-        .fallback-link {
-            display: none;
-            margin-top: 12px;
-            padding: 10px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            text-align: center;
-            font-size: 0.8rem;
-        }
-        .fallback-link a {
-            color: var(--teal);
-            font-weight: 700;
-            word-break: break-all;
-        }
     </style>
 </head>
 <body>
@@ -419,8 +404,8 @@
     <div class="toast" id="toast" aria-live="polite"></div>
     <div class="tooltip" id="tooltip" aria-hidden="true"></div>
 
-    <!-- Hidden iframe for GET-based cell write -->
-    <iframe id="ethercalcSubmitFrame" style="display:none;width:0;height:0;border:none;" title="hidden submission frame"></iframe>
+    <!-- Hidden iframe for GET form submission -->
+    <iframe name="ethercalcSubmitFrame" id="ethercalcSubmitFrame" style="display:none;width:0;height:0;border:none;" title="hidden submission frame"></iframe>
 
     <div class="app-container" id="appContainer">
         <!-- STUDENT VIEW -->
@@ -452,9 +437,6 @@
                 <button class="btn btn-primary" id="submitBtn">✈️ Submit Answer</button>
                 <div id="submissionHint" style="margin-top:10px;font-size:0.7rem;color:rgba(255,255,255,0.35);text-align:center;">
                     Press Enter or tap Submit
-                </div>
-                <div id="fallbackLinkContainer" class="fallback-link">
-                    <span>📝 If answer doesn't appear, <a id="manualWriteLink" href="#" target="_blank">click here to manually add it to the spreadsheet</a></span>
                 </div>
             </div>
 
@@ -516,8 +498,6 @@
             const connectionStatus = document.getElementById('connectionStatus');
             const statusDot = document.getElementById('statusDot');
             const submissionHint = document.getElementById('submissionHint');
-            const fallbackLinkContainer = document.getElementById('fallbackLinkContainer');
-            const manualWriteLink = document.getElementById('manualWriteLink');
 
             const ETHERCALC_CSV = 'https://ethercalc.net/msa547.csv';
             const ETHERCALC_API = 'https://ethercalc.net/_/msa547';
@@ -639,14 +619,33 @@
                 return answers;
             }
 
-            // Submission: use GET request via iframe navigation (primary)
-            function submitViaIframe(cell, value) {
-                const encoded = encodeURIComponent(value);
-                const url = `${ETHERCALC_API}?cell=${cell}&value=${encoded}`;
-                console.log(`📡 Setting iframe src to: ${url}`);
-                submitFrame.src = url;
-                // Also try a secondary no-cors fetch (optional)
-                fetch(url, { method: 'GET', mode: 'no-cors' }).catch(() => {});
+            // SUBMISSION: uses a GET form to write the cell (EtherCalc API standard)
+            function writeCellViaGetForm(cell, value) {
+                const form = document.createElement('form');
+                form.method = 'GET';
+                form.action = ETHERCALC_API;
+                form.target = 'ethercalcSubmitFrame';
+                form.style.display = 'none';
+
+                const cellInput = document.createElement('input');
+                cellInput.type = 'hidden';
+                cellInput.name = 'cell';
+                cellInput.value = cell;
+                form.appendChild(cellInput);
+
+                const valueInput = document.createElement('input');
+                valueInput.type = 'hidden';
+                valueInput.name = 'value';
+                valueInput.value = value;
+                form.appendChild(valueInput);
+
+                document.body.appendChild(form);
+                form.submit();
+                // Remove after a short delay to ensure request is sent
+                setTimeout(() => {
+                    if (form.parentNode) form.remove();
+                }, 500);
+                console.log(`📝 GET form submitted for ${cell} = "${value}"`);
             }
 
             async function submitAnswer(answerText) {
@@ -658,14 +657,18 @@
 
                 const nextRow = existingCount + 1;
                 const cell = `A${nextRow}`;
-                console.log(`🚀 Submitting to cell ${cell}: "${answerText}"`);
+                console.log(`🚀 Submitting answer to ${cell}: "${answerText}"`);
 
-                // Primary submission: iframe GET
-                submitViaIframe(cell, answerText);
+                // Primary: GET form submission
+                writeCellViaGetForm(cell, answerText);
 
-                // Wait for potential write to propagate
-                console.log('⏳ Waiting 5 seconds for spreadsheet update...');
-                await new Promise(r => setTimeout(r, 5000));
+                // Secondary: direct iframe src change as backup
+                const encoded = encodeURIComponent(answerText);
+                submitFrame.src = `${ETHERCALC_API}?cell=${cell}&value=${encoded}`;
+
+                // Wait for potential write to propagate (EtherCalc may have a small delay)
+                console.log('⏳ Waiting 4 seconds for spreadsheet update...');
+                await new Promise(r => setTimeout(r, 4000));
 
                 // Verify
                 let verified = false;
@@ -677,7 +680,7 @@
                         verified = true;
                         console.log('✅ Answer verified in spreadsheet');
                     } else {
-                        console.warn('⚠️ Answer not yet visible – might need more time or manual check');
+                        console.warn('⚠️ Answer not yet visible – might need a few more seconds or a refresh');
                     }
                 } catch (e) {
                     console.warn('Verification fetch failed, assuming submission succeeded');
@@ -699,22 +702,16 @@
                 submitBtn.disabled = true;
                 submitBtn.textContent = '⏳ Submitting...';
                 submissionHint.textContent = 'Sending to spreadsheet...';
-                fallbackLinkContainer.style.display = 'none';
 
                 try {
                     const result = await submitAnswer(answer);
                     answerInput.value = '';
                     answerInput.focus();
 
-                    // Build manual fallback link
-                    const manualUrl = `${ETHERCALC_API}?cell=${result.cell}&value=${encodeURIComponent(result.value)}`;
-                    manualWriteLink.href = manualUrl;
-
                     if (result.verified) {
                         showToast('✅ Answer submitted successfully!', 'success');
                     } else {
-                        showToast('📤 Answer sent, but not yet visible. Click the link below if it doesn\'t appear.', 'success');
-                        fallbackLinkContainer.style.display = 'block';
+                        showToast('📤 Answer sent! It should appear in the results shortly.', 'success');
                     }
                     updateConnectionStatus(true);
                 } catch (e) {
@@ -727,7 +724,7 @@
                 }
             }
 
-            // Word cloud engine (unchanged, compact)
+            // Word cloud engine (unchanged)
             function computeFrequencies(answers) {
                 const map = new Map();
                 answers.forEach(a => {
