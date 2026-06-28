@@ -397,6 +397,21 @@
         .status-indicator.warn {
             background: var(--orange);
         }
+
+        .fallback-link {
+            display: none;
+            margin-top: 12px;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+        .fallback-link a {
+            color: var(--teal);
+            font-weight: 700;
+            word-break: break-all;
+        }
     </style>
 </head>
 <body>
@@ -404,8 +419,8 @@
     <div class="toast" id="toast" aria-live="polite"></div>
     <div class="tooltip" id="tooltip" aria-hidden="true"></div>
 
-    <!-- Hidden iframe for form submission (no sandbox) -->
-    <iframe name="ethercalcSubmitFrame" id="ethercalcSubmitFrame" style="display:none;width:0;height:0;border:none;" title="hidden submission frame"></iframe>
+    <!-- Hidden iframe for GET-based cell write -->
+    <iframe id="ethercalcSubmitFrame" style="display:none;width:0;height:0;border:none;" title="hidden submission frame"></iframe>
 
     <div class="app-container" id="appContainer">
         <!-- STUDENT VIEW -->
@@ -438,8 +453,8 @@
                 <div id="submissionHint" style="margin-top:10px;font-size:0.7rem;color:rgba(255,255,255,0.35);text-align:center;">
                     Press Enter or tap Submit
                 </div>
-                <div id="spreadsheetLink" style="margin-top:8px;font-size:0.7rem;text-align:center;display:none;">
-                    <a href="https://ethercalc.net/msa547" target="_blank" rel="noopener" style="color:var(--sky-blue);">Open spreadsheet to verify</a>
+                <div id="fallbackLinkContainer" class="fallback-link">
+                    <span>📝 If answer doesn't appear, <a id="manualWriteLink" href="#" target="_blank">click here to manually add it to the spreadsheet</a></span>
                 </div>
             </div>
 
@@ -501,7 +516,8 @@
             const connectionStatus = document.getElementById('connectionStatus');
             const statusDot = document.getElementById('statusDot');
             const submissionHint = document.getElementById('submissionHint');
-            const spreadsheetLink = document.getElementById('spreadsheetLink');
+            const fallbackLinkContainer = document.getElementById('fallbackLinkContainer');
+            const manualWriteLink = document.getElementById('manualWriteLink');
 
             const ETHERCALC_CSV = 'https://ethercalc.net/msa547.csv';
             const ETHERCALC_API = 'https://ethercalc.net/_/msa547';
@@ -539,7 +555,7 @@
                 toast.className = 'toast ' + type;
                 void toast.offsetWidth;
                 toast.classList.add('show');
-                toastTimeout = setTimeout(() => toast.classList.remove('show'), 4000);
+                toastTimeout = setTimeout(() => toast.classList.remove('show'), 4500);
             }
 
             // Connection status
@@ -623,7 +639,16 @@
                 return answers;
             }
 
-            // Submission: dynamic form + iframe with extended verification
+            // Submission: use GET request via iframe navigation (primary)
+            function submitViaIframe(cell, value) {
+                const encoded = encodeURIComponent(value);
+                const url = `${ETHERCALC_API}?cell=${cell}&value=${encoded}`;
+                console.log(`📡 Setting iframe src to: ${url}`);
+                submitFrame.src = url;
+                // Also try a secondary no-cors fetch (optional)
+                fetch(url, { method: 'GET', mode: 'no-cors' }).catch(() => {});
+            }
+
             async function submitAnswer(answerText) {
                 let existingCount = 0;
                 try {
@@ -633,42 +658,14 @@
 
                 const nextRow = existingCount + 1;
                 const cell = `A${nextRow}`;
-                console.log(`📡 Submitting to ${ETHERCALC_API} cell=${cell} value="${answerText}"`);
+                console.log(`🚀 Submitting to cell ${cell}: "${answerText}"`);
 
-                // Create a fresh form each time
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = ETHERCALC_API;
-                form.target = 'ethercalcSubmitFrame';
-                form.enctype = 'application/x-www-form-urlencoded';
-                form.style.display = 'none';
-
-                const cellInput = document.createElement('input');
-                cellInput.type = 'hidden';
-                cellInput.name = 'cell';
-                cellInput.value = cell;
-                form.appendChild(cellInput);
-
-                const valueInput = document.createElement('input');
-                valueInput.type = 'hidden';
-                valueInput.name = 'value';
-                valueInput.value = answerText;
-                form.appendChild(valueInput);
-
-                document.body.appendChild(form);
-
-                // Log to confirm form submission
-                console.log('📋 Form submitted to iframe');
-                form.submit();
-
-                // Remove form after a short delay to ensure request is sent
-                setTimeout(() => {
-                    if (form.parentNode) form.remove();
-                }, 1000);
+                // Primary submission: iframe GET
+                submitViaIframe(cell, answerText);
 
                 // Wait for potential write to propagate
-                console.log('⏳ Waiting 4 seconds for spreadsheet update...');
-                await new Promise(r => setTimeout(r, 4000));
+                console.log('⏳ Waiting 5 seconds for spreadsheet update...');
+                await new Promise(r => setTimeout(r, 5000));
 
                 // Verify
                 let verified = false;
@@ -680,14 +677,14 @@
                         verified = true;
                         console.log('✅ Answer verified in spreadsheet');
                     } else {
-                        console.warn('⚠️ Answer not yet visible – may need manual refresh');
+                        console.warn('⚠️ Answer not yet visible – might need more time or manual check');
                     }
                 } catch (e) {
                     console.warn('Verification fetch failed, assuming submission succeeded');
                     verified = true;
                 }
 
-                return { success: true, row: nextRow, verified };
+                return { success: true, cell, value: answerText, verified };
             }
 
             async function handleSubmit() {
@@ -702,17 +699,22 @@
                 submitBtn.disabled = true;
                 submitBtn.textContent = '⏳ Submitting...';
                 submissionHint.textContent = 'Sending to spreadsheet...';
-                spreadsheetLink.style.display = 'none';
+                fallbackLinkContainer.style.display = 'none';
 
                 try {
                     const result = await submitAnswer(answer);
                     answerInput.value = '';
                     answerInput.focus();
+
+                    // Build manual fallback link
+                    const manualUrl = `${ETHERCALC_API}?cell=${result.cell}&value=${encodeURIComponent(result.value)}`;
+                    manualWriteLink.href = manualUrl;
+
                     if (result.verified) {
                         showToast('✅ Answer submitted successfully!', 'success');
                     } else {
-                        showToast('📤 Answer sent! It may take a moment to appear. You can check the spreadsheet.', 'success');
-                        spreadsheetLink.style.display = 'block';
+                        showToast('📤 Answer sent, but not yet visible. Click the link below if it doesn\'t appear.', 'success');
+                        fallbackLinkContainer.style.display = 'block';
                     }
                     updateConnectionStatus(true);
                 } catch (e) {
@@ -725,7 +727,7 @@
                 }
             }
 
-            // Word cloud engine (same as before, compact)
+            // Word cloud engine (unchanged, compact)
             function computeFrequencies(answers) {
                 const map = new Map();
                 answers.forEach(a => {
