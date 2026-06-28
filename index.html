@@ -1,6 +1,3 @@
-After many attempts, I’ve identified the root cause: **browser cookie restrictions** prevent cross‑site writes to EtherCalc. The embedded iframe (same‑domain) can process the `set` command because it carries your session cookie, and now the page waits for the iframe to fully load before sending the write command via `postMessage`. The sheet is visible at the bottom so you can see it update live. No manual steps needed.
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -68,15 +65,8 @@ After many attempts, I’ve identified the root cause: **browser cookie restrict
             animation-delay: var(--delay);
         }
         @keyframes twinkle {
-            0%,
-            100% {
-                opacity: 0.25;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 0.9;
-                transform: scale(1.8);
-            }
+            0%, 100% { opacity: 0.25; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.8); }
         }
         .app-container {
             position: relative;
@@ -86,7 +76,6 @@ After many attempts, I’ve identified the root cause: **browser cookie restrict
             display: flex;
             flex-direction: column;
             gap: 20px;
-            padding-bottom: 80px;
         }
         .view {
             display: none;
@@ -98,14 +87,8 @@ After many attempts, I’ve identified the root cause: **browser cookie restrict
             display: flex;
         }
         @keyframes fadeSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(18px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(18px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .card {
             background: var(--panel-bg);
@@ -376,62 +359,15 @@ After many attempts, I’ve identified the root cause: **browser cookie restrict
             border-radius: 50%;
             display: inline-block;
         }
-        .status-indicator.ok {
-            background: var(--green-accent);
-        }
-        .status-indicator.err {
-            background: var(--red-accent);
-        }
-        .status-indicator.warn {
-            background: var(--orange);
-        }
-
-        /* EtherCalc iframe bar (visible, for same-origin postMessage) */
-        .ethercalc-iframe {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 60px;
-            border: none;
-            z-index: 5;
-            background: #000;
-            opacity: 0.9;
-            transition: height 0.3s;
-        }
-        .iframe-expanded {
-            height: 200px;
-        }
-        .iframe-minimized {
-            height: 60px;
-        }
-        .iframe-toggle {
-            position: fixed;
-            bottom: 65px;
-            right: 16px;
-            z-index: 6;
-            background: var(--panel-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--pale-blue);
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .status-indicator.ok { background: var(--green-accent); }
+        .status-indicator.err { background: var(--red-accent); }
+        .status-indicator.warn { background: var(--orange); }
     </style>
 </head>
 <body>
     <div class="starfield" id="starfield" aria-hidden="true"></div>
     <div class="toast" id="toast" aria-live="polite"></div>
     <div class="tooltip" id="tooltip" aria-hidden="true"></div>
-
-    <!-- Visible EtherCalc iframe (loads same-sheet to use your session) -->
-    <iframe id="ethercalcIframe" class="ethercalc-iframe iframe-minimized" src="about:blank" title="EtherCalc backend" allow="same-origin"></iframe>
-    <button class="iframe-toggle" id="iframeToggle" title="Toggle sheet size">🔽</button>
 
     <div class="app-container" id="appContainer">
         <!-- STUDENT VIEW -->
@@ -504,6 +440,7 @@ After many attempts, I’ve identified the root cause: **browser cookie restrict
 
     <script>
         (function() {
+            // DOM elements
             const studentView = document.getElementById('studentView');
             const resultsView = document.getElementById('resultsView');
             const answerInput = document.getElementById('answerInput');
@@ -519,13 +456,12 @@ After many attempts, I’ve identified the root cause: **browser cookie restrict
             const statUnique = document.getElementById('statUnique');
             const statLastRefresh = document.getElementById('statLastRefresh');
             const qrCodeImg = document.getElementById('qrCodeImg');
-            const ethercalcIframe = document.getElementById('ethercalcIframe');
-            const iframeToggle = document.getElementById('iframeToggle');
             const connectionStatus = document.getElementById('connectionStatus');
             const statusDot = document.getElementById('statusDot');
             const submissionHint = document.getElementById('submissionHint');
 
             const ETHERCALC_CSV = 'https://ethercalc.net/msa547.csv';
+            const ETHERCALC_API = 'https://ethercalc.net/_/msa547';
             const SHEET_URL = 'https://ethercalc.net/msa547';
 
             let currentView = 'student';
@@ -535,7 +471,6 @@ After many attempts, I’ve identified the root cause: **browser cookie restrict
             let canvasCtx, canvasScale = 1;
             let isSubmitting = false;
             let backendReachable = null;
-            let iframeLoaded = false;
 
             // Starfield
             (function() {
@@ -547,8 +482,7 @@ After many attempts, I’ve identified the root cause: **browser cookie restrict
                     const y = Math.random() * 100;
                     const dur = Math.random() * 3 + 2.5;
                     const delay = Math.random() * 4;
-                    html +=
-                        `<div class="star" style="left:${x}%;top:${y}%;width:${size}px;height:${size}px;--dur:${dur}s;--delay:${delay}s;"></div>`;
+                    html += `<div class="star" style="left:${x}%;top:${y}%;width:${size}px;height:${size}px;--dur:${dur}s;--delay:${delay}s;"></div>`;
                 }
                 sf.innerHTML = html;
             })();
@@ -569,17 +503,13 @@ After many attempts, I’ve identified the root cause: **browser cookie restrict
                 backendReachable = reachable;
                 if (reachable === true) {
                     statusDot.className = 'status-indicator ok';
-                    connectionStatus.innerHTML =
-                        '<span class="status-indicator ok"></span> Backend connected';
+                    connectionStatus.innerHTML = '<span class="status-indicator ok"></span> Backend connected';
                 } else if (reachable === false) {
                     statusDot.className = 'status-indicator err';
-                    connectionStatus.innerHTML =
-                        '<span class="status-indicator err"></span> Spreadsheet missing – <a href="' +
-                        SHEET_URL + '" target="_blank" style="color:var(--orange);">create it here</a>';
+                    connectionStatus.innerHTML = '<span class="status-indicator err"></span> Spreadsheet missing – <a href="'+SHEET_URL+'" target="_blank" style="color:var(--orange);">create it here</a>';
                 } else {
                     statusDot.className = 'status-indicator warn';
-                    connectionStatus.innerHTML =
-                        '<span class="status-indicator warn"></span> Checking backend...';
+                    connectionStatus.innerHTML = '<span class="status-indicator warn"></span> Checking backend...';
                 }
             }
 
@@ -609,10 +539,8 @@ After many attempts, I’ve identified the root cause: **browser cookie restrict
             // QR code
             function updateQR() {
                 const url = window.location.href.split('?')[0].split('#')[0];
-                qrCodeImg.src =
-                    `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(url)}&bgcolor=ffffff&color=0a1628&qzone=4`;
-                qrCodeImg.onerror = () => qrCodeImg.src =
-                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Crect fill='%23fff' width='110' height='110' rx='8'/%3E%3Ctext x='55' y='55' text-anchor='middle' fill='%23999' font-size='10'%3EQR%3C/text%3E%3C/svg%3E";
+                qrCodeImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(url)}&bgcolor=ffffff&color=0a1628&qzone=4`;
+                qrCodeImg.onerror = () => qrCodeImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Crect fill='%23fff' width='110' height='110' rx='8'/%3E%3Ctext x='55' y='55' text-anchor='middle' fill='%23999' font-size='10'%3EQR%3C/text%3E%3C/svg%3E";
             }
 
             // Fetch answers from CSV
@@ -638,94 +566,28 @@ After many attempts, I’ve identified the root cause: **browser cookie restrict
                         firstCol = comma > 0 ? line.substring(0, comma) : line;
                     }
                     const cleaned = firstCol.trim();
-                    if (!cleaned || /^(answer|response|submission|word|cell|sheet|ethercalc)/i.test(cleaned) ||
-                        /^[A-Z]\d+$/i.test(cleaned)) continue;
+                    if (!cleaned || /^(answer|response|submission|word|cell|sheet|ethercalc)/i.test(cleaned) || /^[A-Z]\d+$/i.test(cleaned)) continue;
                     answers.push(cleaned);
                 }
                 return answers;
             }
 
-            // --- postMessage write (using correct EtherCalc API) ---
-            function loadEthercalcIframe() {
-                ethercalcIframe.src = SHEET_URL;
-                console.log('📺 Loading EtherCalc iframe:', SHEET_URL);
-            }
-
-            function sendWriteCommand(cell, value) {
-                if (!ethercalcIframe.contentWindow) {
-                    console.error('❌ iframe not available');
-                    return;
-                }
-                const message = {
-                    action: 'set',
-                    name: cell,
-                    value: value
-                };
-                console.log(`📤 postMessage to EtherCalc:`, message);
-                ethercalcIframe.contentWindow.postMessage(message, 'https://ethercalc.net');
-            }
-
-            // Listen for any message from iframe (debug)
-            window.addEventListener('message', (event) => {
-                if (event.origin !== 'https://ethercalc.net') return;
-                console.log('📨 Message from iframe:', event.data);
-                if (event.data && event.data.type === 'socialcalc:response') {
-                    console.log('✅ Write acknowledged by sheet');
-                }
-            });
-
-            // Wait for iframe load, then send any pending writes after a safe delay
-            ethercalcIframe.addEventListener('load', () => {
-                console.log('🟢 EtherCalc iframe loaded');
-                iframeLoaded = true;
-                // After load, wait 2 seconds for scripts to initialize
-                setTimeout(() => {
-                    if (window.pendingWrite) {
-                        sendWriteCommand(window.pendingWrite.cell, window.pendingWrite.value);
-                        window.pendingWrite = null;
-                    }
-                }, 2000);
-            });
-
+            // SUBMISSION: POST CSV to EtherCalc API
             async function submitAnswer(answerText) {
-                let existingCount = 0;
-                try {
-                    const existing = await fetchAnswers();
-                    existingCount = existing.length;
-                } catch (e) {}
+                // Build CSV: just one column with the answer (quoting to be safe)
+                const csvBody = `"${answerText.replace(/"/g, '""')}"\n`;
+                console.log(`📤 POST CSV body: ${csvBody.trim()}`);
 
-                const nextRow = existingCount + 1;
-                const cell = `A${nextRow}`;
-                console.log(`🚀 Writing to ${cell}: "${answerText}"`);
+                const response = await fetch(ETHERCALC_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/csv' },
+                    body: csvBody
+                });
 
-                if (iframeLoaded) {
-                    sendWriteCommand(cell, answerText);
-                } else {
-                    console.log('⏳ Iframe not loaded yet, queuing write');
-                    window.pendingWrite = { cell, value: answerText };
+                if (!response.ok) {
+                    throw new Error(`POST failed with status ${response.status}`);
                 }
-
-                // Wait and verify
-                console.log('⏳ Waiting 5 seconds for spreadsheet update...');
-                await new Promise(r => setTimeout(r, 5000));
-
-                let verified = false;
-                try {
-                    const updated = await fetchAnswers();
-                    const lower = answerText.toLowerCase().trim();
-                    const found = updated.some(a => a.toLowerCase().trim() === lower);
-                    if (found || updated.length > existingCount) {
-                        verified = true;
-                        console.log('✅ Answer verified in spreadsheet');
-                    } else {
-                        console.warn('⚠️ Answer not yet visible – might need a refresh');
-                    }
-                } catch (e) {
-                    console.warn('Verification fetch failed, assuming submission succeeded');
-                    verified = true;
-                }
-
-                return { success: true, cell, value: answerText, verified };
+                console.log('✅ CSV POST successful');
             }
 
             async function handleSubmit() {
@@ -742,17 +604,22 @@ After many attempts, I’ve identified the root cause: **browser cookie restrict
                 submissionHint.textContent = 'Sending to spreadsheet...';
 
                 try {
-                    const result = await submitAnswer(answer);
-                    answerInput.value = '';
-                    answerInput.focus();
-
-                    if (result.verified) {
+                    await submitAnswer(answer);
+                    // Wait a moment then verify
+                    await new Promise(r => setTimeout(r, 2000));
+                    const updated = await fetchAnswers();
+                    const lower = answer.toLowerCase().trim();
+                    const found = updated.some(a => a.toLowerCase().trim() === lower);
+                    if (found) {
                         showToast('✅ Answer submitted successfully!', 'success');
                     } else {
-                        showToast('📤 Answer sent! It should appear in the results shortly.', 'success');
+                        showToast('📤 Answer sent! It may take a few seconds to appear. You can refresh results.', 'success');
                     }
+                    answerInput.value = '';
+                    answerInput.focus();
                     updateConnectionStatus(true);
                 } catch (e) {
+                    console.error('Submission error:', e);
                     showToast('❌ Network error. Please try again.', 'error');
                 } finally {
                     isSubmitting = false;
@@ -769,25 +636,16 @@ After many attempts, I’ve identified the root cause: **browser cookie restrict
                     const k = a.toLowerCase().trim();
                     if (k) map.set(k, (map.get(k) || 0) + 1);
                 });
-                return Array.from(map.entries()).map(([w, c]) => ({ word: w, count: c })).sort((a, b) => b
-                    .count - a.count);
+                return Array.from(map.entries()).map(([w, c]) => ({ word: w, count: c })).sort((a, b) => b.count - a.count);
             }
-            const colors = ['#f4793e', '#ff9a65', '#ffb347', '#4a90d9', '#7eb8da', '#5ba3e6', '#34b7a8', '#5cc9ba',
-                '#d4a853', '#e8c97a', '#ffffff', '#eaf1f8', '#e74c3c', '#f07070'
-            ];
+            const colors = ['#f4793e', '#ff9a65', '#ffb347', '#4a90d9', '#7eb8da', '#5ba3e6', '#34b7a8', '#5cc9ba', '#d4a853', '#e8c97a', '#ffffff', '#eaf1f8', '#e74c3c', '#f07070'];
             function renderWordCloud(answers) {
-                const canvas = wordcloudCanvas,
-                    wrapper = canvas.parentElement;
-                const ctx = canvas.getContext('2d');
-                canvasCtx = ctx;
-                const cw = wrapper.clientWidth,
-                    ch = Math.max(wrapper.clientHeight, 350);
-                const dpr = Math.min(window.devicePixelRatio || 1, 2);
-                canvasScale = dpr;
-                canvas.width = cw * dpr;
-                canvas.height = ch * dpr;
-                canvas.style.width = cw + 'px';
-                canvas.style.height = ch + 'px';
+                const canvas = wordcloudCanvas, wrapper = canvas.parentElement;
+                const ctx = canvas.getContext('2d'); canvasCtx = ctx;
+                const cw = wrapper.clientWidth, ch = Math.max(wrapper.clientHeight, 350);
+                const dpr = Math.min(window.devicePixelRatio || 1, 2); canvasScale = dpr;
+                canvas.width = cw * dpr; canvas.height = ch * dpr;
+                canvas.style.width = cw + 'px'; canvas.style.height = ch + 'px';
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
                 if (!answers.length) {
@@ -800,59 +658,38 @@ After many attempts, I’ve identified the root cause: **browser cookie restrict
                 wordcloudPlaceholder.style.display = 'none';
                 const freqs = computeFrequencies(answers);
                 updateStats(answers.length, freqs.length);
-                const maxC = freqs[0].count,
-                    minC = freqs[freqs.length - 1].count,
-                    range = maxC - minC || 1;
-                const maxFont = Math.min(58, cw / 8),
-                    minFont = Math.max(13, maxFont * 0.22);
+                const maxC = freqs[0].count, minC = freqs[freqs.length-1].count, range = maxC - minC || 1;
+                const maxFont = Math.min(58, cw/8), minFont = Math.max(13, maxFont*0.22);
                 const items = freqs.map((f, i) => ({
-                    word: f.word,
-                    count: f.count,
-                    fontSize: minFont + ((f.count - minC) / range) * (maxFont - minFont),
-                    rotation: (Math.random() - 0.5) * 16,
+                    word: f.word, count: f.count,
+                    fontSize: minFont + ((f.count - minC)/range) * (maxFont - minFont),
+                    rotation: (Math.random()-0.5)*16,
                     color: colors[i % colors.length]
-                })).sort((a, b) => b.fontSize - a.fontSize);
-                const placed = [],
-                    pad = 4 * dpr,
-                    centerX = canvas.width / 2,
-                    centerY = canvas.height / 2,
-                    spiralA = 0.8 * dpr,
-                    step = 0.25;
+                })).sort((a,b) => b.fontSize - a.fontSize);
+                const placed = [], pad = 4*dpr, centerX = canvas.width/2, centerY = canvas.height/2, spiralA = 0.8*dpr, step = 0.25;
                 const font = "'Georgia','Segoe UI','Inter',sans-serif";
-
-                function overlap(a, b) { return !(a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y +
-                        b.h <= a.y); }
+                function overlap(a,b) { return !(a.x+a.w <= b.x || b.x+b.w <= a.x || a.y+a.h <= b.y || b.y+b.h <= a.y); }
                 items.forEach(item => {
-                    const fs = item.fontSize * dpr;
+                    const fs = item.fontSize*dpr;
                     ctx.font = `700 ${fs}px ${font}`;
-                    const tw = ctx.measureText(item.word).width,
-                        th = fs * 1.15;
-                    const bw = tw + pad * 2,
-                        bh = th + pad * 2;
-                    let done = false,
-                        theta = 0;
+                    const tw = ctx.measureText(item.word).width, th = fs*1.15;
+                    const bw = tw+pad*2, bh = th+pad*2;
+                    let done = false, theta = 0;
                     if (!placed.length) {
-                        const x = centerX - tw / 2,
-                            y = centerY - th / 2 + fs * 0.35;
-                        if (x >= pad && y >= pad && x + bw <= canvas.width - pad && y + bh <= canvas.height - pad) {
-                            placed.push({ word: item.word, count: item.count, x, y, w: bw, h: bh, fontSize: item
-                                    .fontSize, color: item.color, rotation: item.rotation, cx: x + bw / 2, cy: y +
-                                    bh / 2 });
+                        const x = centerX - tw/2, y = centerY - th/2 + fs*0.35;
+                        if (x>=pad && y>=pad && x+bw<=canvas.width-pad && y+bh<=canvas.height-pad) {
+                            placed.push({ word:item.word, count:item.count, x, y, w:bw, h:bh, fontSize:item.fontSize, color:item.color, rotation:item.rotation, cx:x+bw/2, cy:y+bh/2 });
                             done = true;
                         }
                     }
                     while (!done && theta < 500) {
-                        const r = spiralA * theta;
-                        const sx = centerX + r * Math.cos(theta),
-                            sy = centerY + r * Math.sin(theta);
-                        const x = sx - tw / 2,
-                            y = sy - th / 2 + fs * 0.35;
-                        if (x >= pad && y >= pad && x + bw <= canvas.width - pad && y + bh <= canvas.height - pad) {
-                            const box = { x: x - pad, y: y - pad, w: bw, h: bh };
-                            if (!placed.some(p => overlap(box, { x: p.x - pad, y: p.y - pad, w: p.w, h: p.h }))) {
-                                placed.push({ word: item.word, count: item.count, x, y, w: bw, h: bh, fontSize: item
-                                        .fontSize, color: item.color, rotation: item.rotation, cx: x + bw / 2, cy: y +
-                                        bh / 2 });
+                        const r = spiralA*theta;
+                        const sx = centerX + r*Math.cos(theta), sy = centerY + r*Math.sin(theta);
+                        const x = sx - tw/2, y = sy - th/2 + fs*0.35;
+                        if (x>=pad && y>=pad && x+bw<=canvas.width-pad && y+bh<=canvas.height-pad) {
+                            const box = {x:x-pad, y:y-pad, w:bw, h:bh};
+                            if (!placed.some(p => overlap(box, {x:p.x-pad, y:p.y-pad, w:p.w, h:p.h}))) {
+                                placed.push({ word:item.word, count:item.count, x, y, w:bw, h:bh, fontSize:item.fontSize, color:item.color, rotation:item.rotation, cx:x+bw/2, cy:y+bh/2 });
                                 done = true;
                             }
                         }
@@ -862,13 +699,11 @@ After many attempts, I’ve identified the root cause: **browser cookie restrict
                 placed.forEach(p => {
                     ctx.save();
                     ctx.translate(p.cx, p.cy);
-                    if (p.rotation) ctx.rotate(p.rotation * Math.PI / 180);
+                    if (p.rotation) ctx.rotate(p.rotation*Math.PI/180);
                     ctx.font = `700 ${p.fontSize*dpr}px ${font}`;
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                     ctx.fillStyle = p.color;
-                    ctx.shadowColor = 'rgba(0,0,0,0.3)';
-                    ctx.shadowBlur = 3 * dpr;
+                    ctx.shadowColor = 'rgba(0,0,0,0.3)'; ctx.shadowBlur = 3*dpr;
                     ctx.fillText(p.word, 0, 0);
                     ctx.restore();
                 });
@@ -877,8 +712,7 @@ After many attempts, I’ve identified the root cause: **browser cookie restrict
                 tooltip.classList.remove('visible');
                 statLastRefresh.textContent = new Date().toLocaleTimeString();
             }
-            function updateStats(total, unique) { statCount.textContent = total;
-                statUnique.textContent = unique; }
+            function updateStats(total, unique) { statCount.textContent = total; statUnique.textContent = unique; }
 
             async function fetchAndRenderWordCloud() {
                 wordcloudPlaceholder.style.display = 'flex';
@@ -894,36 +728,17 @@ After many attempts, I’ve identified the root cause: **browser cookie restrict
                 }
             }
 
-            // Iframe toggle size
-            iframeToggle.addEventListener('click', () => {
-                const iframe = ethercalcIframe;
-                if (iframe.classList.contains('iframe-minimized')) {
-                    iframe.classList.remove('iframe-minimized');
-                    iframe.classList.add('iframe-expanded');
-                    iframeToggle.textContent = '🔽';
-                } else {
-                    iframe.classList.add('iframe-minimized');
-                    iframe.classList.remove('iframe-expanded');
-                    iframeToggle.textContent = '🔼';
-                }
-            });
-
             // Event listeners
             submitBtn.addEventListener('click', handleSubmit);
-            answerInput.addEventListener('keydown', e => {
-                if (e.key === 'Enter') { e.preventDefault();
-                    handleSubmit(); }
-            });
+            answerInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); handleSubmit(); } });
             gotoResultsBtn.addEventListener('click', () => switchView('results'));
             backToStudentBtn.addEventListener('click', () => switchView('student'));
-            refreshBtn.addEventListener('click', () => { fetchAndRenderWordCloud();
-                showToast('🔄 Refreshed'); });
+            refreshBtn.addEventListener('click', () => { fetchAndRenderWordCloud(); showToast('🔄 Refreshed'); });
 
             document.addEventListener('keydown', e => {
                 if (e.target.closest('input')) return;
                 if (e.key === 'n' || e.key === 'N') switchView(currentView === 'student' ? 'results' : 'student');
-                if ((e.key === 'r' || e.key === 'R') && currentView === 'results') { fetchAndRenderWordCloud();
-                    showToast('🔄 Refreshed'); }
+                if ((e.key === 'r' || e.key === 'R') && currentView === 'results') { fetchAndRenderWordCloud(); showToast('🔄 Refreshed'); }
             });
 
             // Word cloud interaction
@@ -938,44 +753,35 @@ After many attempts, I’ve identified the root cause: **browser cookie restrict
                         const p = wordPlacements[idx];
                         tooltip.textContent = `"${p.word}" — ${p.count} response${p.count>1?'s':''}`;
                         tooltip.classList.add('visible');
-                        tooltip.style.left = (e.clientX + 18) + 'px';
-                        tooltip.style.top = (e.clientY - 40) + 'px';
+                        tooltip.style.left = (e.clientX+18)+'px';
+                        tooltip.style.top = (e.clientY-40)+'px';
                     } else tooltip.classList.remove('visible');
                 }
             });
-            wordcloudCanvas.addEventListener('mouseleave', () => { hoveredIndex = -1;
-                redrawHighlighted(-1);
-                tooltip.classList.remove('visible'); });
+            wordcloudCanvas.addEventListener('mouseleave', () => { hoveredIndex = -1; redrawHighlighted(-1); tooltip.classList.remove('visible'); });
             wordcloudCanvas.addEventListener('click', e => {
                 const idx = findWordAt(e.clientX, e.clientY);
-                if (idx >= 0) showToast(`📊 "${wordPlacements[idx].word}" — ${wordPlacements[idx].count} response(s)`,
-                    'success');
+                if (idx >= 0) showToast(`📊 "${wordPlacements[idx].word}" — ${wordPlacements[idx].count} response(s)`, 'success');
             });
             wordcloudCanvas.addEventListener('touchmove', e => {
                 if (e.touches.length === 1) {
                     const t = e.touches[0];
                     const idx = findWordAt(t.clientX, t.clientY);
-                    if (idx !== hoveredIndex) { hoveredIndex = idx;
-                        redrawHighlighted(idx); }
+                    if (idx !== hoveredIndex) { hoveredIndex = idx; redrawHighlighted(idx); }
                 }
-            }, { passive: true });
-            wordcloudCanvas.addEventListener('touchend', () => setTimeout(() => { hoveredIndex = -1;
-                redrawHighlighted(-1); }, 300));
+            }, {passive: true});
+            wordcloudCanvas.addEventListener('touchend', () => setTimeout(() => { hoveredIndex = -1; redrawHighlighted(-1); }, 300));
 
             function findWordAt(mx, my) {
                 const rect = wordcloudCanvas.getBoundingClientRect();
-                const sx = (canvas.width / canvasScale) / rect.width;
-                const sy = (canvas.height / canvasScale) / rect.height;
-                const cx = mx * sx * canvasScale,
-                    cy = my * sy * canvasScale;
-                let best = -1,
-                    bestArea = Infinity;
+                const sx = (canvas.width/canvasScale) / rect.width;
+                const sy = (canvas.height/canvasScale) / rect.height;
+                const cx = mx * sx * canvasScale, cy = my * sy * canvasScale;
+                let best = -1, bestArea = Infinity;
                 wordPlacements.forEach((p, i) => {
-                    const bx = p.x - 2 * canvasScale,
-                        by = p.y - 2 * canvasScale;
-                    if (cx >= bx && cx <= bx + p.w && cy >= by && cy <= by + p.h && p.w * p.h < bestArea) {
-                        bestArea = p.w * p.h;
-                        best = i;
+                    const bx = p.x - 2*canvasScale, by = p.y - 2*canvasScale;
+                    if (cx >= bx && cx <= bx+p.w && cy >= by && cy <= by+p.h && p.w*p.h < bestArea) {
+                        bestArea = p.w*p.h; best = i;
                     }
                 });
                 return best;
@@ -986,22 +792,16 @@ After many attempts, I’ve identified the root cause: **browser cookie restrict
                 wordPlacements.forEach((p, i) => {
                     ctx.save();
                     ctx.translate(p.cx, p.cy);
-                    if (p.rotation) ctx.rotate(p.rotation * Math.PI / 180);
+                    if (p.rotation) ctx.rotate(p.rotation*Math.PI/180);
                     ctx.font = `700 ${p.fontSize*canvasScale}px 'Georgia','Segoe UI',sans-serif`;
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                     if (i === hi) {
-                        ctx.shadowColor = p.color;
-                        ctx.shadowBlur = 18 * canvasScale;
-                        ctx.fillStyle = '#fff';
-                        ctx.fillText(p.word, 0, 0);
-                        ctx.shadowBlur = 0;
-                        ctx.fillStyle = p.color;
-                        ctx.fillText(p.word, 0, 0);
+                        ctx.shadowColor = p.color; ctx.shadowBlur = 18*canvasScale;
+                        ctx.fillStyle = '#fff'; ctx.fillText(p.word, 0, 0);
+                        ctx.shadowBlur = 0; ctx.fillStyle = p.color; ctx.fillText(p.word, 0, 0);
                     } else {
                         ctx.fillStyle = p.color;
-                        ctx.shadowColor = 'rgba(0,0,0,0.3)';
-                        ctx.shadowBlur = 3 * canvasScale;
+                        ctx.shadowColor = 'rgba(0,0,0,0.3)'; ctx.shadowBlur = 3*canvasScale;
                         ctx.fillText(p.word, 0, 0);
                     }
                     ctx.restore();
@@ -1014,15 +814,13 @@ After many attempts, I’ve identified the root cause: **browser cookie restrict
 
             // Init
             async function init() {
-                console.log('🛩️ MSA 547 – ready (postMessage + visible iframe)');
+                console.log('🛩️ MSA 547 – ready (CSV POST method)');
                 updateQR();
-                loadEthercalcIframe(); // start loading the iframe immediately
                 const ok = await checkBackend();
                 if (!ok) {
                     showToast('⚠️ Spreadsheet not found – please visit ' + SHEET_URL + ' to create it.', 'error');
                 } else {
-                    try { allAnswers = await fetchAnswers();
-                        console.log('Existing entries:', allAnswers.length); } catch (e) {}
+                    try { allAnswers = await fetchAnswers(); console.log('Existing entries:', allAnswers.length); } catch (e) {}
                 }
                 setTimeout(() => answerInput.focus(), 500);
             }
@@ -1031,4 +829,3 @@ After many attempts, I’ve identified the root cause: **browser cookie restrict
     </script>
 </body>
 </html>
-```
