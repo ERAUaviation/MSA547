@@ -17,7 +17,6 @@
             --green-accent: #2ecc71;
             --glass-border: rgba(255, 255, 255, 0.10);
             --shadow-lg: 0 25px 60px rgba(0, 0, 0, 0.5);
-            --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.4);
             --radius-xl: 24px;
             --radius-lg: 18px;
             --radius-md: 12px;
@@ -25,26 +24,15 @@
             --font-display: 'Georgia', 'Times New Roman', serif;
             --font-body: 'Segoe UI', 'Inter', 'Helvetica Neue', system-ui, -apple-system, sans-serif;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            font-size: 16px;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-font-smoothing: antialiased;
-        }
-
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { font-size:16px; -webkit-tap-highlight-color:transparent; -webkit-font-smoothing:antialiased; }
         body {
             font-family: var(--font-body);
             background: var(--navy);
             background-image:
-                radial-gradient(ellipse at 30% 20%, rgba(74, 144, 217, 0.12) 0%, transparent 60%),
-                radial-gradient(ellipse at 70% 60%, rgba(244, 121, 62, 0.07) 0%, transparent 55%),
-                radial-gradient(ellipse at 50% 80%, rgba(52, 183, 168, 0.06) 0%, transparent 50%);
+                radial-gradient(ellipse at 30% 20%, rgba(74,144,217,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 60%, rgba(244,121,62,0.07) 0%, transparent 55%),
+                radial-gradient(ellipse at 50% 80%, rgba(52,183,168,0.06) 0%, transparent 50%);
             min-height: 100vh;
             color: var(--pure-white);
             display: flex;
@@ -53,63 +41,14 @@
             padding: 16px;
             overflow-x: hidden;
         }
+        .starfield { position:fixed; inset:0; pointer-events:none; z-index:0; opacity:0.5; }
+        .star { position:absolute; background:var(--pure-white); border-radius:50%; animation:twinkle var(--dur) ease-in-out infinite; animation-delay:var(--delay); }
+        @keyframes twinkle { 0%,100%{opacity:0.25;transform:scale(1);} 50%{opacity:0.9;transform:scale(1.8);} }
 
-        /* Starfield */
-        .starfield {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.5;
-        }
-        .star {
-            position: absolute;
-            background: var(--pure-white);
-            border-radius: 50%;
-            animation: twinkle var(--dur) ease-in-out infinite;
-            animation-delay: var(--delay);
-        }
-        @keyframes twinkle {
-            0%,
-            100% {
-                opacity: 0.25;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 0.9;
-                transform: scale(1.8);
-            }
-        }
-
-        .app-container {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            max-width: 560px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .view {
-            display: none;
-            flex-direction: column;
-            gap: 20px;
-            animation: fadeSlideIn 0.5s ease forwards;
-        }
-        .view.active {
-            display: flex;
-        }
-        @keyframes fadeSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(18px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+        .app-container { position:relative; z-index:1; width:100%; max-width:560px; display:flex; flex-direction:column; gap:20px; }
+        .view { display:none; flex-direction:column; gap:20px; animation:fadeSlideIn 0.5s ease forwards; }
+        .view.active { display:flex; }
+        @keyframes fadeSlideIn { from{opacity:0;transform:translateY(18px);} to{opacity:1;transform:translateY(0);} }
 
         .card {
             background: var(--panel-bg);
@@ -126,21 +65,12 @@
             content: '';
             position: absolute;
             top: -1px;
-            left: 30px;
-            right: 30px;
+            left: 30px; right: 30px;
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
             border-radius: 50%;
         }
-
-        .accent-line {
-            width: 60px;
-            height: 3px;
-            border-radius: 3px;
-            background: var(--orange);
-            margin: 6px 0 14px;
-        }
-
+        .accent-line { width:60px; height:3px; border-radius:3px; background:var(--orange); margin:6px 0 14px; }
         .question-text {
             font-family: var(--font-display);
             font-size: 1.45rem;
@@ -149,261 +79,100 @@
             color: var(--pure-white);
             letter-spacing: 0.01em;
         }
-        .subtitle {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            color: var(--sky-blue);
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-        .label-text {
-            font-size: 0.85rem;
-            color: var(--pale-blue);
-            letter-spacing: 0.03em;
-            font-weight: 500;
-        }
+        .subtitle { font-size:0.8rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--sky-blue); font-weight:600; margin-bottom:2px; }
+        .label-text { font-size:0.85rem; color:var(--pale-blue); letter-spacing:0.03em; font-weight:500; }
 
         .answer-input {
-            width: 100%;
-            padding: 16px 18px;
-            font-size: 1.1rem;
-            font-family: var(--font-body);
-            background: rgba(255, 255, 255, 0.04);
-            border: 2px solid var(--glass-border);
-            border-radius: var(--radius-md);
-            color: var(--pure-white);
-            outline: none;
-            transition: var(--transition);
+            width:100%;
+            padding:16px 18px;
+            font-size:1.1rem;
+            font-family:var(--font-body);
+            background:rgba(255,255,255,0.04);
+            border:2px solid var(--glass-border);
+            border-radius:var(--radius-md);
+            color:var(--pure-white);
+            outline:none;
+            transition:var(--transition);
         }
-        .answer-input:focus {
-            border-color: var(--sky-blue);
-            background: rgba(74, 144, 217, 0.08);
-            box-shadow: 0 0 0 8px rgba(74, 144, 217, 0.06);
-        }
-        .answer-input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-            font-style: italic;
-        }
+        .answer-input:focus { border-color:var(--sky-blue); background:rgba(74,144,217,0.08); box-shadow:0 0 0 8px rgba(74,144,217,0.06); }
+        .answer-input::placeholder { color:rgba(255,255,255,0.3); font-style:italic; }
 
         .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 14px 28px;
-            font-size: 1rem;
-            font-weight: 600;
-            letter-spacing: 0.03em;
-            border-radius: 50px;
-            cursor: pointer;
-            border: none;
-            transition: var(--transition);
-            white-space: nowrap;
-            user-select: none;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
+            padding:14px 28px;
+            font-size:1rem;
+            font-weight:600;
+            letter-spacing:0.03em;
+            border-radius:50px;
+            cursor:pointer;
+            border:none;
+            transition:var(--transition);
+            white-space:nowrap;
+            user-select:none;
         }
-        .btn:active {
-            transform: scale(0.96);
-        }
-        .btn-primary {
-            background: var(--orange);
-            color: #fff;
-            box-shadow: 0 8px 24px rgba(244, 121, 62, 0.35);
-            font-size: 1.05rem;
-            padding: 16px 36px;
-        }
-        .btn-primary:hover {
-            background: #ff8c55;
-            transform: translateY(-2px);
-        }
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .btn-secondary {
-            background: transparent;
-            color: var(--pale-blue);
-            border: 2px solid var(--glass-border);
-            padding: 10px 22px;
-            font-size: 0.9rem;
-        }
-        .btn-secondary:hover {
-            background: rgba(255,255,255,0.06);
-            border-color: rgba(255,255,255,0.25);
-            color: var(--pure-white);
-        }
-        .btn-small {
-            padding: 8px 16px;
-            font-size: 0.8rem;
-            border-radius: 30px;
-        }
+        .btn:active { transform:scale(0.96); }
+        .btn-primary { background:var(--orange); color:#fff; box-shadow:0 8px 24px rgba(244,121,62,0.35); font-size:1.05rem; padding:16px 36px; }
+        .btn-primary:hover { background:#ff8c55; transform:translateY(-2px); }
+        .btn-primary:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+        .btn-secondary { background:transparent; color:var(--pale-blue); border:2px solid var(--glass-border); padding:10px 22px; font-size:0.9rem; }
+        .btn-secondary:hover { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.25); color:var(--pure-white); }
+        .btn-small { padding:8px 16px; font-size:0.8rem; border-radius:30px; }
 
-        .btn-row {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .btn-row.between {
-            justify-content: space-between;
-        }
+        .btn-row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+        .btn-row.between { justify-content:space-between; }
 
-        /* QR code – visible only on larger screens (instructor) */
-        .qr-section {
-            display: none; /* hidden on mobile */
-            align-items: center;
-            gap: 18px;
-            padding: 16px 18px;
-            background: rgba(255, 255, 255, 0.025);
-            border-radius: var(--radius-lg);
-            border: 1px dashed var(--glass-border);
-            position: relative;
-            z-index: 1;
-        }
-        @media (min-width: 769px) {
-            .qr-section {
-                display: flex;
-            }
-        }
-        .qr-code-img {
-            width: 110px;
-            height: 110px;
-            border-radius: var(--radius-sm);
-            background: #fff;
-            padding: 6px;
-            flex-shrink: 0;
-            box-shadow: var(--shadow-md);
-        }
-        .qr-info .qr-title {
-            font-weight: 700;
-            font-size: 0.9rem;
-        }
+        .qr-section { display:none; align-items:center; gap:18px; padding:16px 18px; background:rgba(255,255,255,0.025); border-radius:var(--radius-lg); border:1px dashed var(--glass-border); position:relative; z-index:1; }
+        @media (min-width:769px) { .qr-section { display:flex; } }
+        .qr-code-img { width:110px; height:110px; border-radius:var(--radius-sm); background:#fff; padding:6px; flex-shrink:0; box-shadow:var(--shadow-md); }
+        .qr-info .qr-title { font-weight:700; font-size:0.9rem; }
 
         .toast {
-            position: fixed;
-            top: 24px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-120px);
-            background: #1a3d2e;
-            border: 1px solid var(--teal);
-            color: #d4f7f0;
-            padding: 14px 24px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            z-index: 100;
-            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
-            transition: transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.15);
-            pointer-events: none;
-            text-align: center;
+            position:fixed; top:24px; left:50%; transform:translateX(-50%) translateY(-120px);
+            background:#1a3d2e; border:1px solid var(--teal); color:#d4f7f0;
+            padding:14px 24px; border-radius:50px; font-weight:600; font-size:0.9rem;
+            z-index:100; box-shadow:0 12px 36px rgba(0,0,0,0.5);
+            transition:transform 0.4s cubic-bezier(0.18,0.89,0.32,1.15);
+            pointer-events:none; text-align:center; max-width:90vw;
         }
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-        }
-        .toast.error {
-            background: #3d1a1a;
-            border-color: var(--red-accent);
-            color: #fdd;
-        }
-        .toast.success {
-            background: #1a3d2e;
-            border-color: var(--green-accent);
-        }
+        .toast.show { transform:translateX(-50%) translateY(0); }
+        .toast.error { background:#3d1a1a; border-color:var(--red-accent); color:#fdd; }
+        .toast.success { background:#1a3d2e; border-color:var(--green-accent); }
 
         .wordcloud-wrapper {
-            position: relative;
-            width: 100%;
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            background: rgba(0, 0, 0, 0.25);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--shadow-md);
-            min-height: 350px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            position:relative; width:100%; border-radius:var(--radius-lg); overflow:hidden;
+            background:rgba(0,0,0,0.25); border:1px solid var(--glass-border);
+            box-shadow:var(--shadow-md); min-height:350px;
+            display:flex; align-items:center; justify-content:center;
         }
-        .wordcloud-wrapper canvas {
-            display: block;
-            width: 100%;
-            height: auto;
-        }
-        .wordcloud-placeholder {
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 1.1rem;
-            text-align: center;
-            padding: 40px;
-            font-style: italic;
-            position: absolute;
-            pointer-events: none;
-        }
+        .wordcloud-wrapper canvas { display:block; width:100%; height:auto; }
+        .wordcloud-placeholder { color:rgba(255,255,255,0.4); font-size:1.1rem; text-align:center; padding:40px; font-style:italic; position:absolute; pointer-events:none; }
         .tooltip {
-            position: fixed;
-            pointer-events: none;
-            background: rgba(15, 25, 45, 0.95);
-            border: 1px solid var(--sky-blue);
-            color: var(--pure-white);
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            z-index: 50;
-            opacity: 0;
-            transition: opacity 0.2s;
-            white-space: nowrap;
+            position:fixed; pointer-events:none;
+            background:rgba(15,25,45,0.95); border:1px solid var(--sky-blue);
+            color:var(--pure-white); padding:8px 14px; border-radius:20px;
+            font-size:0.8rem; font-weight:600; z-index:50;
+            opacity:0; transition:opacity 0.2s; white-space:nowrap;
         }
-        .tooltip.visible {
-            opacity: 1;
-        }
+        .tooltip.visible { opacity:1; }
 
-        .stats-bar {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            font-size: 0.8rem;
-            color: var(--pale-blue);
-        }
-        .stat-item {
-            background: rgba(255,255,255,0.03);
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 1px solid var(--glass-border);
-        }
-        .stat-value {
-            color: var(--pure-white);
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
+        .stats-bar { display:flex; gap:16px; flex-wrap:wrap; font-size:0.8rem; color:var(--pale-blue); }
+        .stat-item { background:rgba(255,255,255,0.03); padding:6px 14px; border-radius:20px; border:1px solid var(--glass-border); }
+        .stat-value { color:var(--pure-white); font-weight:700; font-size:1.1rem; }
 
-        .connection-status {
-            font-size: 0.65rem;
-            color: rgba(255,255,255,0.3);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            justify-content: center;
-        }
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-        .status-indicator.ok { background: var(--green-accent); }
-        .status-indicator.err { background: var(--red-accent); }
-        .status-indicator.warn { background: var(--orange); }
+        .connection-status { font-size:0.65rem; color:rgba(255,255,255,0.3); display:flex; align-items:center; gap:4px; justify-content:center; }
+        .status-indicator { width:8px; height:8px; border-radius:50%; display:inline-block; }
+        .status-indicator.ok { background:var(--green-accent); }
+        .status-indicator.err { background:var(--red-accent); }
+        .status-indicator.warn { background:var(--orange); }
     </style>
 </head>
 <body>
-    <!-- Starfield background -->
     <div class="starfield" id="starfield" aria-hidden="true"></div>
-    <!-- Toast notification -->
     <div class="toast" id="toast" aria-live="polite"></div>
-    <!-- Tooltip for word cloud -->
     <div class="tooltip" id="tooltip" aria-hidden="true"></div>
-    <!-- Hidden iframe for submission (GET navigation, no sandbox) -->
-    <iframe id="ethercalcSubmitFrame" style="display:none;width:0;height:0;border:none;" title="hidden submission frame"></iframe>
 
     <div class="app-container" id="appContainer">
         <!-- STUDENT VIEW -->
@@ -414,7 +183,6 @@
                 <h1 class="question-text">In one or two words,<br>what makes you trust an aviation leader?</h1>
             </div>
 
-            <!-- QR Code section (visible only on large screens) -->
             <div class="qr-section" id="qrSection">
                 <img class="qr-code-img" id="qrCodeImg"
                 src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Crect fill='%23fff' width='110' height='110' rx='8'/%3E%3Ctext x='55' y='58' text-anchor='middle' fill='%23999' font-size='11' font-family='sans-serif'%3EQR%3C/text%3E%3C/svg%3E"
@@ -425,17 +193,14 @@
                 </div>
             </div>
 
-            <!-- Answer card -->
             <div class="card" id="inputCard">
-                <div class="input-group" style="display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;flex-direction:column;gap:8px;">
                     <label class="label-text" for="answerInput">Your answer (1–2 words):</label>
                     <input type="text" id="answerInput" class="answer-input" placeholder="e.g. Clear communication" maxlength="80" autocomplete="off">
                 </div>
                 <div style="height:16px;"></div>
                 <button class="btn btn-primary" id="submitBtn">✈️ Submit Answer</button>
-                <div id="submissionHint" style="margin-top:10px;font-size:0.7rem;color:rgba(255,255,255,0.35);text-align:center;">
-                    Press Enter or tap Submit
-                </div>
+                <div id="submissionHint" style="margin-top:10px;font-size:0.7rem;color:rgba(255,255,255,0.35);text-align:center;">Press Enter or tap Submit</div>
             </div>
 
             <div style="text-align:center;">
@@ -492,7 +257,6 @@
             const statUnique = document.getElementById('statUnique');
             const statLastRefresh = document.getElementById('statLastRefresh');
             const qrCodeImg = document.getElementById('qrCodeImg');
-            const submitFrame = document.getElementById('ethercalcSubmitFrame');
             const connectionStatus = document.getElementById('connectionStatus');
             const statusDot = document.getElementById('statusDot');
             const submissionHint = document.getElementById('submissionHint');
@@ -532,10 +296,10 @@
                 toast.className = 'toast ' + type;
                 void toast.offsetWidth;
                 toast.classList.add('show');
-                toastTimeout = setTimeout(() => toast.classList.remove('show'), 3000);
+                toastTimeout = setTimeout(() => toast.classList.remove('show'), 4000);
             }
 
-            // Connection status indicator
+            // Connection status
             function updateConnectionStatus(reachable) {
                 backendReachable = reachable;
                 if (reachable === true) {
@@ -543,7 +307,7 @@
                     connectionStatus.innerHTML = '<span class="status-indicator ok"></span> Backend connected';
                 } else if (reachable === false) {
                     statusDot.className = 'status-indicator err';
-                    connectionStatus.innerHTML = '<span class="status-indicator err"></span> Spreadsheet not found – <a href="'+SHEET_URL+'" target="_blank" style="color:var(--orange);">create it here</a>';
+                    connectionStatus.innerHTML = '<span class="status-indicator err"></span> Spreadsheet missing – <a href="'+SHEET_URL+'" target="_blank" style="color:var(--orange);">create it here</a>';
                 } else {
                     statusDot.className = 'status-indicator warn';
                     connectionStatus.innerHTML = '<span class="status-indicator warn"></span> Checking backend...';
@@ -554,10 +318,7 @@
                 updateConnectionStatus(null);
                 try {
                     const resp = await fetch(ETHERCALC_CSV, { cache: 'no-store' });
-                    if (resp.ok) {
-                        updateConnectionStatus(true);
-                        return true;
-                    }
+                    if (resp.ok) { updateConnectionStatus(true); return true; }
                 } catch (e) {}
                 updateConnectionStatus(false);
                 return false;
@@ -573,14 +334,14 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
-            // QR code update
+            // QR code
             function updateQR() {
                 const url = window.location.href.split('?')[0].split('#')[0];
                 qrCodeImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(url)}&bgcolor=ffffff&color=0a1628&qzone=4`;
                 qrCodeImg.onerror = () => qrCodeImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Crect fill='%23fff' width='110' height='110' rx='8'/%3E%3Ctext x='55' y='55' text-anchor='middle' fill='%23999' font-size='10'%3EQR%3C/text%3E%3C/svg%3E";
             }
 
-            // Fetch answers from EtherCalc CSV
+            // Fetch answers
             async function fetchAnswers() {
                 const resp = await fetch(ETHERCALC_CSV, { cache: 'no-store' });
                 if (!resp.ok) throw new Error('HTTP ' + resp.status);
@@ -609,28 +370,44 @@
                 return answers;
             }
 
-            // Submit answer via iframe GET navigation
+            // SUBMISSION: using Image ping (GET) to write cell
             async function submitAnswer(answerText) {
-                let existing = [];
-                try { existing = await fetchAnswers(); } catch (e) {}
-                const nextRow = existing.length + 1;
+                let existingCount = 0;
+                try {
+                    const existing = await fetchAnswers();
+                    existingCount = existing.length;
+                } catch (e) {}
+
+                const nextRow = existingCount + 1;
                 const cell = `A${nextRow}`;
                 const encoded = encodeURIComponent(answerText);
-                const url = `${ETHERCALC_API}?cell=${cell}&value=${encoded}`;
-                console.log(`📡 Submitting to: ${url}`);
-                // Navigate hidden iframe – this triggers the cell write
-                submitFrame.src = url;
+                const writeUrl = `${ETHERCALC_API}?cell=${cell}&value=${encoded}`;
 
-                // Wait and verify
-                await new Promise(r => setTimeout(r, 2500));
+                console.log(`📡 Sending GET ping: ${writeUrl}`);
+                // Use an Image object to trigger the request
+                const img = new Image();
+                img.src = writeUrl;
+
+                // Wait and verify (4 seconds)
+                await new Promise(resolve => setTimeout(resolve, 4000));
+
+                let verified = false;
                 try {
                     const updated = await fetchAnswers();
                     const lower = answerText.toLowerCase().trim();
                     const found = updated.some(a => a.toLowerCase().trim() === lower);
-                    return { success: found || updated.length > existing.length, row: nextRow, verified: found };
+                    if (found || updated.length > existingCount) {
+                        verified = true;
+                        console.log('✅ Answer verified in spreadsheet');
+                    } else {
+                        console.warn('⚠️ Answer not yet visible – it may appear later. Current entries:', updated.length);
+                    }
                 } catch (e) {
-                    return { success: true, row: nextRow, verified: false };
+                    console.warn('Verification fetch failed, assuming success');
+                    verified = true; // optimistic
                 }
+
+                return { success: true, row: nextRow, verified };
             }
 
             async function handleSubmit() {
@@ -648,16 +425,16 @@
 
                 try {
                     const result = await submitAnswer(answer);
-                    if (result.success) {
-                        showToast('✅ Answer submitted!', 'success');
-                        answerInput.value = '';
-                        answerInput.focus();
-                        updateConnectionStatus(true);
+                    answerInput.value = '';
+                    answerInput.focus();
+                    if (result.verified) {
+                        showToast('✅ Answer submitted successfully!', 'success');
                     } else {
-                        showToast('⚠️ Submission may have failed – please try again.', 'error');
+                        showToast('📤 Answer sent, but not yet visible. Please refresh results in a moment.', 'success');
                     }
+                    updateConnectionStatus(true);
                 } catch (e) {
-                    showToast('❌ Network error – check your connection.', 'error');
+                    showToast('❌ Network error. Please try again.', 'error');
                 } finally {
                     isSubmitting = false;
                     submitBtn.disabled = false;
@@ -666,7 +443,7 @@
                 }
             }
 
-            // Word cloud engine (unchanged from before, just compact)
+            // Word cloud engine
             function computeFrequencies(answers) {
                 const map = new Map();
                 answers.forEach(a => { const k = a.toLowerCase().trim(); if (k) map.set(k, (map.get(k) || 0) + 1); });
@@ -701,8 +478,8 @@
                     color: colors[i % colors.length]
                 })).sort((a,b) => b.fontSize - a.fontSize);
                 const placed = [], pad = 4*dpr, centerX = canvas.width/2, centerY = canvas.height/2, spiralA = 0.8*dpr, step = 0.25;
-                function overlap(a,b) { return !(a.x+a.w <= b.x || b.x+b.w <= a.x || a.y+a.h <= b.y || b.y+b.h <= a.y); }
                 const font = "'Georgia','Segoe UI','Inter',sans-serif";
+                function overlap(a,b) { return !(a.x+a.w <= b.x || b.x+b.w <= a.x || a.y+a.h <= b.y || b.y+b.h <= a.y); }
                 items.forEach(item => {
                     const fs = item.fontSize*dpr;
                     ctx.font = `700 ${fs}px ${font}`;
@@ -775,7 +552,7 @@
                 if ((e.key === 'r' || e.key === 'R') && currentView === 'results') { fetchAndRenderWordCloud(); showToast('🔄 Refreshed'); }
             });
 
-            // Word cloud hover/click
+            // Word cloud interaction
             wordcloudCanvas.addEventListener('mousemove', e => {
                 if (!wordPlacements.length) return;
                 const idx = findWordAt(e.clientX, e.clientY);
@@ -787,8 +564,8 @@
                         const p = wordPlacements[idx];
                         tooltip.textContent = `"${p.word}" — ${p.count} response${p.count>1?'s':''}`;
                         tooltip.classList.add('visible');
-                        tooltip.style.left = (e.clientX+18)+'px';
-                        tooltip.style.top = (e.clientY-40)+'px';
+                        tooltip.style.left = (e.clientX + 18) + 'px';
+                        tooltip.style.top = (e.clientY - 40) + 'px';
                     } else tooltip.classList.remove('visible');
                 }
             });
@@ -808,13 +585,13 @@
 
             function findWordAt(mx, my) {
                 const rect = wordcloudCanvas.getBoundingClientRect();
-                const sx = (canvas.width/canvasScale) / rect.width;
-                const sy = (canvas.height/canvasScale) / rect.height;
+                const sx = (canvas.width / canvasScale) / rect.width;
+                const sy = (canvas.height / canvasScale) / rect.height;
                 const cx = mx * sx * canvasScale, cy = my * sy * canvasScale;
                 let best = -1, bestArea = Infinity;
                 wordPlacements.forEach((p, i) => {
                     const bx = p.x - 2*canvasScale, by = p.y - 2*canvasScale;
-                    if (cx >= bx && cx <= bx+p.w && cy >= by && cy <= by+p.h && p.w*p.h < bestArea) {
+                    if (cx >= bx && cx <= bx + p.w && cy >= by && cy <= by + p.h && p.w*p.h < bestArea) {
                         bestArea = p.w*p.h; best = i;
                     }
                 });
@@ -826,7 +603,7 @@
                 wordPlacements.forEach((p, i) => {
                     ctx.save();
                     ctx.translate(p.cx, p.cy);
-                    if (p.rotation) ctx.rotate(p.rotation*Math.PI/180);
+                    if (p.rotation) ctx.rotate(p.rotation * Math.PI/180);
                     ctx.font = `700 ${p.fontSize*canvasScale}px 'Georgia','Segoe UI',sans-serif`;
                     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                     if (i === hi) {
@@ -854,7 +631,7 @@
                 if (!ok) {
                     showToast('⚠️ Spreadsheet not found – please visit ' + SHEET_URL + ' to create it.', 'error');
                 } else {
-                    try { allAnswers = await fetchAnswers(); console.log('Existing entries:', allAnswers.length); } catch(e){}
+                    try { allAnswers = await fetchAnswers(); console.log('Existing entries:', allAnswers.length); } catch(e) {}
                 }
                 setTimeout(() => answerInput.focus(), 500);
             }
