@@ -24,15 +24,26 @@
             --font-display: 'Georgia', 'Times New Roman', serif;
             --font-body: 'Segoe UI', 'Inter', 'Helvetica Neue', system-ui, -apple-system, sans-serif;
         }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        html { font-size:16px; -webkit-tap-highlight-color:transparent; -webkit-font-smoothing:antialiased; }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+        }
+
         body {
             font-family: var(--font-body);
             background: var(--navy);
             background-image:
-                radial-gradient(ellipse at 30% 20%, rgba(74,144,217,0.12) 0%, transparent 60%),
-                radial-gradient(ellipse at 70% 60%, rgba(244,121,62,0.07) 0%, transparent 55%),
-                radial-gradient(ellipse at 50% 80%, rgba(52,183,168,0.06) 0%, transparent 50%);
+                radial-gradient(ellipse at 30% 20%, rgba(74, 144, 217, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 60%, rgba(244, 121, 62, 0.07) 0%, transparent 55%),
+                radial-gradient(ellipse at 50% 80%, rgba(52, 183, 168, 0.06) 0%, transparent 50%);
             min-height: 100vh;
             color: var(--pure-white);
             display: flex;
@@ -41,14 +52,62 @@
             padding: 16px;
             overflow-x: hidden;
         }
-        .starfield { position:fixed; inset:0; pointer-events:none; z-index:0; opacity:0.5; }
-        .star { position:absolute; background:var(--pure-white); border-radius:50%; animation:twinkle var(--dur) ease-in-out infinite; animation-delay:var(--delay); }
-        @keyframes twinkle { 0%,100%{opacity:0.25;transform:scale(1);} 50%{opacity:0.9;transform:scale(1.8);} }
 
-        .app-container { position:relative; z-index:1; width:100%; max-width:560px; display:flex; flex-direction:column; gap:20px; }
-        .view { display:none; flex-direction:column; gap:20px; animation:fadeSlideIn 0.5s ease forwards; }
-        .view.active { display:flex; }
-        @keyframes fadeSlideIn { from{opacity:0;transform:translateY(18px);} to{opacity:1;transform:translateY(0);} }
+        .starfield {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.5;
+        }
+        .star {
+            position: absolute;
+            background: var(--pure-white);
+            border-radius: 50%;
+            animation: twinkle var(--dur) ease-in-out infinite;
+            animation-delay: var(--delay);
+        }
+        @keyframes twinkle {
+            0%,
+            100% {
+                opacity: 0.25;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.9;
+                transform: scale(1.8);
+            }
+        }
+
+        .app-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 560px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .view {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeSlideIn 0.5s ease forwards;
+        }
+        .view.active {
+            display: flex;
+        }
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
         .card {
             background: var(--panel-bg);
@@ -65,12 +124,21 @@
             content: '';
             position: absolute;
             top: -1px;
-            left: 30px; right: 30px;
+            left: 30px;
+            right: 30px;
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
             border-radius: 50%;
         }
-        .accent-line { width:60px; height:3px; border-radius:3px; background:var(--orange); margin:6px 0 14px; }
+
+        .accent-line {
+            width: 60px;
+            height: 3px;
+            border-radius: 3px;
+            background: var(--orange);
+            margin: 6px 0 14px;
+        }
+
         .question-text {
             font-family: var(--font-display);
             font-size: 1.45rem;
@@ -79,100 +147,265 @@
             color: var(--pure-white);
             letter-spacing: 0.01em;
         }
-        .subtitle { font-size:0.8rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--sky-blue); font-weight:600; margin-bottom:2px; }
-        .label-text { font-size:0.85rem; color:var(--pale-blue); letter-spacing:0.03em; font-weight:500; }
+        .subtitle {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--sky-blue);
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .label-text {
+            font-size: 0.85rem;
+            color: var(--pale-blue);
+            letter-spacing: 0.03em;
+            font-weight: 500;
+        }
 
         .answer-input {
-            width:100%;
-            padding:16px 18px;
-            font-size:1.1rem;
-            font-family:var(--font-body);
-            background:rgba(255,255,255,0.04);
-            border:2px solid var(--glass-border);
-            border-radius:var(--radius-md);
-            color:var(--pure-white);
-            outline:none;
-            transition:var(--transition);
+            width: 100%;
+            padding: 16px 18px;
+            font-size: 1.1rem;
+            font-family: var(--font-body);
+            background: rgba(255, 255, 255, 0.04);
+            border: 2px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            color: var(--pure-white);
+            outline: none;
+            transition: var(--transition);
         }
-        .answer-input:focus { border-color:var(--sky-blue); background:rgba(74,144,217,0.08); box-shadow:0 0 0 8px rgba(74,144,217,0.06); }
-        .answer-input::placeholder { color:rgba(255,255,255,0.3); font-style:italic; }
+        .answer-input:focus {
+            border-color: var(--sky-blue);
+            background: rgba(74, 144, 217, 0.08);
+            box-shadow: 0 0 0 8px rgba(74, 144, 217, 0.06);
+        }
+        .answer-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+            font-style: italic;
+        }
 
         .btn {
-            display:inline-flex;
-            align-items:center;
-            justify-content:center;
-            gap:8px;
-            padding:14px 28px;
-            font-size:1rem;
-            font-weight:600;
-            letter-spacing:0.03em;
-            border-radius:50px;
-            cursor:pointer;
-            border:none;
-            transition:var(--transition);
-            white-space:nowrap;
-            user-select:none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            border-radius: 50px;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            white-space: nowrap;
+            user-select: none;
         }
-        .btn:active { transform:scale(0.96); }
-        .btn-primary { background:var(--orange); color:#fff; box-shadow:0 8px 24px rgba(244,121,62,0.35); font-size:1.05rem; padding:16px 36px; }
-        .btn-primary:hover { background:#ff8c55; transform:translateY(-2px); }
-        .btn-primary:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
-        .btn-secondary { background:transparent; color:var(--pale-blue); border:2px solid var(--glass-border); padding:10px 22px; font-size:0.9rem; }
-        .btn-secondary:hover { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.25); color:var(--pure-white); }
-        .btn-small { padding:8px 16px; font-size:0.8rem; border-radius:30px; }
+        .btn:active {
+            transform: scale(0.96);
+        }
+        .btn-primary {
+            background: var(--orange);
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(244, 121, 62, 0.35);
+            font-size: 1.05rem;
+            padding: 16px 36px;
+        }
+        .btn-primary:hover {
+            background: #ff8c55;
+            transform: translateY(-2px);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-secondary {
+            background: transparent;
+            color: var(--pale-blue);
+            border: 2px solid var(--glass-border);
+            padding: 10px 22px;
+            font-size: 0.9rem;
+        }
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.25);
+            color: var(--pure-white);
+        }
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            border-radius: 30px;
+        }
 
-        .btn-row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-        .btn-row.between { justify-content:space-between; }
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .btn-row.between {
+            justify-content: space-between;
+        }
 
-        .qr-section { display:none; align-items:center; gap:18px; padding:16px 18px; background:rgba(255,255,255,0.025); border-radius:var(--radius-lg); border:1px dashed var(--glass-border); position:relative; z-index:1; }
-        @media (min-width:769px) { .qr-section { display:flex; } }
-        .qr-code-img { width:110px; height:110px; border-radius:var(--radius-sm); background:#fff; padding:6px; flex-shrink:0; box-shadow:var(--shadow-md); }
-        .qr-info .qr-title { font-weight:700; font-size:0.9rem; }
+        .qr-section {
+            display: none;
+            align-items: center;
+            gap: 18px;
+            padding: 16px 18px;
+            background: rgba(255, 255, 255, 0.025);
+            border-radius: var(--radius-lg);
+            border: 1px dashed var(--glass-border);
+            position: relative;
+            z-index: 1;
+        }
+        @media (min-width: 769px) {
+            .qr-section {
+                display: flex;
+            }
+        }
+        .qr-code-img {
+            width: 110px;
+            height: 110px;
+            border-radius: var(--radius-sm);
+            background: #fff;
+            padding: 6px;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-md);
+        }
+        .qr-info .qr-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
 
         .toast {
-            position:fixed; top:24px; left:50%; transform:translateX(-50%) translateY(-120px);
-            background:#1a3d2e; border:1px solid var(--teal); color:#d4f7f0;
-            padding:14px 24px; border-radius:50px; font-weight:600; font-size:0.9rem;
-            z-index:100; box-shadow:0 12px 36px rgba(0,0,0,0.5);
-            transition:transform 0.4s cubic-bezier(0.18,0.89,0.32,1.15);
-            pointer-events:none; text-align:center; max-width:90vw;
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-120px);
+            background: #1a3d2e;
+            border: 1px solid var(--teal);
+            color: #d4f7f0;
+            padding: 14px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            z-index: 100;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+            transition: transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.15);
+            pointer-events: none;
+            text-align: center;
+            max-width: 90vw;
         }
-        .toast.show { transform:translateX(-50%) translateY(0); }
-        .toast.error { background:#3d1a1a; border-color:var(--red-accent); color:#fdd; }
-        .toast.success { background:#1a3d2e; border-color:var(--green-accent); }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast.error {
+            background: #3d1a1a;
+            border-color: var(--red-accent);
+            color: #fdd;
+        }
+        .toast.success {
+            background: #1a3d2e;
+            border-color: var(--green-accent);
+        }
 
         .wordcloud-wrapper {
-            position:relative; width:100%; border-radius:var(--radius-lg); overflow:hidden;
-            background:rgba(0,0,0,0.25); border:1px solid var(--glass-border);
-            box-shadow:var(--shadow-md); min-height:350px;
-            display:flex; align-items:center; justify-content:center;
+            position: relative;
+            width: 100%;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-md);
+            min-height: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .wordcloud-wrapper canvas { display:block; width:100%; height:auto; }
-        .wordcloud-placeholder { color:rgba(255,255,255,0.4); font-size:1.1rem; text-align:center; padding:40px; font-style:italic; position:absolute; pointer-events:none; }
+        .wordcloud-wrapper canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        .wordcloud-placeholder {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 1.1rem;
+            text-align: center;
+            padding: 40px;
+            font-style: italic;
+            position: absolute;
+            pointer-events: none;
+        }
         .tooltip {
-            position:fixed; pointer-events:none;
-            background:rgba(15,25,45,0.95); border:1px solid var(--sky-blue);
-            color:var(--pure-white); padding:8px 14px; border-radius:20px;
-            font-size:0.8rem; font-weight:600; z-index:50;
-            opacity:0; transition:opacity 0.2s; white-space:nowrap;
+            position: fixed;
+            pointer-events: none;
+            background: rgba(15, 25, 45, 0.95);
+            border: 1px solid var(--sky-blue);
+            color: var(--pure-white);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 50;
+            opacity: 0;
+            transition: opacity 0.2s;
+            white-space: nowrap;
         }
-        .tooltip.visible { opacity:1; }
+        .tooltip.visible {
+            opacity: 1;
+        }
 
-        .stats-bar { display:flex; gap:16px; flex-wrap:wrap; font-size:0.8rem; color:var(--pale-blue); }
-        .stat-item { background:rgba(255,255,255,0.03); padding:6px 14px; border-radius:20px; border:1px solid var(--glass-border); }
-        .stat-value { color:var(--pure-white); font-weight:700; font-size:1.1rem; }
+        .stats-bar {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+            color: var(--pale-blue);
+        }
+        .stat-item {
+            background: rgba(255,255,255,0.03);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+        }
+        .stat-value {
+            color: var(--pure-white);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
 
-        .connection-status { font-size:0.65rem; color:rgba(255,255,255,0.3); display:flex; align-items:center; gap:4px; justify-content:center; }
-        .status-indicator { width:8px; height:8px; border-radius:50%; display:inline-block; }
-        .status-indicator.ok { background:var(--green-accent); }
-        .status-indicator.err { background:var(--red-accent); }
-        .status-indicator.warn { background:var(--orange); }
+        .connection-status {
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            justify-content: center;
+        }
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .status-indicator.ok {
+            background: var(--green-accent);
+        }
+        .status-indicator.err {
+            background: var(--red-accent);
+        }
+        .status-indicator.warn {
+            background: var(--orange);
+        }
     </style>
 </head>
 <body>
     <div class="starfield" id="starfield" aria-hidden="true"></div>
     <div class="toast" id="toast" aria-live="polite"></div>
     <div class="tooltip" id="tooltip" aria-hidden="true"></div>
+
+    <!-- Hidden iframe for form submission (no sandbox) -->
+    <iframe name="ethercalcSubmitFrame" id="ethercalcSubmitFrame" style="display:none;width:0;height:0;border:none;" title="hidden submission frame"></iframe>
 
     <div class="app-container" id="appContainer">
         <!-- STUDENT VIEW -->
@@ -183,6 +416,7 @@
                 <h1 class="question-text">In one or two words,<br>what makes you trust an aviation leader?</h1>
             </div>
 
+            <!-- QR Code section (visible only on large screens) -->
             <div class="qr-section" id="qrSection">
                 <img class="qr-code-img" id="qrCodeImg"
                 src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Crect fill='%23fff' width='110' height='110' rx='8'/%3E%3Ctext x='55' y='58' text-anchor='middle' fill='%23999' font-size='11' font-family='sans-serif'%3EQR%3C/text%3E%3C/svg%3E"
@@ -193,6 +427,7 @@
                 </div>
             </div>
 
+            <!-- Answer card -->
             <div class="card" id="inputCard">
                 <div style="display:flex;flex-direction:column;gap:8px;">
                     <label class="label-text" for="answerInput">Your answer (1–2 words):</label>
@@ -200,7 +435,12 @@
                 </div>
                 <div style="height:16px;"></div>
                 <button class="btn btn-primary" id="submitBtn">✈️ Submit Answer</button>
-                <div id="submissionHint" style="margin-top:10px;font-size:0.7rem;color:rgba(255,255,255,0.35);text-align:center;">Press Enter or tap Submit</div>
+                <div id="submissionHint" style="margin-top:10px;font-size:0.7rem;color:rgba(255,255,255,0.35);text-align:center;">
+                    Press Enter or tap Submit
+                </div>
+                <div id="spreadsheetLink" style="margin-top:8px;font-size:0.7rem;text-align:center;display:none;">
+                    <a href="https://ethercalc.net/msa547" target="_blank" rel="noopener" style="color:var(--sky-blue);">Open spreadsheet to verify</a>
+                </div>
             </div>
 
             <div style="text-align:center;">
@@ -257,9 +497,11 @@
             const statUnique = document.getElementById('statUnique');
             const statLastRefresh = document.getElementById('statLastRefresh');
             const qrCodeImg = document.getElementById('qrCodeImg');
+            const submitFrame = document.getElementById('ethercalcSubmitFrame');
             const connectionStatus = document.getElementById('connectionStatus');
             const statusDot = document.getElementById('statusDot');
             const submissionHint = document.getElementById('submissionHint');
+            const spreadsheetLink = document.getElementById('spreadsheetLink');
 
             const ETHERCALC_CSV = 'https://ethercalc.net/msa547.csv';
             const ETHERCALC_API = 'https://ethercalc.net/_/msa547';
@@ -283,7 +525,8 @@
                     const y = Math.random() * 100;
                     const dur = Math.random() * 3 + 2.5;
                     const delay = Math.random() * 4;
-                    html += `<div class="star" style="left:${x}%;top:${y}%;width:${size}px;height:${size}px;--dur:${dur}s;--delay:${delay}s;"></div>`;
+                    html +=
+                        `<div class="star" style="left:${x}%;top:${y}%;width:${size}px;height:${size}px;--dur:${dur}s;--delay:${delay}s;"></div>`;
                 }
                 sf.innerHTML = html;
             })();
@@ -304,13 +547,17 @@
                 backendReachable = reachable;
                 if (reachable === true) {
                     statusDot.className = 'status-indicator ok';
-                    connectionStatus.innerHTML = '<span class="status-indicator ok"></span> Backend connected';
+                    connectionStatus.innerHTML =
+                        '<span class="status-indicator ok"></span> Backend connected';
                 } else if (reachable === false) {
                     statusDot.className = 'status-indicator err';
-                    connectionStatus.innerHTML = '<span class="status-indicator err"></span> Spreadsheet missing – <a href="'+SHEET_URL+'" target="_blank" style="color:var(--orange);">create it here</a>';
+                    connectionStatus.innerHTML =
+                        '<span class="status-indicator err"></span> Spreadsheet missing – <a href="' +
+                        SHEET_URL + '" target="_blank" style="color:var(--orange);">create it here</a>';
                 } else {
                     statusDot.className = 'status-indicator warn';
-                    connectionStatus.innerHTML = '<span class="status-indicator warn"></span> Checking backend...';
+                    connectionStatus.innerHTML =
+                        '<span class="status-indicator warn"></span> Checking backend...';
                 }
             }
 
@@ -318,7 +565,10 @@
                 updateConnectionStatus(null);
                 try {
                     const resp = await fetch(ETHERCALC_CSV, { cache: 'no-store' });
-                    if (resp.ok) { updateConnectionStatus(true); return true; }
+                    if (resp.ok) {
+                        updateConnectionStatus(true);
+                        return true;
+                    }
                 } catch (e) {}
                 updateConnectionStatus(false);
                 return false;
@@ -337,11 +587,13 @@
             // QR code
             function updateQR() {
                 const url = window.location.href.split('?')[0].split('#')[0];
-                qrCodeImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(url)}&bgcolor=ffffff&color=0a1628&qzone=4`;
-                qrCodeImg.onerror = () => qrCodeImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Crect fill='%23fff' width='110' height='110' rx='8'/%3E%3Ctext x='55' y='55' text-anchor='middle' fill='%23999' font-size='10'%3EQR%3C/text%3E%3C/svg%3E";
+                qrCodeImg.src =
+                    `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(url)}&bgcolor=ffffff&color=0a1628&qzone=4`;
+                qrCodeImg.onerror = () => qrCodeImg.src =
+                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Crect fill='%23fff' width='110' height='110' rx='8'/%3E%3Ctext x='55' y='55' text-anchor='middle' fill='%23999' font-size='10'%3EQR%3C/text%3E%3C/svg%3E";
             }
 
-            // Fetch answers
+            // Fetch answers from CSV
             async function fetchAnswers() {
                 const resp = await fetch(ETHERCALC_CSV, { cache: 'no-store' });
                 if (!resp.ok) throw new Error('HTTP ' + resp.status);
@@ -364,13 +616,14 @@
                         firstCol = comma > 0 ? line.substring(0, comma) : line;
                     }
                     const cleaned = firstCol.trim();
-                    if (!cleaned || /^(answer|response|submission|word|cell|sheet|ethercalc)/i.test(cleaned) || /^[A-Z]\d+$/i.test(cleaned)) continue;
+                    if (!cleaned || /^(answer|response|submission|word|cell|sheet|ethercalc)/i.test(cleaned) ||
+                        /^[A-Z]\d+$/i.test(cleaned)) continue;
                     answers.push(cleaned);
                 }
                 return answers;
             }
 
-            // SUBMISSION: using Image ping (GET) to write cell
+            // Submission: dynamic form + iframe with extended verification
             async function submitAnswer(answerText) {
                 let existingCount = 0;
                 try {
@@ -380,17 +633,44 @@
 
                 const nextRow = existingCount + 1;
                 const cell = `A${nextRow}`;
-                const encoded = encodeURIComponent(answerText);
-                const writeUrl = `${ETHERCALC_API}?cell=${cell}&value=${encoded}`;
+                console.log(`📡 Submitting to ${ETHERCALC_API} cell=${cell} value="${answerText}"`);
 
-                console.log(`📡 Sending GET ping: ${writeUrl}`);
-                // Use an Image object to trigger the request
-                const img = new Image();
-                img.src = writeUrl;
+                // Create a fresh form each time
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = ETHERCALC_API;
+                form.target = 'ethercalcSubmitFrame';
+                form.enctype = 'application/x-www-form-urlencoded';
+                form.style.display = 'none';
 
-                // Wait and verify (4 seconds)
-                await new Promise(resolve => setTimeout(resolve, 4000));
+                const cellInput = document.createElement('input');
+                cellInput.type = 'hidden';
+                cellInput.name = 'cell';
+                cellInput.value = cell;
+                form.appendChild(cellInput);
 
+                const valueInput = document.createElement('input');
+                valueInput.type = 'hidden';
+                valueInput.name = 'value';
+                valueInput.value = answerText;
+                form.appendChild(valueInput);
+
+                document.body.appendChild(form);
+
+                // Log to confirm form submission
+                console.log('📋 Form submitted to iframe');
+                form.submit();
+
+                // Remove form after a short delay to ensure request is sent
+                setTimeout(() => {
+                    if (form.parentNode) form.remove();
+                }, 1000);
+
+                // Wait for potential write to propagate
+                console.log('⏳ Waiting 4 seconds for spreadsheet update...');
+                await new Promise(r => setTimeout(r, 4000));
+
+                // Verify
                 let verified = false;
                 try {
                     const updated = await fetchAnswers();
@@ -400,11 +680,11 @@
                         verified = true;
                         console.log('✅ Answer verified in spreadsheet');
                     } else {
-                        console.warn('⚠️ Answer not yet visible – it may appear later. Current entries:', updated.length);
+                        console.warn('⚠️ Answer not yet visible – may need manual refresh');
                     }
                 } catch (e) {
-                    console.warn('Verification fetch failed, assuming success');
-                    verified = true; // optimistic
+                    console.warn('Verification fetch failed, assuming submission succeeded');
+                    verified = true;
                 }
 
                 return { success: true, row: nextRow, verified };
@@ -422,6 +702,7 @@
                 submitBtn.disabled = true;
                 submitBtn.textContent = '⏳ Submitting...';
                 submissionHint.textContent = 'Sending to spreadsheet...';
+                spreadsheetLink.style.display = 'none';
 
                 try {
                     const result = await submitAnswer(answer);
@@ -430,7 +711,8 @@
                     if (result.verified) {
                         showToast('✅ Answer submitted successfully!', 'success');
                     } else {
-                        showToast('📤 Answer sent, but not yet visible. Please refresh results in a moment.', 'success');
+                        showToast('📤 Answer sent! It may take a moment to appear. You can check the spreadsheet.', 'success');
+                        spreadsheetLink.style.display = 'block';
                     }
                     updateConnectionStatus(true);
                 } catch (e) {
@@ -443,20 +725,32 @@
                 }
             }
 
-            // Word cloud engine
+            // Word cloud engine (same as before, compact)
             function computeFrequencies(answers) {
                 const map = new Map();
-                answers.forEach(a => { const k = a.toLowerCase().trim(); if (k) map.set(k, (map.get(k) || 0) + 1); });
-                return Array.from(map.entries()).map(([w, c]) => ({ word: w, count: c })).sort((a, b) => b.count - a.count);
+                answers.forEach(a => {
+                    const k = a.toLowerCase().trim();
+                    if (k) map.set(k, (map.get(k) || 0) + 1);
+                });
+                return Array.from(map.entries()).map(([w, c]) => ({ word: w, count: c })).sort((a, b) => b
+                    .count - a.count);
             }
-            const colors = ['#f4793e','#ff9a65','#ffb347','#4a90d9','#7eb8da','#5ba3e6','#34b7a8','#5cc9ba','#d4a853','#e8c97a','#ffffff','#eaf1f8','#e74c3c','#f07070'];
+            const colors = ['#f4793e', '#ff9a65', '#ffb347', '#4a90d9', '#7eb8da', '#5ba3e6', '#34b7a8', '#5cc9ba',
+                '#d4a853', '#e8c97a', '#ffffff', '#eaf1f8', '#e74c3c', '#f07070'
+            ];
             function renderWordCloud(answers) {
-                const canvas = wordcloudCanvas, wrapper = canvas.parentElement;
-                const ctx = canvas.getContext('2d'); canvasCtx = ctx;
-                const cw = wrapper.clientWidth, ch = Math.max(wrapper.clientHeight, 350);
-                const dpr = Math.min(window.devicePixelRatio || 1, 2); canvasScale = dpr;
-                canvas.width = cw * dpr; canvas.height = ch * dpr;
-                canvas.style.width = cw + 'px'; canvas.style.height = ch + 'px';
+                const canvas = wordcloudCanvas,
+                    wrapper = canvas.parentElement;
+                const ctx = canvas.getContext('2d');
+                canvasCtx = ctx;
+                const cw = wrapper.clientWidth,
+                    ch = Math.max(wrapper.clientHeight, 350);
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                canvasScale = dpr;
+                canvas.width = cw * dpr;
+                canvas.height = ch * dpr;
+                canvas.style.width = cw + 'px';
+                canvas.style.height = ch + 'px';
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
                 if (!answers.length) {
@@ -469,38 +763,59 @@
                 wordcloudPlaceholder.style.display = 'none';
                 const freqs = computeFrequencies(answers);
                 updateStats(answers.length, freqs.length);
-                const maxC = freqs[0].count, minC = freqs[freqs.length-1].count, range = maxC - minC || 1;
-                const maxFont = Math.min(58, cw/8), minFont = Math.max(13, maxFont*0.22);
+                const maxC = freqs[0].count,
+                    minC = freqs[freqs.length - 1].count,
+                    range = maxC - minC || 1;
+                const maxFont = Math.min(58, cw / 8),
+                    minFont = Math.max(13, maxFont * 0.22);
                 const items = freqs.map((f, i) => ({
-                    word: f.word, count: f.count,
-                    fontSize: minFont + ((f.count - minC)/range) * (maxFont - minFont),
-                    rotation: (Math.random()-0.5)*16,
+                    word: f.word,
+                    count: f.count,
+                    fontSize: minFont + ((f.count - minC) / range) * (maxFont - minFont),
+                    rotation: (Math.random() - 0.5) * 16,
                     color: colors[i % colors.length]
-                })).sort((a,b) => b.fontSize - a.fontSize);
-                const placed = [], pad = 4*dpr, centerX = canvas.width/2, centerY = canvas.height/2, spiralA = 0.8*dpr, step = 0.25;
+                })).sort((a, b) => b.fontSize - a.fontSize);
+                const placed = [],
+                    pad = 4 * dpr,
+                    centerX = canvas.width / 2,
+                    centerY = canvas.height / 2,
+                    spiralA = 0.8 * dpr,
+                    step = 0.25;
                 const font = "'Georgia','Segoe UI','Inter',sans-serif";
-                function overlap(a,b) { return !(a.x+a.w <= b.x || b.x+b.w <= a.x || a.y+a.h <= b.y || b.y+b.h <= a.y); }
+
+                function overlap(a, b) { return !(a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y +
+                        b.h <= a.y); }
                 items.forEach(item => {
-                    const fs = item.fontSize*dpr;
+                    const fs = item.fontSize * dpr;
                     ctx.font = `700 ${fs}px ${font}`;
-                    const tw = ctx.measureText(item.word).width, th = fs*1.15;
-                    const bw = tw+pad*2, bh = th+pad*2;
-                    let done = false, theta = 0;
+                    const tw = ctx.measureText(item.word).width,
+                        th = fs * 1.15;
+                    const bw = tw + pad * 2,
+                        bh = th + pad * 2;
+                    let done = false,
+                        theta = 0;
                     if (!placed.length) {
-                        const x = centerX - tw/2, y = centerY - th/2 + fs*0.35;
-                        if (x>=pad && y>=pad && x+bw<=canvas.width-pad && y+bh<=canvas.height-pad) {
-                            placed.push({ word:item.word, count:item.count, x, y, w:bw, h:bh, fontSize:item.fontSize, color:item.color, rotation:item.rotation, cx:x+bw/2, cy:y+bh/2 });
+                        const x = centerX - tw / 2,
+                            y = centerY - th / 2 + fs * 0.35;
+                        if (x >= pad && y >= pad && x + bw <= canvas.width - pad && y + bh <= canvas.height - pad) {
+                            placed.push({ word: item.word, count: item.count, x, y, w: bw, h: bh, fontSize: item
+                                    .fontSize, color: item.color, rotation: item.rotation, cx: x + bw / 2, cy: y +
+                                    bh / 2 });
                             done = true;
                         }
                     }
                     while (!done && theta < 500) {
-                        const r = spiralA*theta;
-                        const sx = centerX + r*Math.cos(theta), sy = centerY + r*Math.sin(theta);
-                        const x = sx - tw/2, y = sy - th/2 + fs*0.35;
-                        if (x>=pad && y>=pad && x+bw<=canvas.width-pad && y+bh<=canvas.height-pad) {
-                            const box = {x:x-pad, y:y-pad, w:bw, h:bh};
-                            if (!placed.some(p => overlap(box, {x:p.x-pad, y:p.y-pad, w:p.w, h:p.h}))) {
-                                placed.push({ word:item.word, count:item.count, x, y, w:bw, h:bh, fontSize:item.fontSize, color:item.color, rotation:item.rotation, cx:x+bw/2, cy:y+bh/2 });
+                        const r = spiralA * theta;
+                        const sx = centerX + r * Math.cos(theta),
+                            sy = centerY + r * Math.sin(theta);
+                        const x = sx - tw / 2,
+                            y = sy - th / 2 + fs * 0.35;
+                        if (x >= pad && y >= pad && x + bw <= canvas.width - pad && y + bh <= canvas.height - pad) {
+                            const box = { x: x - pad, y: y - pad, w: bw, h: bh };
+                            if (!placed.some(p => overlap(box, { x: p.x - pad, y: p.y - pad, w: p.w, h: p.h }))) {
+                                placed.push({ word: item.word, count: item.count, x, y, w: bw, h: bh, fontSize: item
+                                        .fontSize, color: item.color, rotation: item.rotation, cx: x + bw / 2, cy: y +
+                                        bh / 2 });
                                 done = true;
                             }
                         }
@@ -510,11 +825,13 @@
                 placed.forEach(p => {
                     ctx.save();
                     ctx.translate(p.cx, p.cy);
-                    if (p.rotation) ctx.rotate(p.rotation*Math.PI/180);
+                    if (p.rotation) ctx.rotate(p.rotation * Math.PI / 180);
                     ctx.font = `700 ${p.fontSize*dpr}px ${font}`;
-                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
                     ctx.fillStyle = p.color;
-                    ctx.shadowColor = 'rgba(0,0,0,0.3)'; ctx.shadowBlur = 3*dpr;
+                    ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                    ctx.shadowBlur = 3 * dpr;
                     ctx.fillText(p.word, 0, 0);
                     ctx.restore();
                 });
@@ -523,7 +840,8 @@
                 tooltip.classList.remove('visible');
                 statLastRefresh.textContent = new Date().toLocaleTimeString();
             }
-            function updateStats(total, unique) { statCount.textContent = total; statUnique.textContent = unique; }
+            function updateStats(total, unique) { statCount.textContent = total;
+                statUnique.textContent = unique; }
 
             async function fetchAndRenderWordCloud() {
                 wordcloudPlaceholder.style.display = 'flex';
@@ -534,22 +852,27 @@
                     updateConnectionStatus(true);
                 } catch (e) {
                     wordcloudPlaceholder.textContent = '⚠️ Unable to load data. Check spreadsheet.';
-                    updateStats('—','—');
+                    updateStats('—', '—');
                     updateConnectionStatus(false);
                 }
             }
 
             // Event listeners
             submitBtn.addEventListener('click', handleSubmit);
-            answerInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); handleSubmit(); } });
+            answerInput.addEventListener('keydown', e => {
+                if (e.key === 'Enter') { e.preventDefault();
+                    handleSubmit(); }
+            });
             gotoResultsBtn.addEventListener('click', () => switchView('results'));
             backToStudentBtn.addEventListener('click', () => switchView('student'));
-            refreshBtn.addEventListener('click', () => { fetchAndRenderWordCloud(); showToast('🔄 Refreshed'); });
+            refreshBtn.addEventListener('click', () => { fetchAndRenderWordCloud();
+                showToast('🔄 Refreshed'); });
 
             document.addEventListener('keydown', e => {
                 if (e.target.closest('input')) return;
                 if (e.key === 'n' || e.key === 'N') switchView(currentView === 'student' ? 'results' : 'student');
-                if ((e.key === 'r' || e.key === 'R') && currentView === 'results') { fetchAndRenderWordCloud(); showToast('🔄 Refreshed'); }
+                if ((e.key === 'r' || e.key === 'R') && currentView === 'results') { fetchAndRenderWordCloud();
+                    showToast('🔄 Refreshed'); }
             });
 
             // Word cloud interaction
@@ -569,30 +892,39 @@
                     } else tooltip.classList.remove('visible');
                 }
             });
-            wordcloudCanvas.addEventListener('mouseleave', () => { hoveredIndex = -1; redrawHighlighted(-1); tooltip.classList.remove('visible'); });
+            wordcloudCanvas.addEventListener('mouseleave', () => { hoveredIndex = -1;
+                redrawHighlighted(-1);
+                tooltip.classList.remove('visible'); });
             wordcloudCanvas.addEventListener('click', e => {
                 const idx = findWordAt(e.clientX, e.clientY);
-                if (idx >= 0) showToast(`📊 "${wordPlacements[idx].word}" — ${wordPlacements[idx].count} response(s)`, 'success');
+                if (idx >= 0) showToast(`📊 "${wordPlacements[idx].word}" — ${wordPlacements[idx].count} response(s)`,
+                    'success');
             });
             wordcloudCanvas.addEventListener('touchmove', e => {
                 if (e.touches.length === 1) {
                     const t = e.touches[0];
                     const idx = findWordAt(t.clientX, t.clientY);
-                    if (idx !== hoveredIndex) { hoveredIndex = idx; redrawHighlighted(idx); }
+                    if (idx !== hoveredIndex) { hoveredIndex = idx;
+                        redrawHighlighted(idx); }
                 }
-            }, {passive: true});
-            wordcloudCanvas.addEventListener('touchend', () => setTimeout(() => { hoveredIndex = -1; redrawHighlighted(-1); }, 300));
+            }, { passive: true });
+            wordcloudCanvas.addEventListener('touchend', () => setTimeout(() => { hoveredIndex = -1;
+                redrawHighlighted(-1); }, 300));
 
             function findWordAt(mx, my) {
                 const rect = wordcloudCanvas.getBoundingClientRect();
                 const sx = (canvas.width / canvasScale) / rect.width;
                 const sy = (canvas.height / canvasScale) / rect.height;
-                const cx = mx * sx * canvasScale, cy = my * sy * canvasScale;
-                let best = -1, bestArea = Infinity;
+                const cx = mx * sx * canvasScale,
+                    cy = my * sy * canvasScale;
+                let best = -1,
+                    bestArea = Infinity;
                 wordPlacements.forEach((p, i) => {
-                    const bx = p.x - 2*canvasScale, by = p.y - 2*canvasScale;
-                    if (cx >= bx && cx <= bx + p.w && cy >= by && cy <= by + p.h && p.w*p.h < bestArea) {
-                        bestArea = p.w*p.h; best = i;
+                    const bx = p.x - 2 * canvasScale,
+                        by = p.y - 2 * canvasScale;
+                    if (cx >= bx && cx <= bx + p.w && cy >= by && cy <= by + p.h && p.w * p.h < bestArea) {
+                        bestArea = p.w * p.h;
+                        best = i;
                     }
                 });
                 return best;
@@ -603,16 +935,22 @@
                 wordPlacements.forEach((p, i) => {
                     ctx.save();
                     ctx.translate(p.cx, p.cy);
-                    if (p.rotation) ctx.rotate(p.rotation * Math.PI/180);
+                    if (p.rotation) ctx.rotate(p.rotation * Math.PI / 180);
                     ctx.font = `700 ${p.fontSize*canvasScale}px 'Georgia','Segoe UI',sans-serif`;
-                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
                     if (i === hi) {
-                        ctx.shadowColor = p.color; ctx.shadowBlur = 18*canvasScale;
-                        ctx.fillStyle = '#fff'; ctx.fillText(p.word, 0, 0);
-                        ctx.shadowBlur = 0; ctx.fillStyle = p.color; ctx.fillText(p.word, 0, 0);
+                        ctx.shadowColor = p.color;
+                        ctx.shadowBlur = 18 * canvasScale;
+                        ctx.fillStyle = '#fff';
+                        ctx.fillText(p.word, 0, 0);
+                        ctx.shadowBlur = 0;
+                        ctx.fillStyle = p.color;
+                        ctx.fillText(p.word, 0, 0);
                     } else {
                         ctx.fillStyle = p.color;
-                        ctx.shadowColor = 'rgba(0,0,0,0.3)'; ctx.shadowBlur = 3*canvasScale;
+                        ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                        ctx.shadowBlur = 3 * canvasScale;
                         ctx.fillText(p.word, 0, 0);
                     }
                     ctx.restore();
@@ -631,7 +969,8 @@
                 if (!ok) {
                     showToast('⚠️ Spreadsheet not found – please visit ' + SHEET_URL + ' to create it.', 'error');
                 } else {
-                    try { allAnswers = await fetchAnswers(); console.log('Existing entries:', allAnswers.length); } catch(e) {}
+                    try { allAnswers = await fetchAnswers();
+                        console.log('Existing entries:', allAnswers.length); } catch (e) {}
                 }
                 setTimeout(() => answerInput.focus(), 500);
             }
