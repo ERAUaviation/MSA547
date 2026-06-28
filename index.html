@@ -30,13 +30,11 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         html {
             font-size: 16px;
             -webkit-tap-highlight-color: transparent;
             -webkit-font-smoothing: antialiased;
         }
-
         body {
             font-family: var(--font-body);
             background: var(--navy);
@@ -52,7 +50,6 @@
             padding: 16px;
             overflow-x: hidden;
         }
-
         .starfield {
             position: fixed;
             inset: 0;
@@ -78,7 +75,6 @@
                 transform: scale(1.8);
             }
         }
-
         .app-container {
             position: relative;
             z-index: 1;
@@ -88,7 +84,6 @@
             flex-direction: column;
             gap: 20px;
         }
-
         .view {
             display: none;
             flex-direction: column;
@@ -108,7 +103,6 @@
                 transform: translateY(0);
             }
         }
-
         .card {
             background: var(--panel-bg);
             border: 1px solid var(--glass-border);
@@ -130,7 +124,6 @@
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
             border-radius: 50%;
         }
-
         .accent-line {
             width: 60px;
             height: 3px;
@@ -138,7 +131,6 @@
             background: var(--orange);
             margin: 6px 0 14px;
         }
-
         .question-text {
             font-family: var(--font-display);
             font-size: 1.45rem;
@@ -161,7 +153,6 @@
             letter-spacing: 0.03em;
             font-weight: 500;
         }
-
         .answer-input {
             width: 100%;
             padding: 16px 18px;
@@ -183,7 +174,6 @@
             color: rgba(255, 255, 255, 0.3);
             font-style: italic;
         }
-
         .btn {
             display: inline-flex;
             align-items: center;
@@ -236,7 +226,6 @@
             font-size: 0.8rem;
             border-radius: 30px;
         }
-
         .btn-row {
             display: flex;
             gap: 10px;
@@ -246,7 +235,6 @@
         .btn-row.between {
             justify-content: space-between;
         }
-
         .qr-section {
             display: none;
             align-items: center;
@@ -276,7 +264,6 @@
             font-weight: 700;
             font-size: 0.9rem;
         }
-
         .toast {
             position: fixed;
             top: 24px;
@@ -308,7 +295,6 @@
             background: #1a3d2e;
             border-color: var(--green-accent);
         }
-
         .wordcloud-wrapper {
             position: relative;
             width: 100%;
@@ -354,7 +340,6 @@
         .tooltip.visible {
             opacity: 1;
         }
-
         .stats-bar {
             display: flex;
             gap: 16px;
@@ -373,7 +358,6 @@
             font-weight: 700;
             font-size: 1.1rem;
         }
-
         .connection-status {
             font-size: 0.65rem;
             color: rgba(255,255,255,0.3);
@@ -397,17 +381,20 @@
         .status-indicator.warn {
             background: var(--orange);
         }
-
         .ethercalc-iframe {
             position: fixed;
-            top: 0;
+            bottom: 0;
             left: 0;
-            width: 0;
-            height: 0;
-            opacity: 0;
-            pointer-events: none;
-            border: none;
-            z-index: -1;
+            width: 100%;
+            height: 80px;
+            border: 1px solid var(--glass-border);
+            z-index: 10;
+            background: #000;
+            opacity: 0.7;
+        }
+        .iframe-minimized {
+            height: 30px;
+            opacity: 0.4;
         }
     </style>
 </head>
@@ -416,8 +403,8 @@
     <div class="toast" id="toast" aria-live="polite"></div>
     <div class="tooltip" id="tooltip" aria-hidden="true"></div>
 
-    <!-- Invisible iframe for postMessage + EtherCalc write -->
-    <iframe id="ethercalcIframe" class="ethercalc-iframe" src="about:blank" title="hidden ethercalc frame"></iframe>
+    <!-- Visible EtherCalc iframe (for postMessage) -->
+    <iframe id="ethercalcIframe" class="ethercalc-iframe iframe-minimized" src="about:blank" title="EtherCalc backend"></iframe>
 
     <div class="app-container" id="appContainer">
         <!-- STUDENT VIEW -->
@@ -513,7 +500,6 @@
 
             const ETHERCALC_CSV = 'https://ethercalc.net/msa547.csv';
             const SHEET_URL = 'https://ethercalc.net/msa547';
-            const SHEET_EMBED = 'https://ethercalc.net/msa547?full=1'; // minimal UI for postMessage
 
             let currentView = 'student';
             let allAnswers = [];
@@ -523,7 +509,7 @@
             let isSubmitting = false;
             let backendReachable = null;
             let iframeReady = false;
-            let pendingWrite = null;
+            let pendingWrites = [];
 
             // Starfield
             (function() {
@@ -635,8 +621,9 @@
 
             // --- postMessage write via iframe ---
             function loadEthercalcIframe() {
-                ethercalcIframe.src = SHEET_EMBED;
-                console.log('📺 Loading EtherCalc iframe:', SHEET_EMBED);
+                const url = SHEET_URL;
+                console.log('📺 Loading EtherCalc iframe:', url);
+                ethercalcIframe.src = url;
             }
 
             function sendWriteCommand(cell, value) {
@@ -646,26 +633,41 @@
                     value: value
                 };
                 console.log(`📤 postMessage set: ${cell} = "${value}"`);
-                ethercalcIframe.contentWindow.postMessage(command, '*');
+                try {
+                    ethercalcIframe.contentWindow.postMessage(command, 'https://ethercalc.net');
+                } catch (e) {
+                    console.error('postMessage failed:', e);
+                }
             }
 
-            // Called when iframe sends back a 'ready' message (some EtherCalc versions do)
             function handleIframeMessage(event) {
-                if (event.origin !== 'https://ethercalc.net' && event.origin !== 'http://ethercalc.net') return;
+                if (event.origin !== 'https://ethercalc.net') return;
                 const data = event.data;
                 if (data && data.type === 'ready') {
                     console.log('✅ EtherCalc iframe reported ready');
                     iframeReady = true;
-                    if (pendingWrite) {
-                        sendWriteCommand(pendingWrite.cell, pendingWrite.value);
-                        pendingWrite = null;
+                    // Send any pending writes
+                    while (pendingWrites.length > 0) {
+                        const w = pendingWrites.shift();
+                        sendWriteCommand(w.cell, w.value);
                     }
                 }
             }
 
             window.addEventListener('message', handleIframeMessage, false);
 
-            // Write cell via postMessage (with timeout fallback to image beacon)
+            // Iframe ready timeout: if no 'ready' message in 5 seconds, assume ready
+            setTimeout(() => {
+                if (!iframeReady) {
+                    console.warn('⚠️ No ready message from iframe, assuming it is loaded.');
+                    iframeReady = true;
+                    while (pendingWrites.length > 0) {
+                        const w = pendingWrites.shift();
+                        sendWriteCommand(w.cell, w.value);
+                    }
+                }
+            }, 5000);
+
             async function submitAnswer(answerText) {
                 let existingCount = 0;
                 try {
@@ -677,27 +679,24 @@
                 const cell = `A${nextRow}`;
                 console.log(`🚀 Writing to ${cell}: "${answerText}"`);
 
-                // Primary: iframe postMessage
+                // Primary: postMessage (or queue if not ready)
                 if (iframeReady) {
                     sendWriteCommand(cell, answerText);
                 } else {
-                    console.log('⏳ Iframe not ready yet, queueing write');
-                    pendingWrite = { cell, value: answerText };
-                    // If iframe not ready within 2 seconds, use image beacon fallback
-                    setTimeout(() => {
-                        if (!iframeReady && pendingWrite) {
-                            console.warn('⚠️ Iframe still not ready, using image beacon');
-                            const encoded = encodeURIComponent(pendingWrite.value);
-                            new Image().src =
-                                `https://ethercalc.net/_/msa547?cell=${pendingWrite.cell}&value=${encoded}`;
-                            pendingWrite = null;
-                        }
-                    }, 2000);
+                    console.log('⏳ Iframe not ready, queueing write');
+                    pendingWrites.push({ cell, value: answerText });
                 }
 
+                // Fallback: also try image beacon after a short delay
+                setTimeout(() => {
+                    const encoded = encodeURIComponent(answerText);
+                    new Image().src = `https://ethercalc.net/_/msa547?cell=${cell}&value=${encoded}`;
+                    console.log('📸 Fallback image beacon sent');
+                }, 1500);
+
                 // Wait and verify
-                console.log('⏳ Waiting 4 seconds for spreadsheet update...');
-                await new Promise(r => setTimeout(r, 4000));
+                console.log('⏳ Waiting 5 seconds for spreadsheet update...');
+                await new Promise(r => setTimeout(r, 5000));
 
                 let verified = false;
                 try {
@@ -990,7 +989,7 @@
 
             // Init
             async function init() {
-                console.log('🛩️ MSA 547 – ready (postMessage method)');
+                console.log('🛩️ MSA 547 – ready (postMessage + iframe)');
                 updateQR();
                 loadEthercalcIframe(); // start loading the iframe immediately
                 const ok = await checkBackend();
