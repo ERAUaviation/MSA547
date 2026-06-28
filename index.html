@@ -397,6 +397,18 @@
         .status-indicator.warn {
             background: var(--orange);
         }
+
+        .ethercalc-iframe {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            opacity: 0;
+            pointer-events: none;
+            border: none;
+            z-index: -1;
+        }
     </style>
 </head>
 <body>
@@ -404,8 +416,8 @@
     <div class="toast" id="toast" aria-live="polite"></div>
     <div class="tooltip" id="tooltip" aria-hidden="true"></div>
 
-    <!-- Hidden iframe for GET form submission (backup) -->
-    <iframe name="ethercalcSubmitFrame" id="ethercalcSubmitFrame" style="display:none;width:0;height:0;border:none;" title="hidden submission frame"></iframe>
+    <!-- Invisible iframe for postMessage + EtherCalc write -->
+    <iframe id="ethercalcIframe" class="ethercalc-iframe" src="about:blank" title="hidden ethercalc frame"></iframe>
 
     <div class="app-container" id="appContainer">
         <!-- STUDENT VIEW -->
@@ -494,14 +506,14 @@
             const statUnique = document.getElementById('statUnique');
             const statLastRefresh = document.getElementById('statLastRefresh');
             const qrCodeImg = document.getElementById('qrCodeImg');
-            const submitFrame = document.getElementById('ethercalcSubmitFrame');
+            const ethercalcIframe = document.getElementById('ethercalcIframe');
             const connectionStatus = document.getElementById('connectionStatus');
             const statusDot = document.getElementById('statusDot');
             const submissionHint = document.getElementById('submissionHint');
 
             const ETHERCALC_CSV = 'https://ethercalc.net/msa547.csv';
-            const ETHERCALC_API = 'https://ethercalc.net/_/msa547';
             const SHEET_URL = 'https://ethercalc.net/msa547';
+            const SHEET_EMBED = 'https://ethercalc.net/msa547?full=1'; // minimal UI for postMessage
 
             let currentView = 'student';
             let allAnswers = [];
@@ -510,6 +522,8 @@
             let canvasCtx, canvasScale = 1;
             let isSubmitting = false;
             let backendReachable = null;
+            let iframeReady = false;
+            let pendingWrite = null;
 
             // Starfield
             (function() {
@@ -619,44 +633,39 @@
                 return answers;
             }
 
-            // SUBMISSION: Primary method - image beacon (GET request to set cell)
-            function writeCellViaImage(cell, value) {
-                const encoded = encodeURIComponent(value);
-                const url = `${ETHERCALC_API}?cell=${cell}&value=${encoded}`;
-                console.log(`📸 Image beacon: ${url}`);
-                const img = new Image();
-                img.src = url;
-                // No need to append to DOM; browser will still load it
+            // --- postMessage write via iframe ---
+            function loadEthercalcIframe() {
+                ethercalcIframe.src = SHEET_EMBED;
+                console.log('📺 Loading EtherCalc iframe:', SHEET_EMBED);
             }
 
-            // Backup: hidden GET form submission
-            function writeCellViaGetForm(cell, value) {
-                const form = document.createElement('form');
-                form.method = 'GET';
-                form.action = ETHERCALC_API;
-                form.target = 'ethercalcSubmitFrame';
-                form.style.display = 'none';
-
-                const cellInput = document.createElement('input');
-                cellInput.type = 'hidden';
-                cellInput.name = 'cell';
-                cellInput.value = cell;
-                form.appendChild(cellInput);
-
-                const valueInput = document.createElement('input');
-                valueInput.type = 'hidden';
-                valueInput.name = 'value';
-                valueInput.value = value;
-                form.appendChild(valueInput);
-
-                document.body.appendChild(form);
-                form.submit();
-                setTimeout(() => {
-                    if (form.parentNode) form.remove();
-                }, 1000);
-                console.log(`📋 Backup form submitted for ${cell} = "${value}"`);
+            function sendWriteCommand(cell, value) {
+                const command = {
+                    action: 'set',
+                    cell: cell,
+                    value: value
+                };
+                console.log(`📤 postMessage set: ${cell} = "${value}"`);
+                ethercalcIframe.contentWindow.postMessage(command, '*');
             }
 
+            // Called when iframe sends back a 'ready' message (some EtherCalc versions do)
+            function handleIframeMessage(event) {
+                if (event.origin !== 'https://ethercalc.net' && event.origin !== 'http://ethercalc.net') return;
+                const data = event.data;
+                if (data && data.type === 'ready') {
+                    console.log('✅ EtherCalc iframe reported ready');
+                    iframeReady = true;
+                    if (pendingWrite) {
+                        sendWriteCommand(pendingWrite.cell, pendingWrite.value);
+                        pendingWrite = null;
+                    }
+                }
+            }
+
+            window.addEventListener('message', handleIframeMessage, false);
+
+            // Write cell via postMessage (with timeout fallback to image beacon)
             async function submitAnswer(answerText) {
                 let existingCount = 0;
                 try {
@@ -666,19 +675,30 @@
 
                 const nextRow = existingCount + 1;
                 const cell = `A${nextRow}`;
-                console.log(`🚀 Submitting answer to ${cell}: "${answerText}"`);
+                console.log(`🚀 Writing to ${cell}: "${answerText}"`);
 
-                // Primary: image beacon
-                writeCellViaImage(cell, answerText);
+                // Primary: iframe postMessage
+                if (iframeReady) {
+                    sendWriteCommand(cell, answerText);
+                } else {
+                    console.log('⏳ Iframe not ready yet, queueing write');
+                    pendingWrite = { cell, value: answerText };
+                    // If iframe not ready within 2 seconds, use image beacon fallback
+                    setTimeout(() => {
+                        if (!iframeReady && pendingWrite) {
+                            console.warn('⚠️ Iframe still not ready, using image beacon');
+                            const encoded = encodeURIComponent(pendingWrite.value);
+                            new Image().src =
+                                `https://ethercalc.net/_/msa547?cell=${pendingWrite.cell}&value=${encoded}`;
+                            pendingWrite = null;
+                        }
+                    }, 2000);
+                }
 
-                // Backup: form submission (slight delay to avoid race condition)
-                setTimeout(() => writeCellViaGetForm(cell, answerText), 200);
+                // Wait and verify
+                console.log('⏳ Waiting 4 seconds for spreadsheet update...');
+                await new Promise(r => setTimeout(r, 4000));
 
-                // Wait for propagation
-                console.log('⏳ Waiting 5 seconds for spreadsheet update...');
-                await new Promise(r => setTimeout(r, 5000));
-
-                // Verify
                 let verified = false;
                 try {
                     const updated = await fetchAnswers();
@@ -970,8 +990,9 @@
 
             // Init
             async function init() {
-                console.log('🛩️ MSA 547 – ready (image beacon method)');
+                console.log('🛩️ MSA 547 – ready (postMessage method)');
                 updateQR();
+                loadEthercalcIframe(); // start loading the iframe immediately
                 const ok = await checkBackend();
                 if (!ok) {
                     showToast('⚠️ Spreadsheet not found – please visit ' + SHEET_URL + ' to create it.', 'error');
