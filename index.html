@@ -557,7 +557,7 @@
             z-index: 1999;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease;
+            transition: none;
         }
         .drawer-overlay.open {
             opacity: 1;
@@ -578,7 +578,7 @@
             z-index: 2000;
             display: flex;
             flex-direction: column;
-            transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: none;
             color: #fff;
         }
         .settings-drawer.open {
@@ -891,15 +891,19 @@
             body {
                 padding: 0;
                 background: var(--navy);
+                display: flex;
+                align-items: flex-start;
+                justify-content: center;
             }
 
             #studentView.card {
                 width: 100vw;
                 max-width: 100%;
-                height: 100dvh;
+                height: auto;
+                min-height: 100dvh;
                 border-radius: 0;
-                padding: 2rem 1.5rem;
-                justify-content: center;
+                padding: 3rem 1.5rem 2rem;
+                justify-content: flex-start;
                 background: linear-gradient(145deg, rgba(26, 42, 74, 0.9), rgba(10, 22, 40, 0.95));
                 border: none;
                 box-shadow: none;
@@ -1427,20 +1431,11 @@
 
     <div class="results-header" style="margin-bottom: 24px;">
         <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-            <!-- Brand Logo Mark -->
-            <div class="brand-logo" style="display: flex; align-items: center; gap: 10px; user-select: none;">
-                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 10px var(--gold-glow)); transition: 0.3s;">
-                    <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z" fill="url(#logoGradient)" />
-                    <defs>
-                        <linearGradient id="logoGradient" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="var(--gold-light)" />
-                            <stop offset="1" stop-color="var(--gold)" />
-                        </linearGradient>
-                    </defs>
-                </svg>
-                <div style="display: flex; flex-direction: column; line-height: 1.1;">
-                    <span style="font-size: 0.72rem; font-weight: 400; letter-spacing: 0.28em; color: rgba(255,255,255,0.45); text-transform: uppercase; font-family: 'Inter', sans-serif;">Classroom</span>
-                    <span style="font-size: 1.35rem; font-weight: 850; letter-spacing: 0.04em; background: linear-gradient(135deg, var(--gold-light), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-family: 'Inter', sans-serif;">CLOUD</span>
+            <!-- Brand Logo Mark (Gold Metallic Label Rectangle) -->
+            <div class="brand-logo" style="user-select: none;">
+                <div style="background: linear-gradient(135deg, #a8862a 0%, #ffe8bc 25%, #d4af37 50%, #ffe8bc 75%, #886620 100%); border: 1.5px solid #ffe8bc; padding: 4px 10px; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(212,175,55,0.25); text-align: center; border-radius: 0px;">
+                    <span style="font-family: 'Inter', sans-serif; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.25em; color: #0b1a2e; text-transform: uppercase; line-height: 1;">CLASSROOM</span>
+                    <span style="font-family: 'Inter', sans-serif; font-size: 1.15rem; font-weight: 900; letter-spacing: 0.08em; color: #0b1a2e; line-height: 1.1; margin-top: 2px;">CLOUD</span>
                 </div>
             </div>
             <div style="display: flex; align-items: center; gap: 14px;">
@@ -1477,7 +1472,6 @@
             <div id="qrCode"></div>
             <div class="qr-label">
                 Scan to join
-                <small>share with your group</small>
             </div>
         </div>
 
@@ -1556,16 +1550,7 @@
             </button>
         </div>
 
-        <!-- Section: Active Question Editor -->
-        <div class="drawer-section">
-            <span class="drawer-section-title">Active Question</span>
-            <div class="drawer-input-group">
-                <input type="text" id="questionInput" class="drawer-text-input" placeholder="Type new question..." />
-                <button class="action-btn" id="saveQuestionBtn" style="background: rgba(212, 175, 55, 0.2); border-color: rgba(212, 175, 55, 0.4); color: var(--gold-light); font-weight: 600;">
-                    Publish Question
-                </button>
-            </div>
-        </div>
+
 
         <!-- Section: Classroom Mode selector -->
         <div class="drawer-section">
@@ -2349,8 +2334,8 @@
 
             const weightFactor = function(w) {
                 const normalized = (w - minWeight) / weightRange;
-                const size = 16 + normalized * 54;
-                return Math.min(Math.max(size, 14), 72);
+                const size = 32 + normalized * 78; // Much larger word sizes on screen!
+                return Math.min(Math.max(size, 20), 120);
             };
 
             const gridSize = Math.max(8, Math.min(20, Math.round(44 / Math.sqrt(sorted.length))));
@@ -2365,9 +2350,10 @@
                     fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif",
                     fontWeight: '600',
                     color: function(word, weight) {
+                        // Regular colored word cloud using highly vibrant contrasting HSL hues
                         const hash = word.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
-                        const idx = (hash + weight) % currentWordColors.length;
-                        return currentWordColors[idx];
+                        const hue = (hash * 137.5) % 360; 
+                        return `hsl(${hue}, 85%, 65%)`;
                     },
                     shape: activeShape,
                     rotate: function(word, weight) {
@@ -2501,8 +2487,6 @@
 
         // ─── Clear All ───
         clearAllBtn.addEventListener('click', async function() {
-            if (!confirm('⚠️ This will permanently DELETE ALL responses from the spreadsheet. Continue?')) return;
-
             try {
                 const originalText = clearAllBtn.innerHTML;
                 clearAllBtn.innerHTML = '⏳ …';
@@ -2617,6 +2601,9 @@
                         if (isResults && allowMultipleToggle) {
                             allowMultipleToggle.checked = allowMultiple;
                         }
+                    }
+                    if (result.profanityList) {
+                        PROFANITY_LIST = result.profanityList;
                     }
                     if (result.sessionToken !== undefined && result.sessionToken !== currentSessionToken) {
                         const firstLoad = currentSessionToken === '';
@@ -2788,7 +2775,49 @@
         }
 
         // ─── Settings Drawer Open/Close Toggles ───
+        let settingsAuthenticated = false;
+        
         function openDrawer() {
+            if (!settingsAuthenticated) {
+                const promptEl = document.getElementById('settingsPasswordPrompt');
+                const inputEl = document.getElementById('settingsPasswordInput');
+                if (promptEl && inputEl) {
+                    promptEl.style.display = 'block';
+                    inputEl.value = '';
+                    inputEl.focus();
+                    
+                    // Listen for enter key
+                    inputEl.onkeydown = async function(e) {
+                        if (e.key === 'Enter') {
+                            const pw = inputEl.value;
+                            inputEl.disabled = true;
+                            try {
+                                const response = await fetch(`${WEB_APP_URL}?action=verifyPassword&password=${encodeURIComponent(pw)}&_=${Date.now()}`);
+                                const result = await response.json();
+                                if (result.status === 'success') {
+                                    settingsAuthenticated = true;
+                                    promptEl.style.display = 'none';
+                                    realOpenDrawer();
+                                } else {
+                                    showToast('❌ Incorrect password!', true);
+                                    inputEl.value = '';
+                                    inputEl.disabled = false;
+                                    inputEl.focus();
+                                }
+                            } catch(err) {
+                                showToast('❌ Connection error verifying password', true);
+                                inputEl.disabled = false;
+                                inputEl.focus();
+                            }
+                        }
+                    };
+                }
+            } else {
+                realOpenDrawer();
+            }
+        }
+        
+        function realOpenDrawer() {
             if (settingsDrawer && drawerOverlay) {
                 settingsDrawer.classList.add('open');
                 drawerOverlay.classList.add('open');
@@ -2799,6 +2828,10 @@
             if (settingsDrawer && drawerOverlay) {
                 settingsDrawer.classList.remove('open');
                 drawerOverlay.classList.remove('open');
+            }
+            const promptEl = document.getElementById('settingsPasswordPrompt');
+            if (promptEl) {
+                promptEl.style.display = 'none';
             }
         }
 
@@ -3178,12 +3211,10 @@
         }
 
         // ─── Basic Profanity Filter ───
-        const PROFANITY_LIST = [
-            'fuck', 'shit', 'asshole', 'bitch', 'cunt', 'bastard', 'dick', 'pussy', 'nigger', 'faggot'
-        ];
+        let PROFANITY_LIST = [];
         
         function isProfane(text) {
-            if (!text) return false;
+            if (!text || PROFANITY_LIST.length === 0) return false;
             const words = text.toLowerCase().split(/\s+/);
             return words.some(w => PROFANITY_LIST.some(p => w.includes(p)));
         }
@@ -3631,6 +3662,12 @@
         window.__fetchCloud = fetchAndUpdate;
     })();
 </script>
+
+<!-- Password Prompt Overlay (at the bottom, professional Brutalist look) -->
+<div id="settingsPasswordPrompt" style="display: none; position: fixed; bottom: 24px; right: 24px; z-index: 10001; background: #0a1628; border: 2px solid var(--gold); padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); width: 280px; box-sizing: border-box; border-radius: 0px;">
+    <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.45); margin-bottom: 8px; font-weight: 700; font-family: 'Inter', sans-serif;">Admin Password Required</div>
+    <input type="password" id="settingsPasswordInput" style="width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(212,175,55,0.4); padding: 10px 14px; color: #fff; font-size: 1.05rem; outline: none; border-radius: 0px; font-family: inherit; box-sizing: border-box;" placeholder="Password…" />
+</div>
 
 <!-- Tooltip for Word Cloud hover -->
 <div id="cloudTooltip" style="display:none; position:fixed; background:rgba(10,22,40,0.95); border: 1px solid var(--gold); padding:8px 14px; border-radius:10px; font-size:0.9rem; color:#fff; pointer-events:none; z-index:1000; box-shadow:0 8px 24px rgba(0,0,0,0.6); font-family:'Inter', sans-serif;"></div>
