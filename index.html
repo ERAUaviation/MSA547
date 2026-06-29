@@ -816,6 +816,15 @@
         let latestValidCount = 0;
         let latestValidList = null;
 
+        // Pan & Zoom state variables
+        let scale = 1;
+        let panX = 0;
+        let panY = 0;
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+        const tooltip = document.getElementById('cloudTooltip');
+
         // ─── Check mode ───
         const params = new URLSearchParams(window.location.search);
         const isResults = params.get('view') === 'results';
@@ -918,6 +927,12 @@
         function renderCloud(list) {
             if (!canvas || !cloudWrapper) return;
 
+            // Reset pan & zoom state on new render
+            scale = 1;
+            panX = 0;
+            panY = 0;
+            applyTransform();
+
             const rect = cloudWrapper.getBoundingClientRect();
             const w = Math.max(rect.width || 600, 300);
             const h = Math.max(rect.height || 400, 200);
@@ -970,6 +985,19 @@
                         if (angle < 0.70) return -Math.PI / 4;
                         if (angle < 0.85) return Math.PI / 4;
                         return 0;
+                    },
+                    hover: function(item, dimension, event) {
+                        if (isDragging) {
+                            hideTooltip();
+                            return;
+                        }
+                        if (item) {
+                            canvas.style.cursor = 'pointer';
+                            showTooltip(item[0], item[1], event);
+                        } else {
+                            canvas.style.cursor = 'default';
+                            hideTooltip();
+                        }
                     },
                     backgroundColor: 'transparent',
                     minSize: 12,
@@ -1110,6 +1138,63 @@
             }, 300);
         });
 
+        // ─── Tooltip Functions ───
+        function showTooltip(word, count, event) {
+            if (!tooltip) return;
+            tooltip.innerHTML = `<strong>${word}</strong>: ${count} response${count > 1 ? 's' : ''}`;
+            tooltip.style.display = 'block';
+            tooltip.style.left = (event.clientX + 15) + 'px';
+            tooltip.style.top = (event.clientY + 15) + 'px';
+        }
+
+        function hideTooltip() {
+            if (tooltip) tooltip.style.display = 'none';
+        }
+
+        // ─── Pan & Zoom Functions ───
+        function applyTransform() {
+            if (!canvas) return;
+            canvas.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+            canvas.style.transformOrigin = 'center center';
+        }
+
+        // Mouse wheel zoom on the wrapper
+        if (isResults && cloudWrapper) {
+            cloudWrapper.addEventListener('wheel', function(e) {
+                e.preventDefault();
+                const zoomFactor = 1.1;
+                if (e.deltaY < 0) {
+                    scale = Math.min(scale * zoomFactor, 5); // Max 5x zoom
+                } else {
+                    scale = Math.max(scale / zoomFactor, 0.5); // Min 0.5x zoom
+                }
+                applyTransform();
+            }, { passive: false });
+
+            // Mouse dragging (panning)
+            cloudWrapper.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                startX = e.clientX - panX;
+                startY = e.clientY - panY;
+                cloudWrapper.style.cursor = 'grabbing';
+                hideTooltip();
+            });
+
+            window.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                panX = e.clientX - startX;
+                panY = e.clientY - startY;
+                applyTransform();
+            });
+
+            window.addEventListener('mouseup', function() {
+                if (isDragging) {
+                    isDragging = false;
+                    cloudWrapper.style.cursor = 'default';
+                }
+            });
+        }
+
         if (isResults) {
             setTimeout(fetchAndUpdate, 300);
         }
@@ -1118,6 +1203,9 @@
         window.__fetchCloud = fetchAndUpdate;
     })();
 </script>
+
+<!-- Tooltip for Word Cloud hover -->
+<div id="cloudTooltip" style="display:none; position:fixed; background:rgba(10,22,40,0.95); border: 1px solid var(--gold); padding:8px 14px; border-radius:10px; font-size:0.9rem; color:#fff; pointer-events:none; z-index:1000; box-shadow:0 8px 24px rgba(0,0,0,0.6); font-family:'Inter', sans-serif;"></div>
 
 </body>
 </html>
