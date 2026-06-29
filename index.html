@@ -301,7 +301,7 @@
 
         /* ─── QR SECTION — expands/collapses ─── */
         .qr-section {
-            flex: 0 0 280px;
+            flex: 0 0 340px;
             background: rgba(255, 255, 255, 0.04);
             border-radius: 18px;
             border: 1px solid rgba(255, 255, 255, 0.06);
@@ -359,8 +359,8 @@
             background: #fff;
             padding: 8px;
             border-radius: 14px;
-            width: 200px;
-            height: 200px;
+            width: 300px;
+            height: 300px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -824,11 +824,11 @@
             studentView.classList.add('hidden');
             resultsView.classList.remove('hidden');
 
-            // Generate QR code (size 200x200)
+            // Generate QR code (size 300x300)
             new QRCode(qrContainer, {
                 text: window.location.origin + window.location.pathname,
-                width: 200,
-                height: 200,
+                width: 300,
+                height: 300,
                 colorDark: '#0a1628',
                 colorLight: '#ffffff',
             });
