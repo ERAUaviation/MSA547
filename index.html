@@ -806,6 +806,10 @@
                 </button>
             </div>
         </div>
+        <!-- Large Question Display for Projector -->
+        <h1 id="resultsQuestion" style="font-size: 1.85rem; color: var(--gold-light); margin: 6px 0 2px; font-weight: 700; text-shadow: 0 0 20px rgba(212,175,55,0.15); line-height: 1.3;">
+            Loading active question...
+        </h1>
         <!-- Question Editor Bar -->
         <div style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 8px 12px; border-radius: 14px;">
             <span style="font-size: 0.9rem; font-weight: 600; color: var(--gold-light); white-space: nowrap;">Active Question:</span>
@@ -970,8 +974,9 @@
             fetchAndUpdate();
             updateInterval = setInterval(fetchAndUpdate, 1500);
         } else {
-            // Student View: Fetch and load question
+            // Student View: Fetch and load question, and poll for changes in background
             fetchQuestion();
+            setInterval(fetchQuestion, 5000);
         }
 
         // ─── Fetch & Update (with cache-busting) ───
@@ -1321,6 +1326,12 @@
                         studentQuestion.textContent = activeQuestionText;
                     }
                     
+                    // Update instructor results page question display
+                    const resultsQuestion = document.getElementById('resultsQuestion');
+                    if (resultsQuestion) {
+                        resultsQuestion.textContent = activeQuestionText;
+                    }
+                    
                     // Run student submission block check
                     checkStudentSubmissionStatus();
                 }
@@ -1424,6 +1435,12 @@
                     if (result.status === 'success') {
                         activeQuestionText = newQuestion;
                         showToast('✅ Question published successfully!');
+                        
+                        // Update instructor results page question display immediately
+                        const resultsQuestion = document.getElementById('resultsQuestion');
+                        if (resultsQuestion) {
+                            resultsQuestion.textContent = activeQuestionText;
+                        }
                         
                         if (confirm('Question updated! Would you like to clear the current spreadsheet responses to start fresh?')) {
                             clearAllBtn.click();
