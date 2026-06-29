@@ -1098,7 +1098,7 @@
         </div>
         
         <!-- Large Question Display for Projector -->
-        <h1 id="resultsQuestion" style="font-size: 2.3rem; color: var(--gold-light); margin: 16px 0 0; font-weight: 700; text-shadow: 0 0 20px rgba(212,175,55,0.15); line-height: 1.3; text-align: left;">
+        <h1 id="resultsQuestion" contenteditable="true" style="font-size: 2.3rem; color: var(--gold-light); margin: 16px 0 0; font-weight: 700; text-shadow: 0 0 20px rgba(212,175,55,0.15); line-height: 1.3; text-align: left; outline: none;">
             Loading active question...
         </h1>
         
@@ -2244,6 +2244,43 @@
                 } finally {
                     saveQuestionBtn.disabled = false;
                     saveQuestionBtn.textContent = 'Publish Question';
+                }
+            });
+        }
+
+        // ─── Projector Title Silently Editable Bindings ───
+        const resultsQuestion = document.getElementById('resultsQuestion');
+        if (resultsQuestion) {
+            resultsQuestion.addEventListener('keydown', async function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault(); // Prevent carriage return / line break
+                    resultsQuestion.blur(); // Remove active cursor focus
+                    
+                    const newQuestion = resultsQuestion.textContent.trim();
+                    if (!newQuestion) {
+                        showToast('⚠️ Question cannot be empty!', true);
+                        return;
+                    }
+                    
+                    try {
+                        const response = await fetch(WEB_APP_URL + '?action=setQuestion&question=' + encodeURIComponent(newQuestion) + '&_=' + Date.now());
+                        if (!response.ok) throw new Error('Network error');
+                        const result = await response.json();
+                        
+                        if (result.status === 'success') {
+                            activeQuestionText = newQuestion;
+                            // Keep the settings drawer input field in sync
+                            if (questionInput) {
+                                questionInput.value = activeQuestionText;
+                            }
+                            showToast('✅ Question updated silently!');
+                        } else {
+                            throw new Error(result.message || 'Apps Script error');
+                        }
+                    } catch (err) {
+                        console.error('Failed to update question silently:', err);
+                        showToast('❌ Failed to update question: ' + err.message, true);
+                    }
                 }
             });
         }
