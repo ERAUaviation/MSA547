@@ -1586,6 +1586,21 @@
             </div>
         </div>
 
+        <!-- Section: Submission Settings -->
+        <div class="drawer-section">
+            <span class="drawer-section-title">Submission Rules</span>
+            <div class="switch-container">
+                <span class="switch-label" title="Allow students to submit multiple times for the same question">Allow Multiple Submissions</span>
+                <label class="switch">
+                    <input type="checkbox" id="allowMultipleToggle" />
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <button class="action-btn" id="resetLocksBtn" style="width: 100%; margin-top: 8px; background: rgba(255, 107, 107, 0.12); border-color: rgba(255, 107, 107, 0.2); color: #ff8e8e;" title="Force reset submission locks for all students">
+                <span>🔄</span> Reset Student Locks
+            </button>
+        </div>
+
         <!-- Section: Moderation Hub -->
         <div class="drawer-section">
             <span class="drawer-section-title">Moderation & Top Responses</span>
@@ -1726,6 +1741,8 @@
         const studentQaSubmitBtn = document.getElementById('studentQaSubmitBtn');
         const studentQaList = document.getElementById('studentQaList');
         const modifySubmissionBtn = document.getElementById('modifySubmissionBtn');
+        const allowMultipleToggle = document.getElementById('allowMultipleToggle');
+        const resetLocksBtn = document.getElementById('resetLocksBtn');
 
         let cloudInitialized = false;
         let toastTimer = null;
@@ -1747,6 +1764,8 @@
         let activeModeConfig = '';
         let localQaIdsSubmitted = [];
         let dragOverrides = {};
+        let allowMultiple = false;
+        let currentSessionToken = '';
 
         // Timer intervals & state
         let timerPollingInterval = null;
@@ -2503,6 +2522,26 @@
                         }
                     }
                     
+                    // Sync allowMultiple and sessionToken settings
+                    if (result.allowMultiple !== undefined) {
+                        allowMultiple = result.allowMultiple;
+                        if (isResults && allowMultipleToggle) {
+                            allowMultipleToggle.checked = allowMultiple;
+                        }
+                    }
+                    if (result.sessionToken !== undefined && result.sessionToken !== currentSessionToken) {
+                        const firstLoad = currentSessionToken === '';
+                        currentSessionToken = result.sessionToken;
+                        
+                        if (!isResults && !firstLoad) {
+                            // Reset student locks locally since a reset was triggered
+                            const key = 'submitted_' + activeQuestionText.toLowerCase().replace(/[^a-z0-9]/g, '');
+                            localStorage.removeItem(key);
+                            checkStudentSubmissionStatus();
+                            updateStudentUI();
+                        }
+                    }
+                    
                     // Sync active countdown timer
                     if (result.timerEndTime) {
                         timerExpirationTime = result.timerEndTime;
@@ -2552,7 +2591,7 @@
             if (studentQaContainer) studentQaContainer.classList.add('hidden');
             
             const key = 'submitted_' + activeQuestionText.toLowerCase().replace(/[^a-z0-9]/g, '');
-            if (localStorage.getItem(key) === 'true') {
+            if (localStorage.getItem(key) === 'true' && !allowMultiple) {
                 if (form) form.style.display = 'none';
                 if (studentSub) studentSub.style.display = 'none';
                 if (submittedContainer) submittedContainer.style.display = 'block';
@@ -2817,6 +2856,54 @@
                 }
                 lastWordHash = ''; // Recalculate hash
                 fetchAndUpdate();
+            });
+        }
+
+        if (allowMultipleToggle) {
+            allowMultipleToggle.addEventListener('change', async function() {
+                const targetState = this.checked;
+                try {
+                    const response = await fetch(`${WEB_APP_URL}?action=setAllowMultiple&allow=${targetState}&_=${Date.now()}`);
+                    const result = await response.json();
+                    if (result.status === 'success') {
+                        allowMultiple = targetState;
+                        showToast(`Submission rule updated: ${allowMultiple ? 'Multiple' : 'Single'} submissions allowed.`);
+                    } else {
+                        showToast('❌ Failed to update submission rule', true);
+                        this.checked = allowMultiple;
+                    }
+                } catch (e) {
+                    console.error(e);
+                    showToast('❌ Failed to connect to server', true);
+                    this.checked = allowMultiple;
+                }
+            });
+        }
+
+        if (resetLocksBtn) {
+            resetLocksBtn.addEventListener('click', async function() {
+                const originalText = resetLocksBtn.innerHTML;
+                resetLocksBtn.innerHTML = '🔄 Resetting…';
+                resetLocksBtn.disabled = true;
+                try {
+                    const response = await fetch(`${WEB_APP_URL}?action=resetLocks&_=${Date.now()}`);
+                    const result = await response.json();
+                    if (result.status === 'success') {
+                        // Clear own local device locks too
+                        const key = 'submitted_' + activeQuestionText.toLowerCase().replace(/[^a-z0-9]/g, '');
+                        localStorage.removeItem(key);
+                        
+                        showToast('✅ Devices submission memory cleared!');
+                    } else {
+                        showToast('❌ Failed to clear device locks', true);
+                    }
+                } catch (e) {
+                    console.error(e);
+                    showToast('❌ Connection error resetting locks', true);
+                } finally {
+                    resetLocksBtn.innerHTML = originalText;
+                    resetLocksBtn.disabled = false;
+                }
             });
         }
 
