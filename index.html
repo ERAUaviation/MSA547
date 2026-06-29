@@ -1088,7 +1088,22 @@
 
     <div class="results-header" style="margin-bottom: 24px;">
         <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-            <h2>✦ Classroom Cloud</h2>
+            <!-- Brand Logo Mark -->
+            <div class="brand-logo" style="display: flex; align-items: center; gap: 10px; user-select: none;">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 10px var(--gold-glow)); transition: 0.3s;">
+                    <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z" fill="url(#logoGradient)" />
+                    <defs>
+                        <linearGradient id="logoGradient" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="var(--gold-light)" />
+                            <stop offset="1" stop-color="var(--gold)" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <div style="display: flex; flex-direction: column; line-height: 1.1;">
+                    <span style="font-size: 0.72rem; font-weight: 400; letter-spacing: 0.28em; color: rgba(255,255,255,0.45); text-transform: uppercase; font-family: 'Inter', sans-serif;">Classroom</span>
+                    <span style="font-size: 1.35rem; font-weight: 850; letter-spacing: 0.04em; background: linear-gradient(135deg, var(--gold-light), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-family: 'Inter', sans-serif;">CLOUD</span>
+                </div>
+            </div>
             <div style="display: flex; align-items: center; gap: 14px;">
                 <span class="badge" id="responseCount">0 responses</span>
                 <div class="live-label" style="margin-top: 0;">
