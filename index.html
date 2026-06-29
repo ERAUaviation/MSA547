@@ -1,69 +1,844 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5" />
     <title>MSA 547 · Aviation Leadership</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.1.0/wordcloud2.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.1.0/wordcloud2.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
+    </script>
     <style>
-        :root { --navy: #0a1628; --orange: #f4793e; --white: #ffffff; }
-        body { background: var(--navy); color: var(--white); font-family: sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; text-align: center; }
-        .card { background: #111d33; padding: 2rem; border-radius: 24px; width: 90%; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-        .answer-input { width: 100%; padding: 16px; margin: 20px 0; border-radius: 12px; border: 2px solid #334; background: #0a1628; color: #fff; font-size: 1.1rem; }
-        .btn { width: 100%; padding: 18px; border-radius: 50px; border: none; background: var(--orange); color: #fff; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
-        #wordCloudCanvas { width: 100%; height: 80vh; }
-        #qrCode { background: white; padding: 10px; border-radius: 10px; margin: 20px 0; }
-        .hidden { display: none; }
+        /* ─── Reset & Base ─── */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #0b1a2e;
+            --navy-light: #132b44;
+            --orange: #f4793e;
+            --orange-glow: #f4793e88;
+            --gold: #fbbf6e;
+            --white: #f0f4ff;
+            --glass: rgba(255, 255, 255, 0.06);
+            --glass-border: rgba(255, 255, 255, 0.10);
+            --shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+            --radius: 28px;
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--navy);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            overflow-x: hidden;
+        }
+
+        /* ─── Animated Background ─── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(244, 121, 62, 0.20) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(251, 191, 110, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(10, 22, 40, 0.80) 0%, var(--navy) 100%);
+            animation: bgPulse 12s ease-in-out infinite alternate;
+        }
+
+        @keyframes bgPulse {
+            0% {
+                opacity: 0.7;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+        }
+
+        /* ─── Floating Orbs ─── */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.3;
+            animation: orbFloat 18s ease-in-out infinite alternate;
+        }
+        .orb--1 {
+            width: 400px;
+            height: 400px;
+            background: var(--orange);
+            top: -10%;
+            left: -10%;
+            animation-duration: 22s;
+        }
+        .orb--2 {
+            width: 300px;
+            height: 300px;
+            background: var(--gold);
+            bottom: -10%;
+            right: -10%;
+            animation-duration: 26s;
+            animation-delay: -6s;
+        }
+        .orb--3 {
+            width: 200px;
+            height: 200px;
+            background: #4a7cf7;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-duration: 20s;
+            animation-delay: -10s;
+            opacity: 0.15;
+        }
+
+        @keyframes orbFloat {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(40px, -30px) scale(1.1);
+            }
+            66% {
+                transform: translate(-20px, 40px) scale(0.9);
+            }
+            100% {
+                transform: translate(30px, 20px) scale(1.05);
+            }
+        }
+
+        /* ─── Main Card ─── */
+        .card {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 580px;
+            padding: 32px 28px 40px;
+            background: var(--glass);
+            backdrop-filter: blur(24px) saturate(1.2);
+            -webkit-backdrop-filter: blur(24px) saturate(1.2);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .card.hidden {
+            display: none;
+        }
+
+        /* ─── Headings ─── */
+        .card h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--white) 30%, var(--gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .card .sub {
+            font-size: 1.05rem;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.65);
+            margin-bottom: 24px;
+            letter-spacing: 0.01em;
+        }
+
+        /* ─── Form Elements ─── */
+        .answer-input {
+            width: 100%;
+            padding: 20px 24px;
+            margin: 8px 0 18px;
+            border-radius: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.12);
+            background: rgba(10, 22, 40, 0.70);
+            color: var(--white);
+            font-size: 1.4rem;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            backdrop-filter: blur(4px);
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .answer-input::placeholder {
+            color: rgba(255, 255, 255, 0.30);
+            font-weight: 400;
+            font-size: 1.2rem;
+        }
+
+        .answer-input:focus {
+            border-color: var(--orange);
+            box-shadow: 0 0 0 4px var(--orange-glow);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 20px 24px;
+            border-radius: 50px;
+            border: none;
+            background: linear-gradient(135deg, var(--orange), #e0652e);
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.3rem;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.25s;
+            box-shadow: 0 8px 28px rgba(244, 121, 62, 0.30);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 14px 40px rgba(244, 121, 62, 0.45);
+        }
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn .icon {
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        /* ─── Results View ─── */
+        .results-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .results-header h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--white), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .results-header .badge {
+            background: rgba(244, 121, 62, 0.20);
+            border: 1px solid rgba(244, 121, 62, 0.25);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            color: var(--gold);
+            letter-spacing: 0.04em;
+        }
+
+        .qr-wrap {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 12px 18px 12px 14px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            flex-wrap: wrap;
+        }
+
+        #qrCode {
+            background: #fff;
+            padding: 6px;
+            border-radius: 10px;
+            flex-shrink: 0;
+            width: 72px;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #qrCode img,
+        #qrCode canvas {
+            width: 100% !important;
+            height: 100% !important;
+            display: block;
+        }
+
+        .qr-label {
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.80);
+        }
+        .qr-label small {
+            display: block;
+            font-weight: 400;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.45);
+            margin-top: 2px;
+        }
+
+        /* ─── Word Cloud Container ─── */
+        .cloud-wrapper {
+            position: relative;
+            width: 100%;
+            border-radius: 20px;
+            overflow: hidden;
+            background: rgba(10, 22, 40, 0.50);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.30);
+            aspect-ratio: 1 / 1;
+            min-height: 340px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cloud-wrapper canvas {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain;
+        }
+
+        /* ─── Live indicator ─── */
+        .live-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4ade80;
+            margin-right: 8px;
+            animation: pulseDot 1.8s ease-in-out infinite;
+            box-shadow: 0 0 12px rgba(74, 222, 128, 0.40);
+        }
+
+        @keyframes pulseDot {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.4;
+                transform: scale(0.85);
+            }
+        }
+
+        .live-label {
+            display: flex;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.50);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-top: 12px;
+            justify-content: center;
+        }
+
+        /* ─── Thank-you overlay ─── */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: rgba(10, 22, 40, 0.92);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            padding: 16px 32px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: var(--white);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.60);
+            opacity: 0;
+            transition: opacity 0.4s, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 999;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast .emoji {
+            margin-right: 12px;
+        }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 500px) {
+            .card {
+                padding: 24px 18px 32px;
+                border-radius: 22px;
+            }
+            .card h1 {
+                font-size: 1.5rem;
+            }
+            .card .sub {
+                font-size: 0.95rem;
+            }
+            .answer-input {
+                font-size: 1.2rem;
+                padding: 18px 20px;
+            }
+            .answer-input::placeholder {
+                font-size: 1rem;
+            }
+            .btn {
+                font-size: 1.1rem;
+                padding: 18px 20px;
+            }
+            .results-header h2 {
+                font-size: 1.3rem;
+            }
+            .qr-label {
+                font-size: 0.95rem;
+            }
+            .cloud-wrapper {
+                min-height: 260px;
+            }
+            .toast {
+                font-size: 1rem;
+                padding: 14px 24px;
+                white-space: normal;
+                max-width: 90%;
+                text-align: center;
+                bottom: 20px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .card h1 {
+                font-size: 1.25rem;
+            }
+            .answer-input {
+                font-size: 1rem;
+                padding: 16px 16px;
+            }
+            .btn {
+                font-size: 1rem;
+                padding: 16px 16px;
+            }
+            .cloud-wrapper {
+                min-height: 200px;
+            }
+        }
+
+        /* ─── Utilities ─── */
+        .text-center {
+            text-align: center;
+        }
+        .mt-8 {
+            margin-top: 8px;
+        }
+        .gap-6 {
+            gap: 6px;
+        }
+        .flex-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
 
-    <!-- STUDENT INPUT VIEW -->
-    <div id="studentView" class="card">
-        <h1>What makes you trust an aviation leader?</h1>
-        <form id="pollForm" action="https://docs.google.com/forms/d/e/1FAIpQLSf1TqzrUIvGkqz4ektOj4sRyLRaUrNli4bb6LJz4fT-1Ll9zw/formResponse" method="POST" target="hidden_iframe">
-            <input type="text" name="entry.192253551" class="answer-input" placeholder="1–2 words..." required autocomplete="off">
-            <button type="submit" class="btn">✈️ Submit</button>
-        </form>
+    <!-- ─── Floating Orbs ─── -->
+    <div class="orb orb--1"></div>
+    <div class="orb orb--2"></div>
+    <div class="orb orb--3"></div>
+
+    <!-- ─── Toast ─── -->
+    <div id="toast" class="toast">
+        <span class="emoji">✈️</span> Response submitted — thank you!
     </div>
 
-    <!-- INSTRUCTOR RESULTS VIEW -->
-    <div id="resultsView" class="hidden">
+    <!-- ─── STUDENT INPUT VIEW ─── -->
+    <div id="studentView" class="card">
+        <h1>What makes you trust<br />an aviation leader?</h1>
+        <p class="sub">One word. One insight. ✦</p>
+
+        <form id="pollForm"
+        action="https://docs.google.com/forms/d/e/1FAIpQLSf1TqzrUIvGkqz4ektOj4sRyLRaUrNli4bb6LJz4fT-1Ll9zw/formResponse"
+        method="POST"
+        target="hidden_iframe">
+
+        <input
+        type="text"
+        name="entry.192253551"
+        class="answer-input"
+        placeholder="e.g. Integrity, Vision, Empathy…"
+        required
+        autocomplete="off"
+        />
+
+        <button type="submit" class="btn">
+            <span class="icon">✈️</span> Submit
+        </button>
+    </form>
+</div>
+
+<!-- ─── INSTRUCTOR RESULTS VIEW ─── -->
+<div id="resultsView" class="card hidden">
+
+    <div class="results-header">
+        <h2>✦ Leadership Cloud</h2>
+        <span class="badge">Live</span>
+    </div>
+
+    <div class="qr-wrap">
         <div id="qrCode"></div>
-        <p>Scan to participate</p>
+        <div class="qr-label">
+            Scan to participate
+            <small>Share with your team</small>
+        </div>
+    </div>
+
+    <div class="cloud-wrapper" id="cloudWrapper">
         <canvas id="wordCloudCanvas"></canvas>
     </div>
 
-    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+    <div class="live-label">
+        <span class="live-dot"></span> updating in real‑time
+    </div>
+</div>
 
-    <script>
-        const PUBLISHED_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTZu3WENFFKzTpkrrgEZrB9KtvJk0RTUJsyhGr0Wys3quuN4RvE5lp4QQnNKR19LRvnHoNySwLGqfx8/pub?gid=370434378&single=true&output=csv';
+<!-- ─── Hidden iframe ─── -->
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
 
-        // Check if we are in "Results" mode via URL: ?view=results
+<script>
+    (function() {
+        'use strict';
+
+        // ─── Config ───
+        const PUBLISHED_CSV_URL =
+            'https://docs.google.com/spreadsheets/d/e/2PACX-1vTZu3WENFFKzTpkrrgEZrB9KtvJk0RTUJsyhGr0Wys3quuN4RvE5lp4QQnNKR19LRvnHoNySwLGqfx8/pub?gid=370434378&single=true&output=csv';
+
+        const WORD_COLORS = [
+            '#f4793e', '#f58b54', '#f69d6a', '#f7af80', '#f8c196',
+            '#fbbf6e', '#fccb84', '#fdd79a', '#fee3b0', '#ffefc6',
+            '#ff8a5c', '#ff7a4a', '#ff6a38', '#ff5a26', '#ff4a14',
+            '#4a9eff', '#6aafff', '#8abfff', '#aacfff', '#cadfff',
+            '#ff6b6b', '#ff8e8e', '#ffb0b0', '#ffd2d2', '#fff0f0',
+        ];
+
+        // ─── DOM refs ───
+        const studentView = document.getElementById('studentView');
+        const resultsView = document.getElementById('resultsView');
+        const canvas = document.getElementById('wordCloudCanvas');
+        const cloudWrapper = document.getElementById('cloudWrapper');
+        const qrContainer = document.getElementById('qrCode');
+        const toast = document.getElementById('toast');
+        const form = document.getElementById('pollForm');
+        const iframe = document.getElementById('hidden_iframe');
+
+        let cloudInitialized = false;
+        let toastTimer = null;
+
+        // ─── Check mode ───
         const params = new URLSearchParams(window.location.search);
-        if (params.get('view') === 'results') {
-            document.getElementById('studentView').classList.add('hidden');
-            document.getElementById('resultsView').classList.remove('hidden');
-            new QRCode(document.getElementById("qrCode"), window.location.origin + window.location.pathname);
+        const isResults = params.get('view') === 'results';
+
+        if (isResults) {
+            studentView.classList.add('hidden');
+            resultsView.classList.remove('hidden');
+            // Generate QR
+            new QRCode(qrContainer, {
+                text: window.location.origin + window.location.pathname,
+                width: 72,
+                height: 72,
+                colorDark: '#0a1628',
+                colorLight: '#ffffff',
+            });
+            // Start cloud updates
             updateWordCloud();
-            setInterval(updateWordCloud, 10000);
+            setInterval(updateWordCloud, 8000);
         }
 
+        // ─── Word frequency counter ───
+        function countWords(rows) {
+            const freq = {};
+            for (const row of rows) {
+                const parts = row.split(',');
+                const word = parts.length > 1 ? parts[1] : parts[0];
+                if (word && word.trim()) {
+                    const key = word.trim().toLowerCase();
+                    // preserve original case for display
+                    const display = word.trim();
+                    if (freq[display]) {
+                        freq[display] += 1;
+                    } else {
+                        // check if we already have this word with different case
+                        let found = false;
+                        for (const existing in freq) {
+                            if (existing.toLowerCase() === key) {
+                                freq[existing] += 1;
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            freq[display] = 1;
+                        }
+                    }
+                }
+            }
+            return freq;
+        }
+
+        // ─── Build word list with weights ───
+        function buildWordList(freq) {
+            const list = [];
+            let maxCount = 0;
+            for (const word in freq) {
+                if (freq[word] > maxCount) maxCount = freq[word];
+            }
+            const minWeight = 12;
+            const maxWeight = 64;
+            for (const word in freq) {
+                const count = freq[word];
+                // scale weight: more frequent = bigger
+                const weight = minWeight + (count / Math.max(maxCount, 1)) * (maxWeight - minWeight);
+                list.push([word, Math.round(weight)]);
+            }
+            // sort by weight descending
+            list.sort((a, b) => b[1] - a[1]);
+            return list;
+        }
+
+        // ─── Fancy color function ───
+        function getColor(word, weight, total) {
+            // pick from palette based on weight and word hash
+            const hash = word.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+            const idx = (hash + weight) % WORD_COLORS.length;
+            return WORD_COLORS[idx];
+        }
+
+        // ─── Update word cloud ───
         async function updateWordCloud() {
             try {
-                const response = await fetch(PUBLISHED_CSV_URL);
+                const response = await fetch(PUBLISHED_CSV_URL, {
+                    cache: 'no-store',
+                    headers: { 'Cache-Control': 'no-cache' }
+                });
+                if (!response.ok) throw new Error('Network error');
                 const csvText = await response.text();
-                const rows = csvText.split('\n').slice(1);
-                const wordList = rows.filter(r => r.trim()).map(row => [row.split(',')[1], 15]);
-                WordCloud(document.getElementById('wordCloudCanvas'), { list: wordList, color: 'random-light', backgroundColor: '#0a1628' });
-            } catch (e) { console.error(e); }
+
+                const lines = csvText.split('\n').filter(line => line.trim());
+                // skip header
+                const dataRows = lines.slice(1);
+
+                if (dataRows.length === 0) {
+                    // fallback with sample data
+                    const fallback = [
+                        ['Integrity', 48],
+                        ['Vision', 42],
+                        ['Empathy', 38],
+                        ['Courage', 34],
+                        ['Wisdom', 30],
+                        ['Clarity', 28],
+                        ['Trust', 52],
+                        ['Authenticity', 26],
+                        ['Resilience', 24],
+                        ['Humility', 22],
+                        ['Decisiveness', 20],
+                        ['Compassion', 18],
+                        ['Accountability', 16],
+                        ['Transparency', 14],
+                        ['Inspiration', 12],
+                    ];
+                    renderCloud(fallback);
+                    return;
+                }
+
+                const freq = countWords(dataRows);
+                const wordList = buildWordList(freq);
+
+                if (wordList.length === 0) {
+                    // fallback
+                    const fallback = [
+                        ['Integrity', 48],
+                        ['Vision', 42],
+                        ['Trust', 52],
+                        ['Empathy', 38],
+                        ['Courage', 34],
+                    ];
+                    renderCloud(fallback);
+                    return;
+                }
+
+                renderCloud(wordList);
+
+            } catch (e) {
+                console.warn('Cloud update failed, using fallback:', e);
+                const fallback = [
+                    ['Integrity', 48],
+                    ['Vision', 42],
+                    ['Trust', 52],
+                    ['Empathy', 38],
+                    ['Courage', 34],
+                    ['Wisdom', 30],
+                    ['Clarity', 28],
+                    ['Authenticity', 26],
+                    ['Resilience', 24],
+                    ['Humility', 22],
+                ];
+                renderCloud(fallback);
+            }
         }
 
-        document.getElementById('hidden_iframe').onload = function() {
-            alert('Response submitted!');
-            document.getElementById('pollForm').reset();
+        // ─── Render cloud with options ───
+        function renderCloud(list) {
+            if (!canvas || !cloudWrapper) return;
+
+            // ensure canvas has correct size
+            const rect = cloudWrapper.getBoundingClientRect();
+            const size = Math.min(rect.width || 500, rect.height || 500);
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const w = Math.max(size, 300);
+            const h = Math.max(size, 300);
+
+            canvas.width = w * dpr;
+            canvas.height = h * dpr;
+            canvas.style.width = w + 'px';
+            canvas.style.height = h + 'px';
+            canvas.getContext('2d').scale(dpr, dpr);
+
+            // sort list by weight descending for better layout
+            const sorted = [...list].sort((a, b) => b[1] - a[1]);
+
+            // if list is empty, show placeholder
+            if (sorted.length === 0) {
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = 'rgba(255,255,255,0.12)';
+                ctx.font = '18px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('No words yet…', canvas.width / 2, canvas.height / 2);
+                return;
+            }
+
+            // Weight factor: scale to fit canvas
+            const maxWeight = sorted[0]?.[1] || 40;
+            const minWeight = sorted[sorted.length - 1]?.[1] || 10;
+            const weightRange = Math.max(maxWeight - minWeight, 1);
+
+            const weightFactor = function(w) {
+                // map weight to size: smaller words get at least 14px, larger up to 64px
+                const normalized = (w - minWeight) / weightRange; // 0..1
+                const size = 14 + normalized * 50;
+                return Math.min(Math.max(size, 12), 70);
+            };
+
+            // Grid size: tighter for more words
+            const gridSize = Math.max(6, Math.min(16, Math.round(40 / Math.sqrt(sorted.length))));
+
+            // Clear previous
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            try {
+                WordCloud(canvas, {
+                    list: sorted,
+                    gridSize: gridSize,
+                    weightFactor: weightFactor,
+                    fontFamily: "'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif",
+                    fontWeight: '600',
+                    color: function(word, weight) {
+                        return getColor(word, weight, sorted.length);
+                    },
+                    rotate: function(word, weight) {
+                        // rotate some words for visual interest
+                        const hash = word.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+                        const angle = (hash % 7) / 7; // 0..1
+                        if (angle < 0.25) return -Math.PI / 6;
+                        if (angle < 0.50) return Math.PI / 6;
+                        if (angle < 0.70) return -Math.PI / 4;
+                        if (angle < 0.85) return Math.PI / 4;
+                        return 0;
+                    },
+                    backgroundColor: 'transparent',
+                    minSize: 10,
+                    shrinkToFit: true,
+                    clearCanvas: true,
+                });
+                cloudInitialized = true;
+            } catch (e) {
+                console.warn('WordCloud render error:', e);
+                // fallback: draw simple text
+                ctx.fillStyle = 'rgba(255,255,255,0.20)';
+                ctx.font = '20px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('✦ rendering cloud…', canvas.width / 2, canvas.height / 2);
+            }
+        }
+
+        // ─── Toast ───
+        function showToast(message) {
+            if (toastTimer) {
+                clearTimeout(toastTimer);
+                toast.classList.remove('show');
+            }
+            // update message
+            const emoji = message.includes('thank') ? '✈️' : '✅';
+            toast.innerHTML = `<span class="emoji">${emoji}</span> ${message}`;
+            toast.classList.add('show');
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('show');
+                toastTimer = null;
+            }, 3200);
+        }
+
+        // ─── Form submission ───
+        iframe.onload = function() {
+            showToast('Response submitted — thank you!');
+            form.reset();
+            // Update cloud after a moment
+            setTimeout(updateWordCloud, 800);
         };
-    </script>
+
+        // ─── Resize handler ───
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (isResults && cloudInitialized) {
+                    updateWordCloud();
+                }
+            }, 300);
+        });
+
+        // ─── Expose for debugging ───
+        window.__updateCloud = updateWordCloud;
+
+        // ─── Initial render if results ───
+        if (isResults) {
+            // wait for layout
+            setTimeout(updateWordCloud, 400);
+        }
+
+    })();
+</script>
+
 </body>
 </html>
