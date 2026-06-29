@@ -1339,7 +1339,8 @@
     <div id="submittedContainer" style="display:none; text-align:center; padding: 20px 0;">
         <div style="font-size: 4rem; margin-bottom: 16px; filter: drop-shadow(0 0 10px rgba(212,175,55,0.35));">✈️</div>
         <h2 style="font-size: 1.6rem; color: var(--gold-light); margin-bottom: 8px;">Response Received!</h2>
-        <p style="color: rgba(255,255,255,0.7); font-size: 1.1rem; line-height: 1.4;">You have already shared your insight for this question.<br>Look at the main screen to see the live cloud grow!</p>
+        <p style="color: rgba(255,255,255,0.7); font-size: 1.1rem; line-height: 1.4;">You have already shared your insight for this question.<br>Look at the main screen to see the live updates!</p>
+        <button id="modifySubmissionBtn" class="btn" style="margin-top: 20px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 1.05rem; padding: 12px 20px; display: none; width: auto; margin-left: auto; margin-right: auto;" title="Change your submitted choice">✏️ Change Selection</button>
     </div>
 </div>
 
@@ -1724,6 +1725,7 @@
         const studentQaInput = document.getElementById('studentQaInput');
         const studentQaSubmitBtn = document.getElementById('studentQaSubmitBtn');
         const studentQaList = document.getElementById('studentQaList');
+        const modifySubmissionBtn = document.getElementById('modifySubmissionBtn');
 
         let cloudInitialized = false;
         let toastTimer = null;
@@ -1744,6 +1746,7 @@
         let activeMode = 'wordcloud';
         let activeModeConfig = '';
         let localQaIdsSubmitted = [];
+        let dragOverrides = {};
 
         // Timer intervals & state
         let timerPollingInterval = null;
@@ -2079,19 +2082,30 @@
                         });
                     });
                     
+                    // Chronological parsing: studentName -> topic selection
+                    let studentSelections = {};
                     words.forEach(w => {
                         const clean = w.trim();
                         const match = clean.match(/^(.*?)\s*\((.*?)\)$/);
                         if (match) {
-                            const topicName = match[1].trim().toLowerCase();
+                            const topicName = match[1].trim();
                             const studentName = match[2].trim();
                             
-                            const col = columns.find(c => c.topic.toLowerCase() === topicName);
-                            if (col && col.students.length < col.limit) {
-                                col.students.push(studentName);
-                            }
+                            // Map student name to topic choice (latest choice wins)
+                            studentSelections[studentName] = topicName;
                         }
                     });
+
+                    // Distribute students to columns, applying manual drag overrides
+                    for (const [studentName, topicName] of Object.entries(studentSelections)) {
+                        // Apply drag-and-drop overrides
+                        const finalTopic = dragOverrides[studentName] || topicName;
+                        
+                        const col = columns.find(c => c.topic.toLowerCase() === finalTopic.toLowerCase());
+                        if (col) {
+                            col.students.push(studentName);
+                        }
+                    }
                     
                     const hasSubmissions = columns.some(c => c.students.length > 0);
                     
@@ -2104,14 +2118,22 @@
                             const count = col.students.length;
                             const isFull = count >= col.limit;
                             return `
-                                <div class="slot-column" style="border-color: ${isFull ? 'var(--gold)' : 'rgba(255,255,255,0.06)'}">
+                                <div class="slot-column" 
+                                     style="border-color: ${isFull ? 'var(--gold)' : 'rgba(255,255,255,0.06)'}" 
+                                     ondragover="event.preventDefault()" 
+                                     ondrop="window.__dropStudent(event, '${col.topic}')">
                                     <div class="slot-column-header">
                                         <span>${col.topic}</span>
                                         <span style="color: ${isFull ? 'var(--gold-light)' : 'rgba(255,255,255,0.4)'}">${count}/${col.limit}</span>
                                     </div>
                                     <div class="slot-student-list">
                                         ${col.students.map(st => `
-                                            <div class="slot-student-name">${escapeHtml(st)}</div>
+                                            <div class="slot-student-name" 
+                                                 draggable="true" 
+                                                 style="cursor: grab;"
+                                                 ondragstart="window.__dragStudent(event, '${st.replace(/'/g, "\\'")}', '${col.topic.replace(/'/g, "\\'")}')">
+                                                 ${escapeHtml(st)}
+                                            </div>
                                         `).join('')}
                                         ${Array(Math.max(0, col.limit - count)).fill(0).map(() => `
                                             <div class="slot-student-name" style="opacity: 0.15; border-style: dashed; background: transparent;">(Available Slot)</div>
@@ -2388,6 +2410,7 @@
 
                 if (result.status === 'success') {
                     showToast('✅ All responses cleared!');
+                    dragOverrides = {};
                     // Force reset and reload
                     lastWordHash = '';
                     latestValidList = null;
@@ -3262,21 +3285,7 @@
                 if (studentSubmitBtn) studentSubmitBtn.style.display = 'flex';
             } 
             else if (activeMode === 'slots') {
-                let takenCounts = {};
-                try {
-                    const res = await fetch(WEB_APP_URL + '?_=' + Date.now());
-                    const dataObj = await res.json();
-                    if (dataObj.status === 'success' && dataObj.data) {
-                        dataObj.data.forEach(resp => {
-                            const cleanResp = resp.split('(')[0].trim().toLowerCase();
-                            takenCounts[cleanResp] = (takenCounts[cleanResp] || 0) + 1;
-                        });
-                    }
-                } catch(e) {
-                    console.warn(e);
-                }
-
-                const slotStrings = activeModeConfig ? activeModeConfig.split(',').map(s => s.trim()) : ['Chapter 1:3', 'Chapter 2:3'];
+                const slotStrings = activeModeConfig ? activeModeConfig.split(',').map(s => s.trim()) : ['Chapter 1', 'Chapter 2'];
                 
                 let html = `
                     <div style="margin-bottom: 12px;">
@@ -3287,17 +3296,10 @@
                 `;
 
                 slotStrings.forEach(s => {
-                    const parts = s.split(':');
-                    const topic = parts[0].trim();
-                    const limit = Number(parts[1]) || 3;
-                    const taken = takenCounts[topic.toLowerCase()] || 0;
-                    const left = Math.max(0, limit - taken);
-                    const isFull = left <= 0;
-                    
+                    const topic = s.split(':')[0].trim();
                     html += `
-                        <button type="button" class="btn slot-btn" data-topic="${topic}" ${isFull ? 'disabled' : ''} style="background: ${isFull ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.03)'}; border: 1px solid ${isFull ? 'rgba(255,255,255,0.05)' : 'rgba(212, 175, 55, 0.2)'}; color: ${isFull ? 'rgba(255,255,255,0.2)' : '#fff'}; padding: 14px 18px; font-size: 1rem; justify-content: space-between; cursor: ${isFull ? 'not-allowed' : 'pointer'}; text-shadow: none; box-shadow: none; width: 100%;">
+                        <button type="button" class="btn slot-btn" data-topic="${topic}" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(212, 175, 55, 0.2); color: #fff; padding: 14px 18px; font-size: 1rem; justify-content: flex-start; cursor: pointer; text-shadow: none; box-shadow: none; width: 100%;">
                             <span>${topic}</span>
-                            <span style="font-weight: 700; color: ${isFull ? 'rgba(255,255,255,0.2)' : 'var(--gold-light)'};">${isFull ? 'FULL' : `${left} / ${limit} left`}</span>
                         </button>
                     `;
                 });
@@ -3308,6 +3310,12 @@
                 const nameInput = studentFormContent.querySelector('#studentNameInput');
                 const hiddenInput = studentFormContent.querySelector('#studentAnswerInput');
                 
+                // Pre-populate name if they already submitted before and modified
+                const savedName = localStorage.getItem('student_slots_name') || '';
+                if (savedName && nameInput) {
+                    nameInput.value = savedName;
+                }
+                
                 btns.forEach(btn => {
                     btn.addEventListener('click', function() {
                         const name = nameInput.value.trim();
@@ -3316,6 +3324,9 @@
                             showToast('⚠️ Please enter your name first!', true);
                             return;
                         }
+                        // Save name for convenience if they modify later
+                        localStorage.setItem('student_slots_name', name);
+                        
                         btns.forEach(b => b.style.borderColor = 'rgba(212, 175, 55, 0.2)');
                         this.style.borderColor = 'var(--gold)';
                         
@@ -3363,10 +3374,45 @@
             return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
 
+        // ─── Drag and Drop Handlers for Slots Column Rebalancing ───
+        let draggedStudent = null;
+        let dragSourceTopic = null;
+
+        window.__dragStudent = function(event, studentName, sourceTopic) {
+            draggedStudent = studentName;
+            dragSourceTopic = sourceTopic;
+            event.dataTransfer.setData("text/plain", studentName);
+        };
+
+        window.__dropStudent = function(event, targetTopic) {
+            event.preventDefault();
+            const studentName = event.dataTransfer.getData("text/plain") || draggedStudent;
+            if (studentName && targetTopic) {
+                // Set local override for student topic placement
+                dragOverrides[studentName] = targetTopic;
+                // Instantly re-render locally
+                fetchAndUpdate();
+            }
+            draggedStudent = null;
+            dragSourceTopic = null;
+        };
+
+        // ─── Bind student modify selection button ───
+        if (modifySubmissionBtn) {
+            modifySubmissionBtn.addEventListener('click', function() {
+                const key = 'submitted_' + activeQuestionText.toLowerCase().replace(/[^a-z0-9]/g, '');
+                localStorage.removeItem(key);
+                checkStudentSubmissionStatus();
+                updateStudentUI();
+            });
+        }
+
         if (isResults) {
             setTimeout(fetchAndUpdate, 300);
         } else {
             setInterval(fetchStudentQaList, 5000);
+            // Dynamic polling to check for active mode changes on student view
+            setInterval(updateStudentUI, 10000);
         }
 
         // Expose for debugging
