@@ -54,7 +54,7 @@
             inset: 0;
             z-index: 0;
             background:
-                radial-gradient(ellipse at 20% 50%, rgba(212, 175, 55, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 20% 50%, rgba(212, 175, 55, 0.12) 0%, transparent 60%),
                 radial-gradient(ellipse at 80% 20%, rgba(26, 42, 74, 0.3) 0%, transparent 50%),
                 radial-gradient(ellipse at 50% 80%, rgba(10, 22, 40, 0.80) 0%, var(--navy) 100%);
             animation: bgPulse 12s ease-in-out infinite alternate;
@@ -132,7 +132,7 @@
             display: none;
         }
 
-        /* ─── STUDENT VIEW · FULLSCREEN MOBILE · LUXURY THEME ─── */
+        /* ─── STUDENT VIEW · LUXURY THEME ─── */
         #studentView.card {
             max-width: 580px;
             padding: 32px 28px 40px;
@@ -246,7 +246,7 @@
         .results-header .stats {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 10px;
             flex-wrap: wrap;
         }
 
@@ -263,21 +263,29 @@
             gap: 6px;
         }
 
-        .refresh-btn {
+        .action-btn {
             background: rgba(255, 255, 255, 0.06);
             border: 1px solid rgba(255, 255, 255, 0.12);
             color: #fff;
-            padding: 3px 14px;
+            padding: 3px 12px;
             border-radius: 40px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             transition: 0.2s;
             display: flex;
             align-items: center;
             gap: 4px;
         }
-        .refresh-btn:hover {
+        .action-btn:hover {
             background: rgba(255, 255, 255, 0.14);
+        }
+        .action-btn.clear-btn {
+            color: #ff6b6b;
+            border-color: rgba(255, 107, 107, 0.2);
+        }
+        .action-btn.clear-btn:hover {
+            background: rgba(255, 107, 107, 0.12);
+            border-color: rgba(255, 107, 107, 0.4);
         }
 
         /* ─── CONTENT ROW ─── */
@@ -575,6 +583,10 @@
                 max-width: 90%;
                 top: 12px;
             }
+            .action-btn {
+                font-size: 0.75rem;
+                padding: 2px 10px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -657,8 +669,11 @@
         <h2>✦ Insight Cloud</h2>
         <div class="stats">
             <span class="badge" id="responseCount">0 responses</span>
-            <button class="refresh-btn" id="manualRefresh" title="Refresh now">
+            <button class="action-btn" id="manualRefresh" title="Refresh now">
                 <span>⟳</span>
+            </button>
+            <button class="action-btn clear-btn" id="clearAllBtn" title="Clear all responses (opens Google Forms)">
+                <span>🗑</span> Clear
             </button>
         </div>
     </div>
@@ -700,6 +715,10 @@
         const PUBLISHED_CSV_URL =
             'https://docs.google.com/spreadsheets/d/e/2PACX-1vTZu3WENFFKzTpkrrgEZrB9KtvJk0RTUJsyhGr0Wys3quuN4RvE5lp4QQnNKR19LRvnHoNySwLGqfx8/pub?gid=370434378&single=true&output=csv';
 
+        // URL to view analytics (where you can delete responses)
+        const FORM_RESPONSES_URL =
+            'https://docs.google.com/forms/d/e/1FAIpQLSf1TqzrUIvGkqz4ektOj4sRyLRaUrNli4bb6LJz4fT-1Ll9zw/viewanalytics';
+
         const WORD_COLORS = [
             '#d4af37', '#e8c45a', '#f0d080', '#f8dc9e', '#ffe8bc',
             '#c9a030', '#b8962f', '#a8862a', '#987625', '#886620',
@@ -722,14 +741,15 @@
         const form = document.getElementById('pollForm');
         const iframe = document.getElementById('hidden_iframe');
         const manualRefreshBtn = document.getElementById('manualRefresh');
+        const clearAllBtn = document.getElementById('clearAllBtn');
 
         let cloudInitialized = false;
         let toastTimer = null;
         let qrVisible = true;
         let updateInterval = null;
         let lastWordHash = '';
-        let lastValidCount = 0;
-        let lastValidData = null;
+        let latestValidCount = 0;
+        let latestValidList = null; // store the sorted list for resize re-render
 
         // ─── Check mode ───
         const params = new URLSearchParams(window.location.search);
@@ -770,14 +790,15 @@
 
                 const lines = csvText.split('\n').filter(line => line.trim());
                 if (lines.length < 2) {
-                    // No data – keep previous state if any
-                    if (lastValidData) {
-                        // keep showing last data
+                    // No data – keep previous state if we have any
+                    if (latestValidList) {
+                        // keep showing last data, don't update count
                         return;
                     }
+                    // If we never had data, show empty
                     showEmptyState(true);
                     responseCount.textContent = '0 responses';
-                    lastValidCount = 0;
+                    latestValidCount = 0;
                     return;
                 }
 
@@ -800,10 +821,15 @@
 
                 const totalResponses = dataRows.length;
 
-                // Update count only if it's different and we have data
-                if (totalResponses !== lastValidCount || totalResponses === 0) {
-                    responseCount.textContent = `${totalResponses} responses`;
-                    lastValidCount = totalResponses;
+                // Only update count if we have a new, larger number (or if we're at zero and have data)
+                if (totalResponses !== latestValidCount || totalResponses === 0) {
+                    // But if totalResponses is less than previous valid count, we might have a glitch – keep previous count
+                    if (totalResponses >= latestValidCount || latestValidCount === 0) {
+                        responseCount.textContent = `${totalResponses} responses`;
+                        latestValidCount = totalResponses;
+                    } else {
+                        // don't update count (keep previous)
+                    }
                 }
 
                 if (wordMap.size === 0) {
@@ -815,14 +841,14 @@
                 const wordList = Array.from(wordMap.values()).map(item => [item.display, item.count]);
                 const sorted = [...wordList].sort((a, b) => b[1] - a[1]);
 
-                // Check if data changed
+                // Check if data changed (hash)
                 const currentHash = JSON.stringify(sorted);
                 if (currentHash === lastWordHash) {
                     // No change – keep current cloud
                     return;
                 }
                 lastWordHash = currentHash;
-                lastValidData = sorted;
+                latestValidList = sorted;
 
                 showEmptyState(false);
                 renderCloud(sorted);
@@ -830,7 +856,7 @@
             } catch (e) {
                 console.warn('Cloud update failed:', e);
                 // On error, keep previous state; don't reset count
-                if (!lastValidData) {
+                if (!latestValidList) {
                     showEmptyState(true);
                     responseCount.textContent = '0 responses';
                 }
@@ -960,6 +986,25 @@
             }
         });
 
+        // ─── Clear All ───
+        clearAllBtn.addEventListener('click', function() {
+            if (confirm('⚠️ Are you sure you want to delete ALL responses?\nThis will open Google Forms where you can confirm the deletion.')) {
+                // Open the form analytics page (where delete option is available)
+                window.open(FORM_RESPONSES_URL, '_blank');
+                // Reset local state so cloud shows empty after manual deletion
+                // We'll force a refresh after a few seconds
+                setTimeout(() => {
+                    lastWordHash = '';
+                    latestValidList = null;
+                    latestValidCount = 0;
+                    showEmptyState(true);
+                    responseCount.textContent = '0 responses';
+                    fetchAndUpdate();
+                }, 3000);
+                showToast('Opening Google Forms to delete responses…');
+            }
+        });
+
         // ─── Manual Refresh ───
         manualRefreshBtn.addEventListener('click', function() {
             lastWordHash = '';
@@ -974,8 +1019,8 @@
         window.addEventListener('resize', function() {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
-                if (isResults && cloudInitialized && lastValidData) {
-                    renderCloud(lastValidData);
+                if (isResults && cloudInitialized && latestValidList) {
+                    renderCloud(latestValidList);
                 }
             }, 300);
         });
