@@ -1311,23 +1311,43 @@
             padding-right: 12px;
             line-height: 1.35;
         }
-        .student-qa-vote-btn {
-            background: rgba(212,175,55,0.15);
-            border: 1px solid rgba(212,175,55,0.25);
-            color: var(--gold-light);
-            padding: 6px 12px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 700;
+        .student-qa-actions {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
+        }
+        .student-qa-vote-btn {
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
             transition: all 0.15s ease;
             user-select: none;
             touch-action: manipulation;
+            border-radius: 0px;
         }
-        .student-qa-vote-btn:hover {
-            background: rgba(212,175,55,0.25);
+        .student-qa-vote-btn.upvote {
+            background: rgba(74, 222, 128, 0.12);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            color: #4ade80;
+        }
+        .student-qa-vote-btn.upvote:hover:not(:disabled) {
+            background: rgba(74, 222, 128, 0.25);
+        }
+        .student-qa-vote-btn.downvote {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+        .student-qa-vote-btn.downvote:hover:not(:disabled) {
+            background: rgba(239, 68, 68, 0.25);
+        }
+        .student-qa-vote-btn:active:not(:disabled) {
+            transform: scale(0.92);
         }
     </style>
 </head>
@@ -1358,7 +1378,7 @@
         </div>
 
         <h1 id="studentQuestion">What makes you trust an aviation leader?</h1>
-        <p class="sub" id="studentSub">Share your insight in one word ✦</p>
+        <p class="sub" id="studentSub">Share your insight in one word ✈️</p>
 
         <!-- Mode Forms Container -->
         <form id="pollForm"
@@ -1379,7 +1399,7 @@
             </div>
 
             <button type="submit" class="btn" id="studentSubmitBtn">
-                <span class="icon">✦</span> Submit
+                <span class="icon">✈️</span> Submit
             </button>
         </form>
 
@@ -1982,15 +2002,18 @@
                     throw new Error(result.message || 'Apps Script error');
                 }
 
-                const words = result.data || [];
+                // Filter out the active question if it gets read as a response
+                const activeQuestionLower = activeQuestionText.trim().toLowerCase();
+                const words = (result.data || []).filter(w => {
+                    const cw = w.trim();
+                    return cw && cw.toLowerCase() !== activeQuestionLower;
+                });
+                
                 const totalResponses = words.length;
 
-                if (totalResponses >= latestValidCount || latestValidCount === 0) {
-                    responseCount.textContent = `${totalResponses} response${totalResponses !== 1 ? 's' : ''}`;
-                    latestValidCount = totalResponses;
-                }
-
                 if (words.length === 0) {
+                    responseCount.textContent = '0 responses';
+                    latestValidCount = 0;
                     const emptyMap = new Map();
                     showEmptyState(true);
                     updateSidebarAndBlacklist(emptyMap);
@@ -2004,6 +2027,7 @@
 
                 // Render based on activeMode
                 if (activeMode === 'wordcloud') {
+                    responseCount.textContent = `${totalResponses} response${totalResponses !== 1 ? 's' : ''}`;
                     const wordMap = new Map();
                     for (const word of words) {
                         if (word && word.trim()) {
@@ -2069,6 +2093,7 @@
                             }
                         });
                     });
+                    responseCount.textContent = `${totalMCResponses} response${totalMCResponses !== 1 ? 's' : ''}`;
                     
                     if (totalMCResponses === 0) {
                         showEmptyState(true);
@@ -2105,6 +2130,7 @@
                             totalScaleResponses++;
                         }
                     });
+                    responseCount.textContent = `${totalScaleResponses} response${totalScaleResponses !== 1 ? 's' : ''}`;
                     
                     if (totalScaleResponses === 0) {
                         showEmptyState(true);
@@ -2120,12 +2146,16 @@
                             </div>
                         `;
                         
+                        const scaleConfig = activeModeConfig ? activeModeConfig.split(',').map(s => s.trim()) : ['Least Preferred', 'Most Preferred'];
+                        const minLabel = scaleConfig[0] || 'Least Preferred';
+                        const maxLabel = scaleConfig[1] || 'Most Preferred';
+                        
                         const labels = {
-                            '1': '1 - Novice / Lost',
-                            '2': '2 - Developing',
-                            '3': '3 - Comfortable',
-                            '4': '4 - Confident',
-                            '5': '5 - Expert / Pro'
+                            '1': `1 - ${minLabel}`,
+                            '2': '2',
+                            '3': '3',
+                            '4': '4',
+                            '5': `5 - ${maxLabel}`
                         };
                         
                         for (let i = 1; i <= 5; i++) {
@@ -2184,6 +2214,9 @@
                         }
                     }
                     
+                    const totalUnique = Object.keys(studentSelections).length;
+                    responseCount.textContent = `${totalUnique} participant${totalUnique !== 1 ? 's' : ''}`;
+                    
                     const hasSubmissions = columns.some(c => c.students.length > 0);
                     
                     if (!hasSubmissions) {
@@ -2212,9 +2245,6 @@
                                                  ${escapeHtml(st)}
                                             </div>
                                         `).join('')}
-                                        ${Array(Math.max(0, col.limit - count)).fill(0).map(() => `
-                                            <div class="slot-student-name" style="opacity: 0.15; border-style: dashed; background: transparent;">(Available Slot)</div>
-                                        `).join('')}
                                     </div>
                                 </div>
                             `;
@@ -2222,6 +2252,7 @@
                     }
                 } 
                 else if (activeMode === 'sticky') {
+                    responseCount.textContent = `${totalResponses} note${totalResponses !== 1 ? 's' : ''}`;
                     const cols = activeModeConfig ? activeModeConfig.split(',').map(c => c.trim()) : ['Crew', 'Weather', 'Maintenance'];
                     const board = {};
                     cols.forEach(c => board[c.toLowerCase()] = { title: c, notes: [] });
@@ -2639,7 +2670,7 @@
                 if (form) form.style.display = 'none';
                 if (studentSub) {
                     studentSub.style.display = 'block';
-                    studentSub.textContent = 'Ask anonymous questions & upvote peers! ✦';
+                    studentSub.textContent = 'Ask anonymous questions, upvote or downvote peers! ✈️';
                 }
                 if (studentQaContainer) studentQaContainer.classList.remove('hidden');
                 if (submittedContainer) submittedContainer.style.display = 'none';
@@ -2649,7 +2680,8 @@
             if (studentQaContainer) studentQaContainer.classList.add('hidden');
             
             const key = 'submitted_' + activeQuestionText.toLowerCase().replace(/[^a-z0-9]/g, '');
-            if (localStorage.getItem(key) === 'true' && !allowMultiple) {
+            // In sticky notes mode, we always bypass the submitted lockout to allow multiple brainstorming ideas!
+            if (localStorage.getItem(key) === 'true' && !allowMultiple && activeMode !== 'sticky') {
                 if (form) form.style.display = 'none';
                 if (studentSub) studentSub.style.display = 'none';
                 if (submittedContainer) submittedContainer.style.display = 'block';
@@ -2658,15 +2690,15 @@
                 if (studentSub) {
                     studentSub.style.display = 'block';
                     if (activeMode === 'wordcloud') {
-                        studentSub.textContent = 'Share your insight in one word ✦';
+                        studentSub.textContent = 'Share your insight in one word ✈️';
                     } else if (activeMode === 'multichoice') {
-                        studentSub.textContent = 'Select one choice below ✦';
+                        studentSub.textContent = 'Select one choice below ✈️';
                     } else if (activeMode === 'scale') {
-                        studentSub.textContent = 'Rate your understanding ✦';
+                        studentSub.textContent = 'Rate your understanding ✈️';
                     } else if (activeMode === 'slots') {
-                        studentSub.textContent = 'Choose a topic to sign up ✦';
+                        studentSub.textContent = 'Choose a topic to sign up ✈️';
                     } else if (activeMode === 'sticky') {
-                        studentSub.textContent = 'Submit your idea to the columns ✦';
+                        studentSub.textContent = 'Submit your idea to the columns ✈️';
                     }
                 }
                 if (submittedContainer) submittedContainer.style.display = 'none';
@@ -3213,7 +3245,7 @@
         function toggleModeConfigFields() {
             if (!modeSelect || !modeConfigGroup || !modeConfigLabel || !modeConfigHelp) return;
             const mode = modeSelect.value;
-            if (mode === 'wordcloud' || mode === 'scale' || mode === 'qa') {
+            if (mode === 'wordcloud' || mode === 'qa') {
                 modeConfigGroup.classList.add('hidden');
             } else {
                 modeConfigGroup.classList.remove('hidden');
@@ -3221,6 +3253,10 @@
                     modeConfigLabel.textContent = 'Options List';
                     modeConfigInput.placeholder = 'Choice A, Choice B, Choice C';
                     modeConfigHelp.textContent = 'Enter choices separated by commas.';
+                } else if (mode === 'scale') {
+                    modeConfigLabel.textContent = 'Scale End Labels';
+                    modeConfigInput.placeholder = 'Least Preferred, Most Preferred';
+                    modeConfigHelp.textContent = 'Enter low (1) and high (5) labels separated by a comma.';
                 } else if (mode === 'slots') {
                     modeConfigLabel.textContent = 'Topic Slots & Limits';
                     modeConfigInput.placeholder = 'Chapter 1:3, Chapter 2:3';
@@ -3290,13 +3326,15 @@
                         studentQaList.innerHTML = `<div style="text-align: center; color: rgba(255,255,255,0.2); font-size: 0.82rem; margin-top: 10px;">No questions asked yet</div>`;
                     } else {
                         studentQaList.innerHTML = questions.map(q => {
-                            const hasUpvoted = localQaIdsSubmitted.includes(q.id);
+                            const hasVoted = localQaIdsSubmitted.includes(q.id);
                             return `
                                 <div class="student-qa-item">
                                     <span class="student-qa-text">${escapeHtml(q.text)}</span>
-                                    <button class="student-qa-vote-btn" data-id="${q.id}" ${hasUpvoted ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
-                                        ▲ ${q.votes}
-                                    </button>
+                                    <div class="student-qa-actions">
+                                        <span style="font-size: 0.95rem; font-weight: 750; color: var(--gold-light); margin-right: 6px;">${q.votes}</span>
+                                        <button class="student-qa-vote-btn upvote" data-id="${q.id}" ${hasVoted ? 'disabled style="opacity: 0.3; cursor: not-allowed;"' : ''}>▲</button>
+                                        <button class="student-qa-vote-btn downvote" data-id="${q.id}" ${hasVoted ? 'disabled style="opacity: 0.3; cursor: not-allowed;"' : ''}>▼</button>
+                                    </div>
                                 </div>
                             `;
                         }).join('');
@@ -3306,11 +3344,20 @@
                                 const id = Number(this.getAttribute('data-id'));
                                 if (localQaIdsSubmitted.includes(id)) return;
                                 
-                                this.disabled = true;
+                                const isUpvote = this.classList.contains('upvote');
+                                const action = isUpvote ? 'upvoteQa' : 'downvoteQa';
+                                
+                                // Disable siblings
+                                const container = this.closest('.student-qa-actions');
+                                if (container) {
+                                    container.querySelectorAll('.student-qa-vote-btn').forEach(b => b.disabled = true);
+                                }
+                                
                                 try {
-                                    const upres = await fetch(`${WEB_APP_URL}?action=upvoteQa&id=${id}&_=${Date.now()}`);
-                                    const upresult = await upres.json();
-                                    if (upresult.status === 'success') {
+                                    const url = `${WEB_APP_URL}?action=${action}&id=${id}&_=${Date.now()}`;
+                                    const res = await fetch(url);
+                                    const result = await res.json();
+                                    if (result.status === 'success') {
                                         localQaIdsSubmitted.push(id);
                                         fetchStudentQaList();
                                     }
@@ -3419,14 +3466,18 @@
                 if (studentSubmitBtn) studentSubmitBtn.style.display = 'flex';
             } 
             else if (activeMode === 'scale') {
+                const scaleConfig = activeModeConfig ? activeModeConfig.split(',').map(s => s.trim()) : ['Least Preferred', 'Most Preferred'];
+                const minLabel = scaleConfig[0] || 'Least Preferred';
+                const maxLabel = scaleConfig[1] || 'Most Preferred';
+
                 studentFormContent.innerHTML = `
                     <input type="hidden" name="entry.192253551" id="studentAnswerInput" value="" required />
                     <div class="student-scale-row">
-                        <button type="button" class="student-scale-btn" data-val="1">1</button>
+                        <button type="button" class="student-scale-btn" data-val="1" style="font-size: 0.9rem; padding: 10px 4px; line-height: 1.25;">1<br><span style="font-size: 0.62rem; font-weight: normal; opacity: 0.8;">${minLabel}</span></button>
                         <button type="button" class="student-scale-btn" data-val="2">2</button>
                         <button type="button" class="student-scale-btn" data-val="3">3</button>
                         <button type="button" class="student-scale-btn" data-val="4">4</button>
-                        <button type="button" class="student-scale-btn" data-val="5">5</button>
+                        <button type="button" class="student-scale-btn" data-val="5" style="font-size: 0.9rem; padding: 10px 4px; line-height: 1.25;">5<br><span style="font-size: 0.62rem; font-weight: normal; opacity: 0.8;">${maxLabel}</span></button>
                     </div>
                 `;
                 
