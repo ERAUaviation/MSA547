@@ -370,15 +370,13 @@
     <div class="tooltip" id="tooltip" aria-hidden="true"></div>
 
     <div class="app-container" id="appContainer">
-        <!-- STUDENT VIEW -->
         <div class="view active" id="studentView">
             <div class="card">
-                <span class="subtitle">MSA 547 · Leadership &amp; Critical Decision-Making</span>
+                <span class="subtitle">MSA 547 · Leadership & Critical Decision-Making</span>
                 <div class="accent-line"></div>
                 <h1 class="question-text">In one or two words,<br>what makes you trust an aviation leader?</h1>
             </div>
 
-            <!-- QR Code section (visible only on large screens) -->
             <div class="qr-section" id="qrSection">
                 <img class="qr-code-img" id="qrCodeImg"
                 src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='110' height='110' viewBox='0 0 110 110'%3E%3Crect fill='%23fff' width='110' height='110' rx='8'/%3E%3Ctext x='55' y='58' text-anchor='middle' fill='%23999' font-size='11' font-family='sans-serif'%3EQR%3C/text%3E%3C/svg%3E"
@@ -389,7 +387,6 @@
                 </div>
             </div>
 
-            <!-- Answer card -->
             <div class="card" id="inputCard">
                 <div style="display:flex;flex-direction:column;gap:8px;">
                     <label class="label-text" for="answerInput">Your answer (1–2 words):</label>
@@ -410,7 +407,6 @@
             </div>
         </div>
 
-        <!-- RESULTS VIEW -->
         <div class="view" id="resultsView">
             <div class="card">
                 <span class="subtitle">MSA 547 · Live Poll Results</span>
@@ -629,7 +625,7 @@
                 }
             }
 
-            // Word cloud engine (unchanged)
+            // Word cloud engine
             function computeFrequencies(answers) {
                 const map = new Map();
                 answers.forEach(a => {
@@ -639,6 +635,7 @@
                 return Array.from(map.entries()).map(([w, c]) => ({ word: w, count: c })).sort((a, b) => b.count - a.count);
             }
             const colors = ['#f4793e', '#ff9a65', '#ffb347', '#4a90d9', '#7eb8da', '#5ba3e6', '#34b7a8', '#5cc9ba', '#d4a853', '#e8c97a', '#ffffff', '#eaf1f8', '#e74c3c', '#f07070'];
+            
             function renderWordCloud(answers) {
                 const canvas = wordcloudCanvas, wrapper = canvas.parentElement;
                 const ctx = canvas.getContext('2d'); canvasCtx = ctx;
@@ -666,9 +663,11 @@
                     rotation: (Math.random()-0.5)*16,
                     color: colors[i % colors.length]
                 })).sort((a,b) => b.fontSize - a.fontSize);
+                
                 const placed = [], pad = 4*dpr, centerX = canvas.width/2, centerY = canvas.height/2, spiralA = 0.8*dpr, step = 0.25;
                 const font = "'Georgia','Segoe UI','Inter',sans-serif";
                 function overlap(a,b) { return !(a.x+a.w <= b.x || b.x+b.w <= a.x || a.y+a.h <= b.y || b.y+b.h <= a.y); }
+                
                 items.forEach(item => {
                     const fs = item.fontSize*dpr;
                     ctx.font = `700 ${fs}px ${font}`;
@@ -696,6 +695,7 @@
                         theta += step;
                     }
                 });
+                
                 placed.forEach(p => {
                     ctx.save();
                     ctx.translate(p.cx, p.cy);
@@ -712,6 +712,7 @@
                 tooltip.classList.remove('visible');
                 statLastRefresh.textContent = new Date().toLocaleTimeString();
             }
+            
             function updateStats(total, unique) { statCount.textContent = total; statUnique.textContent = unique; }
 
             async function fetchAndRenderWordCloud() {
@@ -758,11 +759,14 @@
                     } else tooltip.classList.remove('visible');
                 }
             });
+            
             wordcloudCanvas.addEventListener('mouseleave', () => { hoveredIndex = -1; redrawHighlighted(-1); tooltip.classList.remove('visible'); });
+            
             wordcloudCanvas.addEventListener('click', e => {
                 const idx = findWordAt(e.clientX, e.clientY);
                 if (idx >= 0) showToast(`📊 "${wordPlacements[idx].word}" — ${wordPlacements[idx].count} response(s)`, 'success');
             });
+            
             wordcloudCanvas.addEventListener('touchmove', e => {
                 if (e.touches.length === 1) {
                     const t = e.touches[0];
@@ -770,6 +774,7 @@
                     if (idx !== hoveredIndex) { hoveredIndex = idx; redrawHighlighted(idx); }
                 }
             }, {passive: true});
+            
             wordcloudCanvas.addEventListener('touchend', () => setTimeout(() => { hoveredIndex = -1; redrawHighlighted(-1); }, 300));
 
             function findWordAt(mx, my) {
@@ -786,6 +791,7 @@
                 });
                 return best;
             }
+            
             function redrawHighlighted(hi) {
                 const ctx = canvasCtx || wordcloudCanvas.getContext('2d');
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
