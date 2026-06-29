@@ -161,7 +161,7 @@
             letter-spacing: 0.01em;
         }
 
-        /* ─── Form Elements ─── */
+        /* ─── Form Elements (student view) ─── */
         .answer-input {
             width: 100%;
             padding: 20px 24px;
@@ -223,18 +223,24 @@
             line-height: 1;
         }
 
-        /* ─── Results View ─── */
+        /* ─── Results View (instructor) ─── */
+        .results-card {
+            max-width: 960px;
+            /* wider for desktop */;
+            padding: 32px 36px 44px;
+        }
+
         .results-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 12px;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .results-header h2 {
-            font-size: 1.6rem;
+            font-size: 2rem;
             font-weight: 700;
             background: linear-gradient(135deg, var(--white), var(--gold));
             -webkit-background-clip: text;
@@ -245,9 +251,9 @@
         .results-header .badge {
             background: rgba(244, 121, 62, 0.20);
             border: 1px solid rgba(244, 121, 62, 0.25);
-            padding: 6px 16px;
+            padding: 6px 20px;
             border-radius: 40px;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: var(--gold);
             letter-spacing: 0.04em;
         }
@@ -255,11 +261,11 @@
         .qr-wrap {
             display: flex;
             align-items: center;
-            gap: 18px;
+            gap: 20px;
             background: rgba(255, 255, 255, 0.04);
             border-radius: 16px;
-            padding: 12px 18px 12px 14px;
-            margin-bottom: 20px;
+            padding: 14px 22px 14px 18px;
+            margin-bottom: 24px;
             border: 1px solid rgba(255, 255, 255, 0.06);
             flex-wrap: wrap;
         }
@@ -269,8 +275,8 @@
             padding: 6px;
             border-radius: 10px;
             flex-shrink: 0;
-            width: 72px;
-            height: 72px;
+            width: 80px;
+            height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -283,19 +289,19 @@
         }
 
         .qr-label {
-            font-size: 1.05rem;
+            font-size: 1.15rem;
             font-weight: 500;
-            color: rgba(255, 255, 255, 0.80);
+            color: rgba(255, 255, 255, 0.85);
         }
         .qr-label small {
             display: block;
             font-weight: 400;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: rgba(255, 255, 255, 0.45);
             margin-top: 2px;
         }
 
-        /* ─── Word Cloud Container ─── */
+        /* ─── Word Cloud Container (larger on desktop) ─── */
         .cloud-wrapper {
             position: relative;
             width: 100%;
@@ -304,8 +310,9 @@
             background: rgba(10, 22, 40, 0.50);
             border: 1px solid rgba(255, 255, 255, 0.06);
             box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.30);
-            aspect-ratio: 1 / 1;
-            min-height: 340px;
+            aspect-ratio: 16 / 10;
+            /* wider than tall */;
+            min-height: 420px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -345,16 +352,26 @@
         .live-label {
             display: flex;
             align-items: center;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: 500;
             color: rgba(255, 255, 255, 0.50);
             letter-spacing: 0.06em;
             text-transform: uppercase;
-            margin-top: 12px;
+            margin-top: 14px;
             justify-content: center;
         }
 
-        /* ─── Thank-you overlay ─── */
+        /* ─── Empty state ─── */
+        .empty-message {
+            font-size: 1.4rem;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.30);
+            text-align: center;
+            padding: 40px 20px;
+            letter-spacing: 0.02em;
+        }
+
+        /* ─── Toast ─── */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -383,16 +400,21 @@
             margin-right: 12px;
         }
 
-        /* ─── Responsive ─── */
-        @media (max-width: 500px) {
-            .card {
+        /* ─── Responsive (only for student view) ─── */
+        @media (max-width: 640px) {
+            body {
+                padding: 12px;
+            }
+            /* student card remains mobile-friendly */
+            .card:not(.results-card) {
                 padding: 24px 18px 32px;
                 border-radius: 22px;
+                max-width: 100%;
             }
-            .card h1 {
+            .card:not(.results-card) h1 {
                 font-size: 1.5rem;
             }
-            .card .sub {
+            .card:not(.results-card) .sub {
                 font-size: 0.95rem;
             }
             .answer-input {
@@ -406,14 +428,28 @@
                 font-size: 1.1rem;
                 padding: 18px 20px;
             }
-            .results-header h2 {
-                font-size: 1.3rem;
+
+            /* results view: keep larger, but reduce padding slightly */
+            .results-card {
+                padding: 24px 18px 32px;
+                max-width: 100%;
             }
-            .qr-label {
-                font-size: 0.95rem;
+            .results-header h2 {
+                font-size: 1.6rem;
             }
             .cloud-wrapper {
-                min-height: 260px;
+                min-height: 280px;
+                aspect-ratio: 4 / 3;
+            }
+            .qr-wrap {
+                padding: 12px 16px;
+            }
+            #qrCode {
+                width: 64px;
+                height: 64px;
+            }
+            .qr-label {
+                font-size: 1rem;
             }
             .toast {
                 font-size: 1rem;
@@ -425,8 +461,8 @@
             }
         }
 
-        @media (max-width: 380px) {
-            .card h1 {
+        @media (max-width: 400px) {
+            .card:not(.results-card) h1 {
                 font-size: 1.25rem;
             }
             .answer-input {
@@ -471,7 +507,7 @@
         <span class="emoji">✈️</span> Response submitted — thank you!
     </div>
 
-    <!-- ─── STUDENT INPUT VIEW ─── -->
+    <!-- ─── STUDENT INPUT VIEW (mobile-friendly) ─── -->
     <div id="studentView" class="card">
         <h1>What makes you trust<br />an aviation leader?</h1>
         <p class="sub">One word. One insight. ✦</p>
@@ -496,8 +532,8 @@
     </form>
 </div>
 
-<!-- ─── INSTRUCTOR RESULTS VIEW ─── -->
-<div id="resultsView" class="card hidden">
+<!-- ─── INSTRUCTOR RESULTS VIEW (desktop‑focused) ─── -->
+<div id="resultsView" class="card results-card hidden">
 
     <div class="results-header">
         <h2>✦ Leadership Cloud</h2>
@@ -514,6 +550,9 @@
 
     <div class="cloud-wrapper" id="cloudWrapper">
         <canvas id="wordCloudCanvas"></canvas>
+        <div id="emptyState" class="empty-message" style="display:none; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none;">
+            No responses yet —<br />share the QR code to start collecting insights.
+        </div>
     </div>
 
     <div class="live-label">
@@ -545,6 +584,7 @@
         const resultsView = document.getElementById('resultsView');
         const canvas = document.getElementById('wordCloudCanvas');
         const cloudWrapper = document.getElementById('cloudWrapper');
+        const emptyState = document.getElementById('emptyState');
         const qrContainer = document.getElementById('qrCode');
         const toast = document.getElementById('toast');
         const form = document.getElementById('pollForm');
@@ -563,8 +603,8 @@
             // Generate QR
             new QRCode(qrContainer, {
                 text: window.location.origin + window.location.pathname,
-                width: 72,
-                height: 72,
+                width: 80,
+                height: 80,
                 colorDark: '#0a1628',
                 colorLight: '#ffffff',
             });
@@ -581,12 +621,10 @@
                 const word = parts.length > 1 ? parts[1] : parts[0];
                 if (word && word.trim()) {
                     const key = word.trim().toLowerCase();
-                    // preserve original case for display
                     const display = word.trim();
                     if (freq[display]) {
                         freq[display] += 1;
                     } else {
-                        // check if we already have this word with different case
                         let found = false;
                         for (const existing in freq) {
                             if (existing.toLowerCase() === key) {
@@ -611,22 +649,19 @@
             for (const word in freq) {
                 if (freq[word] > maxCount) maxCount = freq[word];
             }
-            const minWeight = 12;
-            const maxWeight = 64;
+            const minWeight = 14;
+            const maxWeight = 68;
             for (const word in freq) {
                 const count = freq[word];
-                // scale weight: more frequent = bigger
                 const weight = minWeight + (count / Math.max(maxCount, 1)) * (maxWeight - minWeight);
                 list.push([word, Math.round(weight)]);
             }
-            // sort by weight descending
             list.sort((a, b) => b[1] - a[1]);
             return list;
         }
 
-        // ─── Fancy color function ───
+        // ─── Color function ───
         function getColor(word, weight, total) {
-            // pick from palette based on weight and word hash
             const hash = word.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
             const idx = (hash + weight) % WORD_COLORS.length;
             return WORD_COLORS[idx];
@@ -643,29 +678,10 @@
                 const csvText = await response.text();
 
                 const lines = csvText.split('\n').filter(line => line.trim());
-                // skip header
-                const dataRows = lines.slice(1);
+                const dataRows = lines.slice(1); // skip header
 
                 if (dataRows.length === 0) {
-                    // fallback with sample data
-                    const fallback = [
-                        ['Integrity', 48],
-                        ['Vision', 42],
-                        ['Empathy', 38],
-                        ['Courage', 34],
-                        ['Wisdom', 30],
-                        ['Clarity', 28],
-                        ['Trust', 52],
-                        ['Authenticity', 26],
-                        ['Resilience', 24],
-                        ['Humility', 22],
-                        ['Decisiveness', 20],
-                        ['Compassion', 18],
-                        ['Accountability', 16],
-                        ['Transparency', 14],
-                        ['Inspiration', 12],
-                    ];
-                    renderCloud(fallback);
+                    showEmptyState(true);
                     return;
                 }
 
@@ -673,87 +689,69 @@
                 const wordList = buildWordList(freq);
 
                 if (wordList.length === 0) {
-                    // fallback
-                    const fallback = [
-                        ['Integrity', 48],
-                        ['Vision', 42],
-                        ['Trust', 52],
-                        ['Empathy', 38],
-                        ['Courage', 34],
-                    ];
-                    renderCloud(fallback);
+                    showEmptyState(true);
                     return;
                 }
 
+                showEmptyState(false);
                 renderCloud(wordList);
 
             } catch (e) {
-                console.warn('Cloud update failed, using fallback:', e);
-                const fallback = [
-                    ['Integrity', 48],
-                    ['Vision', 42],
-                    ['Trust', 52],
-                    ['Empathy', 38],
-                    ['Courage', 34],
-                    ['Wisdom', 30],
-                    ['Clarity', 28],
-                    ['Authenticity', 26],
-                    ['Resilience', 24],
-                    ['Humility', 22],
-                ];
-                renderCloud(fallback);
+                console.warn('Cloud update failed:', e);
+                showEmptyState(true);
             }
         }
 
-        // ─── Render cloud with options ───
+        // ─── Show/hide empty state ───
+        function showEmptyState(show) {
+            if (emptyState) {
+                emptyState.style.display = show ? 'flex' : 'none';
+            }
+            if (show) {
+                // Clear canvas
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        // ─── Render cloud ───
         function renderCloud(list) {
             if (!canvas || !cloudWrapper) return;
 
-            // ensure canvas has correct size
+            // Ensure canvas size matches container
             const rect = cloudWrapper.getBoundingClientRect();
-            const size = Math.min(rect.width || 500, rect.height || 500);
+            const w = Math.max(rect.width || 600, 400);
+            const h = Math.max(rect.height || 400, 300);
             const dpr = Math.min(window.devicePixelRatio || 1, 2);
-            const w = Math.max(size, 300);
-            const h = Math.max(size, 300);
 
             canvas.width = w * dpr;
             canvas.height = h * dpr;
             canvas.style.width = w + 'px';
             canvas.style.height = h + 'px';
-            canvas.getContext('2d').scale(dpr, dpr);
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
 
-            // sort list by weight descending for better layout
+            // Sort by weight
             const sorted = [...list].sort((a, b) => b[1] - a[1]);
 
-            // if list is empty, show placeholder
             if (sorted.length === 0) {
-                const ctx = canvas.getContext('2d');
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = 'rgba(255,255,255,0.12)';
-                ctx.font = '18px Inter, sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('No words yet…', canvas.width / 2, canvas.height / 2);
+                showEmptyState(true);
                 return;
             }
 
-            // Weight factor: scale to fit canvas
             const maxWeight = sorted[0]?.[1] || 40;
             const minWeight = sorted[sorted.length - 1]?.[1] || 10;
             const weightRange = Math.max(maxWeight - minWeight, 1);
 
             const weightFactor = function(w) {
-                // map weight to size: smaller words get at least 14px, larger up to 64px
-                const normalized = (w - minWeight) / weightRange; // 0..1
-                const size = 14 + normalized * 50;
-                return Math.min(Math.max(size, 12), 70);
+                const normalized = (w - minWeight) / weightRange;
+                const size = 16 + normalized * 54;
+                return Math.min(Math.max(size, 14), 72);
             };
 
-            // Grid size: tighter for more words
-            const gridSize = Math.max(6, Math.min(16, Math.round(40 / Math.sqrt(sorted.length))));
+            const gridSize = Math.max(8, Math.min(18, Math.round(40 / Math.sqrt(sorted.length))));
 
-            // Clear previous
-            const ctx = canvas.getContext('2d');
+            // Clear
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             try {
@@ -761,15 +759,14 @@
                     list: sorted,
                     gridSize: gridSize,
                     weightFactor: weightFactor,
-                    fontFamily: "'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif",
+                    fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif",
                     fontWeight: '600',
                     color: function(word, weight) {
                         return getColor(word, weight, sorted.length);
                     },
                     rotate: function(word, weight) {
-                        // rotate some words for visual interest
                         const hash = word.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
-                        const angle = (hash % 7) / 7; // 0..1
+                        const angle = (hash % 7) / 7;
                         if (angle < 0.25) return -Math.PI / 6;
                         if (angle < 0.50) return Math.PI / 6;
                         if (angle < 0.70) return -Math.PI / 4;
@@ -777,16 +774,15 @@
                         return 0;
                     },
                     backgroundColor: 'transparent',
-                    minSize: 10,
+                    minSize: 12,
                     shrinkToFit: true,
                     clearCanvas: true,
                 });
                 cloudInitialized = true;
             } catch (e) {
                 console.warn('WordCloud render error:', e);
-                // fallback: draw simple text
-                ctx.fillStyle = 'rgba(255,255,255,0.20)';
-                ctx.font = '20px Inter, sans-serif';
+                ctx.fillStyle = 'rgba(255,255,255,0.15)';
+                ctx.font = '22px Inter, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText('✦ rendering cloud…', canvas.width / 2, canvas.height / 2);
@@ -799,7 +795,6 @@
                 clearTimeout(toastTimer);
                 toast.classList.remove('show');
             }
-            // update message
             const emoji = message.includes('thank') ? '✈️' : '✅';
             toast.innerHTML = `<span class="emoji">${emoji}</span> ${message}`;
             toast.classList.add('show');
@@ -813,7 +808,6 @@
         iframe.onload = function() {
             showToast('Response submitted — thank you!');
             form.reset();
-            // Update cloud after a moment
             setTimeout(updateWordCloud, 800);
         };
 
@@ -825,7 +819,7 @@
                 if (isResults && cloudInitialized) {
                     updateWordCloud();
                 }
-            }, 300);
+            }, 400);
         });
 
         // ─── Expose for debugging ───
@@ -833,8 +827,7 @@
 
         // ─── Initial render if results ───
         if (isResults) {
-            // wait for layout
-            setTimeout(updateWordCloud, 400);
+            setTimeout(updateWordCloud, 500);
         }
 
     })();
