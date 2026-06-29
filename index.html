@@ -3497,9 +3497,13 @@
         if (isResults) {
             setTimeout(fetchAndUpdate, 300);
         } else {
+            // Initial fetch of question, mode, and configs on student device
+            fetchQuestion();
+            
+            // Poll for question updates, mode changes, and global lock resets
+            setInterval(fetchQuestion, 6000);
+            
             setInterval(fetchStudentQaList, 5000);
-            // Dynamic polling to check for active mode changes on student view
-            setInterval(updateStudentUI, 10000);
         }
 
         // Expose for debugging
