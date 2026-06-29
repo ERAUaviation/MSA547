@@ -718,6 +718,9 @@
         <h2>✦ Classroom Cloud</h2>
         <div class="stats">
             <span class="badge" id="responseCount">0 responses</span>
+            <button class="action-btn" id="toggleCloudBtn" title="Toggle cloud visibility">
+                <span>👁️</span> Hide Cloud
+            </button>
             <button class="action-btn" id="manualRefresh" title="Refresh now">
                 <span>⟳</span>
             </button>
@@ -744,6 +747,11 @@
             <div id="emptyState" class="empty-message" style="display:none; position:absolute; inset:0; align-items:center; justify-content:center; pointer-events:none; flex-direction:column;">
                 <div>✨ No responses yet</div>
                 <div style="font-size:0.9rem; margin-top:6px; opacity:0.5;">Share the QR code to start</div>
+            </div>
+            <div id="hiddenState" class="empty-message" style="display:none; position:absolute; inset:0; align-items:center; justify-content:center; pointer-events:none; flex-direction:column; background: rgba(10, 22, 40, 0.7); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-radius: 18px;">
+                <div style="font-size: 3rem; margin-bottom: 12px; filter: drop-shadow(0 0 10px rgba(212,175,55,0.3));">🙈</div>
+                <div style="font-weight: 600; color: var(--gold-light);">Cloud Hidden by Instructor</div>
+                <div style="font-size:0.9rem; margin-top:6px; opacity:0.6;">Responses are still being collected live!</div>
             </div>
         </div>
     </div>
@@ -786,6 +794,7 @@
         const canvas = document.getElementById('wordCloudCanvas');
         const cloudWrapper = document.getElementById('cloudWrapper');
         const emptyState = document.getElementById('emptyState');
+        const hiddenState = document.getElementById('hiddenState');
         const qrContainer = document.getElementById('qrCode');
         const qrSection = document.getElementById('qrSection');
         const qrToggle = document.getElementById('qrToggle');
@@ -796,10 +805,12 @@
         const iframe = document.getElementById('hidden_iframe');
         const manualRefreshBtn = document.getElementById('manualRefresh');
         const clearAllBtn = document.getElementById('clearAllBtn');
+        const toggleCloudBtn = document.getElementById('toggleCloudBtn');
 
         let cloudInitialized = false;
         let toastTimer = null;
         let qrVisible = true;
+        let cloudHidden = false;
         let updateInterval = null;
         let lastWordHash = '';
         let latestValidCount = 0;
@@ -895,7 +906,7 @@
         // ─── Show/hide empty state ───
         function showEmptyState(show) {
             if (emptyState) {
-                emptyState.style.display = show ? 'flex' : 'none';
+                emptyState.style.display = (show && !cloudHidden) ? 'flex' : 'none';
             }
             if (show) {
                 const ctx = canvas.getContext('2d');
@@ -1012,6 +1023,22 @@
             } else {
                 qrSection.classList.add('collapsed');
                 qrToggle.textContent = 'Show';
+            }
+        });
+
+        // ─── Cloud Hide/Show Toggle ───
+        toggleCloudBtn.addEventListener('click', function() {
+            cloudHidden = !cloudHidden;
+            if (cloudHidden) {
+                hiddenState.style.display = 'flex';
+                toggleCloudBtn.innerHTML = '<span>👁️</span> Show Cloud';
+                if (emptyState) emptyState.style.display = 'none';
+            } else {
+                hiddenState.style.display = 'none';
+                toggleCloudBtn.innerHTML = '<span>👁️</span> Hide Cloud';
+                if (latestValidCount === 0) {
+                    if (emptyState) emptyState.style.display = 'flex';
+                }
             }
         });
 
