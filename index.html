@@ -1026,6 +1026,251 @@
         .relative {
             position: relative;
         }
+
+        /* ─── NEW MODE LAYOUTS ─── */
+        .bar-chart-container,
+        .scale-chart-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            padding: 24px;
+            box-sizing: border-box;
+        }
+        .bar-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 100%;
+        }
+        .bar-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #fff;
+        }
+        .bar-outer {
+            width: 100%;
+            height: 22px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 0px;
+            overflow: hidden;
+        }
+        .bar-inner {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-light), var(--gold));
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .scale-average-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 16px;
+            margin-bottom: 8px;
+        }
+        .scale-avg-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: rgba(255,255,255,0.4);
+        }
+        .scale-avg-val {
+            font-size: 2.8rem;
+            font-weight: 850;
+            color: var(--gold-light);
+            text-shadow: 0 0 20px var(--gold-glow);
+        }
+
+        .slots-grid-container,
+        .sticky-grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            width: 100%;
+            padding: 24px;
+            box-sizing: border-box;
+        }
+        .slot-column,
+        .sticky-column {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 250px;
+            max-height: 480px;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+        .slot-column-header,
+        .sticky-column-header {
+            font-size: 0.95rem;
+            font-weight: 750;
+            color: var(--gold-light);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .slot-student-list,
+        .sticky-notes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 2px;
+        }
+        .slot-student-name {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 8px 12px;
+            font-size: 0.88rem;
+            color: rgba(255,255,255,0.85);
+        }
+        .sticky-note {
+            background: rgba(212, 175, 55, 0.05);
+            border-left: 3px solid var(--gold);
+            border-top: 1px solid rgba(212, 175, 55, 0.1);
+            border-right: 1px solid rgba(212, 175, 55, 0.1);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+            padding: 12px 14px;
+            font-size: 0.9rem;
+            line-height: 1.35;
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            word-break: break-word;
+        }
+
+        .qa-board-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            padding: 24px;
+            box-sizing: border-box;
+        }
+        .qa-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 12px 18px;
+            gap: 16px;
+            box-sizing: border-box;
+        }
+        .qa-card-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
+        }
+        .qa-votes-box {
+            background: rgba(212, 175, 55, 0.12);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            color: var(--gold-light);
+            width: 48px;
+            height: 48px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 750;
+            font-size: 1.05rem;
+            flex-shrink: 0;
+            line-height: 1.1;
+        }
+        .qa-votes-label {
+            font-size: 0.52rem;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            opacity: 0.6;
+        }
+        .qa-text {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #fff;
+            line-height: 1.35;
+        }
+
+        /* Student scale selectors styling */
+        .student-scale-row {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            margin-bottom: 16px;
+        }
+        .student-scale-btn {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            color: #fff;
+            padding: 14px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .student-scale-btn:hover,
+        .student-scale-btn.active {
+            background: rgba(212, 175, 55, 0.15);
+            border-color: var(--gold);
+            color: var(--gold-light);
+        }
+
+        /* Q&A Student List */
+        .student-qa-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 250px;
+            overflow-y: auto;
+            margin-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding-top: 12px;
+        }
+        .student-qa-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            padding: 8px 12px;
+            font-size: 0.88rem;
+        }
+        .student-qa-text {
+            color: rgba(255,255,255,0.85);
+            flex: 1;
+            padding-right: 12px;
+        }
+        .student-qa-vote-btn {
+            background: rgba(212,175,55,0.15);
+            border: 1px solid rgba(212,175,55,0.25);
+            color: var(--gold-light);
+            padding: 3px 8px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .student-qa-vote-btn:hover {
+            background: rgba(212,175,55,0.25);
+        }
     </style>
 </head>
 <body>
@@ -1057,25 +1302,39 @@
         <h1 id="studentQuestion">What makes you trust an aviation leader?</h1>
         <p class="sub" id="studentSub">Share your insight in one word ✦</p>
 
+        <!-- Mode Forms Container -->
         <form id="pollForm"
         action="https://docs.google.com/forms/d/e/1FAIpQLSf1TqzrUIvGkqz4ektOj4sRyLRaUrNli4bb6LJz4fT-1Ll9zw/formResponse"
         method="POST"
         target="hidden_iframe">
 
-        <input
-        type="text"
-        name="entry.192253551"
-        id="studentAnswerInput"
-        class="answer-input"
-        placeholder="Type your response…"
-        required
-        autocomplete="off"
-        />
+            <div id="studentFormContent">
+                <input
+                type="text"
+                name="entry.192253551"
+                id="studentAnswerInput"
+                class="answer-input"
+                placeholder="Type your response…"
+                required
+                autocomplete="off"
+                />
+            </div>
 
-        <button type="submit" class="btn">
-            <span class="icon">✦</span> Submit
-        </button>
-    </form>
+            <button type="submit" class="btn" id="studentSubmitBtn">
+                <span class="icon">✦</span> Submit
+            </button>
+        </form>
+
+        <!-- Mode 5: Q&A Board Student UI -->
+        <div id="studentQaContainer" class="hidden" style="margin-top: 10px; width: 100%;">
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <input type="text" id="studentQaInput" class="answer-input" placeholder="Ask an anonymous question…" style="margin-top: 0;" />
+                <button type="button" class="btn" id="studentQaSubmitBtn">
+                    <span class="icon">❓</span> Ask Question
+                </button>
+            </div>
+            <div id="studentQaList" class="student-qa-list"></div>
+        </div>
 
     <div id="submittedContainer" style="display:none; text-align:center; padding: 20px 0;">
         <div style="font-size: 4rem; margin-bottom: 16px; filter: drop-shadow(0 0 10px rgba(212,175,55,0.35));">✈️</div>
@@ -1143,14 +1402,41 @@
             </div>
         </div>
 
-        <!-- Word Cloud -->
+        <!-- Word Cloud & Dynamic Mode Viewport -->
         <div class="cloud-wrapper" id="cloudWrapper">
+            <!-- Mode 1: Word Cloud Canvas -->
             <canvas id="wordCloudCanvas"></canvas>
+            
+            <!-- Mode 2: Multiple Choice Bar Chart -->
+            <div id="barChartWrapper" class="hidden" style="width: 100%; height: 100%; overflow-y: auto;">
+                <div id="barChartContainer" class="bar-chart-container"></div>
+            </div>
+
+            <!-- Mode 3: Rating Scale Distribution -->
+            <div id="scaleChartWrapper" class="hidden" style="width: 100%; height: 100%; overflow-y: auto;">
+                <div id="scaleChartContainer" class="scale-chart-container"></div>
+            </div>
+
+            <!-- Mode 4: Topic Slots Sign-up Board -->
+            <div id="slotsBoardWrapper" class="hidden" style="width: 100%; height: 100%; overflow-y: auto;">
+                <div id="slotsBoardContainer" class="slots-grid-container"></div>
+            </div>
+
+            <!-- Mode 5: Q&A Question Board -->
+            <div id="qaBoardWrapper" class="hidden" style="width: 100%; height: 100%; overflow-y: auto;">
+                <div id="qaBoardContainer" class="qa-board-container"></div>
+            </div>
+
+            <!-- Mode 6: Sticky Note Ideation Board -->
+            <div id="stickyBoardWrapper" class="hidden" style="width: 100%; height: 100%; overflow-y: auto;">
+                <div id="stickyBoardContainer" class="sticky-grid-container"></div>
+            </div>
+
             <div id="emptyState" class="empty-message" style="display:none; position:absolute; inset:0; align-items:center; justify-content:center; pointer-events:none; flex-direction:column;">
                 <div>✨ No responses yet</div>
                 <div style="font-size:0.9rem; margin-top:6px; opacity:0.5;">Share the QR code to start</div>
             </div>
-            <div id="hiddenState" class="empty-message" style="display:none; position:absolute; inset:0; align-items:center; justify-content:center; pointer-events:none; flex-direction:column; background: rgba(10, 22, 40, 0.7); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-radius: 18px;">
+            <div id="hiddenState" class="empty-message" style="display:none; position:absolute; inset:0; align-items:center; justify-content:center; pointer-events:none; flex-direction:column; background: rgba(10, 22, 40, 0.7); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-radius: 0px;">
                 <div style="font-size: 3rem; margin-bottom: 12px; filter: drop-shadow(0 0 10px rgba(212,175,55,0.3));">🙈</div>
                 <div style="font-weight: 600; color: var(--gold-light);">Cloud Hidden by Instructor</div>
                 <div style="font-size:0.9rem; margin-top:6px; opacity:0.6;">Responses are still being collected live!</div>
@@ -1200,6 +1486,33 @@
                     Publish Question
                 </button>
             </div>
+        </div>
+
+        <!-- Section: Classroom Mode selector -->
+        <div class="drawer-section">
+            <span class="drawer-section-title">Interactive Mode</span>
+            <div class="drawer-input-group">
+                <label class="drawer-input-label">Classroom Layout Mode</label>
+                <select id="modeSelect" class="drawer-select">
+                    <option value="wordcloud" selected>Word Cloud (Frequencies)</option>
+                    <option value="multichoice">Multiple Choice (Bar Chart)</option>
+                    <option value="scale">Rating Scale (1-5 Distribution)</option>
+                    <option value="slots">Topic Slots (Team Sign-ups)</option>
+                    <option value="qa">Live Q&A Board (Upvotes)</option>
+                    <option value="sticky">Sticky Notes Board (Ideation)</option>
+                </select>
+            </div>
+            
+            <!-- Dynamic Configuration input fields for active modes -->
+            <div id="modeConfigGroup" class="drawer-input-group hidden" style="margin-top: 8px;">
+                <label id="modeConfigLabel" class="drawer-input-label">Options Config</label>
+                <input type="text" id="modeConfigInput" class="drawer-text-input" placeholder="Option A, Option B, Option C" />
+                <span id="modeConfigHelp" style="font-size: 0.72rem; color: rgba(255,255,255,0.4); line-height: 1.3;">Enter comma-separated choices.</span>
+            </div>
+            
+            <button class="action-btn" id="saveModeBtn" style="width: 100%; margin-top: 6px; background: rgba(212, 175, 55, 0.2); border-color: rgba(212, 175, 55, 0.4); color: var(--gold-light); font-weight: 600;" title="Save and apply mode changes">
+                Apply Mode Layout
+            </button>
         </div>
 
         <!-- Section: Countdown Timer -->
@@ -1386,6 +1699,32 @@
         const minFrequencySlider = document.getElementById('minFrequencySlider');
         const minFrequencyVal = document.getElementById('minFrequencyVal');
 
+        // Mode & Layout DOM references
+        const modeSelect = document.getElementById('modeSelect');
+        const modeConfigGroup = document.getElementById('modeConfigGroup');
+        const modeConfigInput = document.getElementById('modeConfigInput');
+        const modeConfigLabel = document.getElementById('modeConfigLabel');
+        const modeConfigHelp = document.getElementById('modeConfigHelp');
+        const saveModeBtn = document.getElementById('saveModeBtn');
+
+        const barChartWrapper = document.getElementById('barChartWrapper');
+        const barChartContainer = document.getElementById('barChartContainer');
+        const scaleChartWrapper = document.getElementById('scaleChartWrapper');
+        const scaleChartContainer = document.getElementById('scaleChartContainer');
+        const slotsBoardWrapper = document.getElementById('slotsBoardWrapper');
+        const slotsBoardContainer = document.getElementById('slotsBoardContainer');
+        const qaBoardWrapper = document.getElementById('qaBoardWrapper');
+        const qaBoardContainer = document.getElementById('qaBoardContainer');
+        const stickyBoardWrapper = document.getElementById('stickyBoardWrapper');
+        const stickyBoardContainer = document.getElementById('stickyBoardContainer');
+
+        const studentFormContent = document.getElementById('studentFormContent');
+        const studentSubmitBtn = document.getElementById('studentSubmitBtn');
+        const studentQaContainer = document.getElementById('studentQaContainer');
+        const studentQaInput = document.getElementById('studentQaInput');
+        const studentQaSubmitBtn = document.getElementById('studentQaSubmitBtn');
+        const studentQaList = document.getElementById('studentQaList');
+
         let cloudInitialized = false;
         let toastTimer = null;
         let qrVisible = true;
@@ -1402,6 +1741,9 @@
         let activeShape = 'circle';
         let minFrequencyThreshold = 1;
         let enableFuzzyMerge = false;
+        let activeMode = 'wordcloud';
+        let activeModeConfig = '';
+        let localQaIdsSubmitted = [];
 
         // Timer intervals & state
         let timerPollingInterval = null;
@@ -1492,8 +1834,65 @@
         }
 
         // ─── Fetch & Update (with cache-busting) ───
+        // ─── Fetch & Update (with cache-busting) ───
         async function fetchAndUpdate() {
             try {
+                // Toggle viewports based on activeMode
+                const wrappers = {
+                    wordcloud: canvas,
+                    multichoice: barChartWrapper,
+                    scale: scaleChartWrapper,
+                    slots: slotsBoardWrapper,
+                    qa: qaBoardWrapper,
+                    sticky: stickyBoardWrapper
+                };
+
+                for (const [m, el] of Object.entries(wrappers)) {
+                    if (el) {
+                        if (m === activeMode) {
+                            el.classList.remove('hidden');
+                        } else {
+                            el.classList.add('hidden');
+                        }
+                    }
+                }
+
+                // If Q&A Mode, fetch and render Q&A questions instead of word cloud
+                if (activeMode === 'qa') {
+                    try {
+                        const res = await fetch(`${WEB_APP_URL}?action=getQa&_=${Date.now()}`);
+                        const result = await res.json();
+                        if (result.status === 'success' && result.data) {
+                            const questions = result.data.sort((a,b) => b.votes - a.votes);
+                            responseCount.textContent = `${questions.length} question${questions.length !== 1 ? 's' : ''}`;
+                            latestValidCount = questions.length;
+                            if (questions.length === 0) {
+                                showEmptyState(true);
+                                qaBoardContainer.innerHTML = '';
+                            } else {
+                                showEmptyState(false);
+                                qaBoardContainer.innerHTML = questions.map(q => `
+                                    <div class="qa-card">
+                                        <div class="qa-card-left">
+                                            <div class="qa-votes-box">
+                                                <span>${q.votes}</span>
+                                                <span class="qa-votes-label">Votes</span>
+                                            </div>
+                                            <span class="qa-text">${escapeHtml(q.text)}</span>
+                                        </div>
+                                        <div style="font-size: 0.72rem; color: rgba(255,255,255,0.35); font-family: monospace;">
+                                            ${new Date(q.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                        </div>
+                                    </div>
+                                `).join('');
+                            }
+                        }
+                    } catch(e) {
+                        console.warn('Failed to update Results Q&A board:', e);
+                    }
+                    return;
+                }
+
                 const url = WEB_APP_URL + '?action=get&_=' + Date.now();
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Network error');
@@ -1504,79 +1903,270 @@
                 }
 
                 const words = result.data || [];
-                if (words.length === 0) {
-                    const emptyMap = new Map();
-                    showEmptyState(true);
-                    responseCount.textContent = '0 responses';
-                    latestValidCount = 0;
-                    updateSidebarAndBlacklist(emptyMap);
-                    return;
-                }
-
-                const wordMap = new Map();
-                for (const word of words) {
-                    if (word && word.trim()) {
-                        const clean = word.trim();
-                        const lower = clean.toLowerCase();
-                        
-                        // Filter out blacklisted words
-                        if (blacklist.includes(lower)) {
-                            continue;
-                        }
-                        
-                        // If Fuzzy Merge is enabled, try to find a similar word already in the map
-                        let matchedKey = lower;
-                        if (enableFuzzyMerge) {
-                            for (const existingKey of wordMap.keys()) {
-                                if (isSimilar(lower, existingKey)) {
-                                    matchedKey = existingKey;
-                                    break;
-                                }
-                            }
-                        }
-                        
-                        if (wordMap.has(matchedKey)) {
-                            wordMap.get(matchedKey).count += 1;
-                        } else {
-                            wordMap.set(matchedKey, { display: clean, count: 1 });
-                        }
-                    }
-                }
-
-                // Apply Noise Reduction Filter (Minimum Frequency)
-                for (const [key, val] of wordMap.entries()) {
-                    if (val.count < minFrequencyThreshold) {
-                        wordMap.delete(key);
-                    }
-                }
-
                 const totalResponses = words.length;
 
                 if (totalResponses >= latestValidCount || latestValidCount === 0) {
-                    responseCount.textContent = `${totalResponses} responses`;
+                    responseCount.textContent = `${totalResponses} response${totalResponses !== 1 ? 's' : ''}`;
                     latestValidCount = totalResponses;
                 }
 
-                updateSidebarAndBlacklist(wordMap);
-
-                if (wordMap.size === 0) {
+                if (words.length === 0) {
+                    const emptyMap = new Map();
                     showEmptyState(true);
+                    updateSidebarAndBlacklist(emptyMap);
+                    
+                    barChartContainer.innerHTML = '';
+                    scaleChartContainer.innerHTML = '';
+                    slotsBoardContainer.innerHTML = '';
+                    stickyBoardContainer.innerHTML = '';
                     return;
                 }
 
-                const wordList = Array.from(wordMap.values()).map(item => [item.display, item.count]);
-                const sorted = [...wordList].sort((a, b) => b[1] - a[1]);
+                // Render based on activeMode
+                if (activeMode === 'wordcloud') {
+                    const wordMap = new Map();
+                    for (const word of words) {
+                        if (word && word.trim()) {
+                            const clean = word.trim();
+                            const lower = clean.toLowerCase();
+                            
+                            if (blacklist.includes(lower)) continue;
+                            
+                            let matchedKey = lower;
+                            if (enableFuzzyMerge) {
+                                for (const existingKey of wordMap.keys()) {
+                                    if (isSimilar(lower, existingKey)) {
+                                        matchedKey = existingKey;
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                            if (wordMap.has(matchedKey)) {
+                                wordMap.get(matchedKey).count += 1;
+                            } else {
+                                wordMap.set(matchedKey, { display: clean, count: 1 });
+                            }
+                        }
+                    }
 
-                const currentHash = JSON.stringify(sorted);
-                if (currentHash === lastWordHash) return;
-                lastWordHash = currentHash;
-                latestValidList = sorted;
+                    for (const [key, val] of wordMap.entries()) {
+                        if (val.count < minFrequencyThreshold) {
+                            wordMap.delete(key);
+                        }
+                    }
 
-                showEmptyState(false);
-                renderCloud(sorted);
+                    updateSidebarAndBlacklist(wordMap);
+
+                    if (wordMap.size === 0) {
+                        showEmptyState(true);
+                        return;
+                    }
+
+                    const wordList = Array.from(wordMap.values()).map(item => [item.display, item.count]);
+                    const sorted = [...wordList].sort((a, b) => b[1] - a[1]);
+
+                    const currentHash = JSON.stringify(sorted);
+                    if (currentHash === lastWordHash) return;
+                    lastWordHash = currentHash;
+                    latestValidList = sorted;
+
+                    showEmptyState(false);
+                    renderCloud(sorted);
+                } 
+                else if (activeMode === 'multichoice') {
+                    const options = activeModeConfig ? activeModeConfig.split(',').map(o => o.trim()) : ['Option A', 'Option B'];
+                    const counts = {};
+                    options.forEach(o => counts[o.toLowerCase()] = 0);
+                    
+                    let totalMCResponses = 0;
+                    words.forEach(w => {
+                        const clean = w.trim().toLowerCase();
+                        options.forEach(opt => {
+                            if (clean === opt.toLowerCase()) {
+                                counts[opt.toLowerCase()]++;
+                                totalMCResponses++;
+                            }
+                        });
+                    });
+                    
+                    if (totalMCResponses === 0) {
+                        showEmptyState(true);
+                        barChartContainer.innerHTML = '';
+                    } else {
+                        showEmptyState(false);
+                        barChartContainer.innerHTML = options.map(opt => {
+                            const count = counts[opt.toLowerCase()] || 0;
+                            const pct = totalMCResponses > 0 ? Math.round((count / totalMCResponses) * 100) : 0;
+                            return `
+                                <div class="bar-item">
+                                    <div class="bar-header">
+                                        <span>${opt}</span>
+                                        <span>${count} response${count !== 1 ? 's' : ''} (${pct}%)</span>
+                                    </div>
+                                    <div class="bar-outer">
+                                        <div class="bar-inner" style="width: ${pct}%;"></div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                } 
+                else if (activeMode === 'scale') {
+                    const counts = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 };
+                    let totalScaleResponses = 0;
+                    let sum = 0;
+                    
+                    words.forEach(w => {
+                        const clean = w.trim();
+                        if (counts.hasOwnProperty(clean)) {
+                            counts[clean]++;
+                            sum += Number(clean);
+                            totalScaleResponses++;
+                        }
+                    });
+                    
+                    if (totalScaleResponses === 0) {
+                        showEmptyState(true);
+                        scaleChartContainer.innerHTML = '';
+                    } else {
+                        showEmptyState(false);
+                        const avg = (sum / totalScaleResponses).toFixed(1);
+                        
+                        let barsHtml = `
+                            <div class="scale-average-box">
+                                <div class="scale-avg-label">Weighted Class Average</div>
+                                <div class="scale-avg-val">${avg}</div>
+                            </div>
+                        `;
+                        
+                        const labels = {
+                            '1': '1 - Novice / Lost',
+                            '2': '2 - Developing',
+                            '3': '3 - Comfortable',
+                            '4': '4 - Confident',
+                            '5': '5 - Expert / Pro'
+                        };
+                        
+                        for (let i = 1; i <= 5; i++) {
+                            const count = counts[i.toString()] || 0;
+                            const pct = totalScaleResponses > 0 ? Math.round((count / totalScaleResponses) * 100) : 0;
+                            barsHtml += `
+                                <div class="bar-item">
+                                    <div class="bar-header">
+                                        <span>${labels[i.toString()]}</span>
+                                        <span>${count} response${count !== 1 ? 's' : ''} (${pct}%)</span>
+                                    </div>
+                                    <div class="bar-outer">
+                                        <div class="bar-inner" style="width: ${pct}%;"></div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                        scaleChartContainer.innerHTML = barsHtml;
+                    }
+                } 
+                else if (activeMode === 'slots') {
+                    const slotStrings = activeModeConfig ? activeModeConfig.split(',').map(s => s.trim()) : ['Chapter 1:3', 'Chapter 2:3'];
+                    
+                    const columns = [];
+                    slotStrings.forEach(s => {
+                        const parts = s.split(':');
+                        columns.push({
+                            topic: parts[0].trim(),
+                            limit: Number(parts[1]) || 3,
+                            students: []
+                        });
+                    });
+                    
+                    words.forEach(w => {
+                        const clean = w.trim();
+                        const match = clean.match(/^(.*?)\s*\((.*?)\)$/);
+                        if (match) {
+                            const topicName = match[1].trim().toLowerCase();
+                            const studentName = match[2].trim();
+                            
+                            const col = columns.find(c => c.topic.toLowerCase() === topicName);
+                            if (col && col.students.length < col.limit) {
+                                col.students.push(studentName);
+                            }
+                        }
+                    });
+                    
+                    const hasSubmissions = columns.some(c => c.students.length > 0);
+                    
+                    if (!hasSubmissions) {
+                        showEmptyState(true);
+                        slotsBoardContainer.innerHTML = '';
+                    } else {
+                        showEmptyState(false);
+                        slotsBoardContainer.innerHTML = columns.map(col => {
+                            const count = col.students.length;
+                            const isFull = count >= col.limit;
+                            return `
+                                <div class="slot-column" style="border-color: ${isFull ? 'var(--gold)' : 'rgba(255,255,255,0.06)'}">
+                                    <div class="slot-column-header">
+                                        <span>${col.topic}</span>
+                                        <span style="color: ${isFull ? 'var(--gold-light)' : 'rgba(255,255,255,0.4)'}">${count}/${col.limit}</span>
+                                    </div>
+                                    <div class="slot-student-list">
+                                        ${col.students.map(st => `
+                                            <div class="slot-student-name">${escapeHtml(st)}</div>
+                                        `).join('')}
+                                        ${Array(Math.max(0, col.limit - count)).fill(0).map(() => `
+                                            <div class="slot-student-name" style="opacity: 0.15; border-style: dashed; background: transparent;">(Available Slot)</div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                } 
+                else if (activeMode === 'sticky') {
+                    const cols = activeModeConfig ? activeModeConfig.split(',').map(c => c.trim()) : ['Crew', 'Weather', 'Maintenance'];
+                    const board = {};
+                    cols.forEach(c => board[c.toLowerCase()] = { title: c, notes: [] });
+                    
+                    words.forEach(w => {
+                        const clean = w.trim();
+                        const idx = clean.indexOf(':');
+                        if (idx !== -1) {
+                            const cat = clean.substring(0, idx).trim().toLowerCase();
+                            const idea = clean.substring(idx + 1).trim();
+                            if (board[cat]) {
+                                board[cat].notes.push(idea);
+                            }
+                        }
+                    });
+                    
+                    const hasNotes = Object.values(board).some(b => b.notes.length > 0);
+                    
+                    if (!hasNotes) {
+                        showEmptyState(true);
+                        stickyBoardContainer.innerHTML = '';
+                    } else {
+                        showEmptyState(false);
+                        stickyBoardContainer.innerHTML = cols.map(c => {
+                            const col = board[c.toLowerCase()];
+                            return `
+                                <div class="sticky-column">
+                                    <div class="sticky-column-header">
+                                        <span>${col.title}</span>
+                                        <span>${col.notes.length}</span>
+                                    </div>
+                                    <div class="sticky-notes-list">
+                                        ${col.notes.map(note => `
+                                            <div class="sticky-note">${escapeHtml(note)}</div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                }
 
             } catch (e) {
-                console.warn('Cloud update failed:', e);
+                console.warn('Update failed:', e);
                 if (!latestValidList) {
                     showEmptyState(true);
                     responseCount.textContent = '0 responses';
@@ -1717,11 +2307,15 @@
 
         if (form) {
             form.addEventListener('submit', function(e) {
-                // Run profanity filter first
-                const inputVal = studentAnswerInput ? studentAnswerInput.value : '';
+                const inputVal = getStudentInputValue();
+                if (!inputVal || !inputVal.trim()) {
+                    e.preventDefault();
+                    showToast('⚠️ Please make a selection or enter a value!', true);
+                    return;
+                }
                 if (isProfane(inputVal)) {
                     e.preventDefault();
-                    showToast('⚠️ Inappropriate content detected. Please share a constructive trait.', true);
+                    showToast('⚠️ Inappropriate content detected.', true);
                     return;
                 }
                 formSubmitted = true;
@@ -1739,6 +2333,11 @@
                 showToast('Response submitted — thank you!');
                 checkStudentSubmissionStatus();
                 form.reset();
+
+                // If slots mode, update counters immediately
+                if (activeMode === 'slots') {
+                    updateStudentUI();
+                }
             }
         };
 
@@ -1864,6 +2463,23 @@
                         resultsQuestion.textContent = activeQuestionText;
                     }
                     
+                    // Sync active mode & config parameters
+                    const receivedMode = result.mode || 'wordcloud';
+                    const receivedConfig = result.config || '';
+                    if (receivedMode !== activeMode || receivedConfig !== activeModeConfig) {
+                        activeMode = receivedMode;
+                        activeModeConfig = receivedConfig;
+                        
+                        if (isResults) {
+                            if (modeSelect) modeSelect.value = activeMode;
+                            if (modeConfigInput) modeConfigInput.value = activeModeConfig;
+                            toggleModeConfigFields();
+                            fetchAndUpdate();
+                        } else {
+                            updateStudentUI();
+                        }
+                    }
+                    
                     // Sync active countdown timer
                     if (result.timerEndTime) {
                         timerExpirationTime = result.timerEndTime;
@@ -1897,7 +2513,20 @@
         }
 
         function checkStudentSubmissionStatus() {
-            if (isResults) return; // Only run on student view
+            if (isResults) return;
+            
+            if (activeMode === 'qa') {
+                if (form) form.style.display = 'none';
+                if (studentSub) {
+                    studentSub.style.display = 'block';
+                    studentSub.textContent = 'Ask anonymous questions & upvote peers! ✦';
+                }
+                if (studentQaContainer) studentQaContainer.classList.remove('hidden');
+                if (submittedContainer) submittedContainer.style.display = 'none';
+                return;
+            }
+            
+            if (studentQaContainer) studentQaContainer.classList.add('hidden');
             
             const key = 'submitted_' + activeQuestionText.toLowerCase().replace(/[^a-z0-9]/g, '');
             if (localStorage.getItem(key) === 'true') {
@@ -1908,7 +2537,17 @@
                 if (form) form.style.display = 'block';
                 if (studentSub) {
                     studentSub.style.display = 'block';
-                    studentSub.textContent = 'Share your insight in one word ✦';
+                    if (activeMode === 'wordcloud') {
+                        studentSub.textContent = 'Share your insight in one word ✦';
+                    } else if (activeMode === 'multichoice') {
+                        studentSub.textContent = 'Select one choice below ✦';
+                    } else if (activeMode === 'scale') {
+                        studentSub.textContent = 'Rate your understanding ✦';
+                    } else if (activeMode === 'slots') {
+                        studentSub.textContent = 'Choose a topic to sign up ✦';
+                    } else if (activeMode === 'sticky') {
+                        studentSub.textContent = 'Submit your idea to the columns ✦';
+                    }
                 }
                 if (submittedContainer) submittedContainer.style.display = 'none';
             }
@@ -2402,8 +3041,332 @@
             });
         }
 
+        // ─── Classroom Mode Settings Drawer & Submit Logic ───
+        function toggleModeConfigFields() {
+            if (!modeSelect || !modeConfigGroup || !modeConfigLabel || !modeConfigHelp) return;
+            const mode = modeSelect.value;
+            if (mode === 'wordcloud' || mode === 'scale' || mode === 'qa') {
+                modeConfigGroup.classList.add('hidden');
+            } else {
+                modeConfigGroup.classList.remove('hidden');
+                if (mode === 'multichoice') {
+                    modeConfigLabel.textContent = 'Options List';
+                    modeConfigInput.placeholder = 'Choice A, Choice B, Choice C';
+                    modeConfigHelp.textContent = 'Enter choices separated by commas.';
+                } else if (mode === 'slots') {
+                    modeConfigLabel.textContent = 'Topic Slots & Limits';
+                    modeConfigInput.placeholder = 'Chapter 1:3, Chapter 2:3';
+                    modeConfigHelp.textContent = 'Enter chapter names and capacity slots like: "Topic:Limit", separated by commas.';
+                } else if (mode === 'sticky') {
+                    modeConfigLabel.textContent = 'Sticky Columns';
+                    modeConfigInput.placeholder = 'Crew, Weather, Maintenance';
+                    modeConfigHelp.textContent = 'Enter columns/categories separated by commas.';
+                }
+            }
+        }
+
+        if (modeSelect) {
+            modeSelect.addEventListener('change', toggleModeConfigFields);
+        }
+
+        if (saveModeBtn) {
+            saveModeBtn.addEventListener('click', async function() {
+                const selectedMode = modeSelect.value;
+                const configVal = modeConfigInput.value.trim();
+                
+                const originalText = saveModeBtn.innerHTML;
+                saveModeBtn.innerHTML = 'Publishing…';
+                saveModeBtn.disabled = true;
+                
+                try {
+                    const url = `${WEB_APP_URL}?action=setMode&mode=${encodeURIComponent(selectedMode)}&config=${encodeURIComponent(configVal)}&_=${Date.now()}`;
+                    const res = await fetch(url);
+                    const result = await res.json();
+                    
+                    if (result.status === 'success') {
+                        activeMode = selectedMode;
+                        activeModeConfig = configVal;
+                        showToast('✅ Classroom layout mode updated!');
+                        closeDrawer();
+                        fetchAndUpdate();
+                    } else {
+                        showToast('❌ Mode update failed: ' + result.message, true);
+                    }
+                } catch(e) {
+                    console.error(e);
+                    showToast('❌ Mode update network error', true);
+                } finally {
+                    saveModeBtn.innerHTML = originalText;
+                    saveModeBtn.disabled = false;
+                }
+            });
+        }
+
+        function getStudentInputValue() {
+            const checkedRadio = studentFormContent.querySelector('input[name="entry.192253551"]:checked');
+            if (checkedRadio) return checkedRadio.value;
+
+            const input = studentFormContent.querySelector('input[name="entry.192253551"]');
+            return input ? input.value : '';
+        }
+
+        // Q&A Student List Fetching
+        async function fetchStudentQaList() {
+            if (activeMode !== 'qa' || isResults) return;
+            try {
+                const res = await fetch(`${WEB_APP_URL}?action=getQa&_=${Date.now()}`);
+                const result = await res.json();
+                if (result.status === 'success' && result.data && studentQaList) {
+                    const questions = result.data.sort((a,b) => b.votes - a.votes);
+                    if (questions.length === 0) {
+                        studentQaList.innerHTML = `<div style="text-align: center; color: rgba(255,255,255,0.2); font-size: 0.82rem; margin-top: 10px;">No questions asked yet</div>`;
+                    } else {
+                        studentQaList.innerHTML = questions.map(q => {
+                            const hasUpvoted = localQaIdsSubmitted.includes(q.id);
+                            return `
+                                <div class="student-qa-item">
+                                    <span class="student-qa-text">${escapeHtml(q.text)}</span>
+                                    <button class="student-qa-vote-btn" data-id="${q.id}" ${hasUpvoted ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
+                                        ▲ ${q.votes}
+                                    </button>
+                                </div>
+                            `;
+                        }).join('');
+                        
+                        studentQaList.querySelectorAll('.student-qa-vote-btn').forEach(btn => {
+                            btn.addEventListener('click', async function() {
+                                const id = Number(this.getAttribute('data-id'));
+                                if (localQaIdsSubmitted.includes(id)) return;
+                                
+                                this.disabled = true;
+                                try {
+                                    const upres = await fetch(`${WEB_APP_URL}?action=upvoteQa&id=${id}&_=${Date.now()}`);
+                                    const upresult = await upres.json();
+                                    if (upresult.status === 'success') {
+                                        localQaIdsSubmitted.push(id);
+                                        fetchStudentQaList();
+                                    }
+                                } catch(e) {
+                                    console.error(e);
+                                    this.disabled = false;
+                                }
+                            });
+                        });
+                    }
+                }
+            } catch(e) {
+                console.warn('Failed to fetch Q&A list for student:', e);
+            }
+        }
+
+        if (studentQaSubmitBtn && studentQaInput) {
+            studentQaSubmitBtn.addEventListener('click', async function() {
+                const text = studentQaInput.value.trim();
+                if (!text) {
+                    showToast('⚠️ Question cannot be empty!', true);
+                    return;
+                }
+                if (isProfane(text)) {
+                    showToast('⚠️ Inappropriate content detected.', true);
+                    return;
+                }
+                
+                const originalText = studentQaSubmitBtn.innerHTML;
+                studentQaSubmitBtn.innerHTML = 'Submitting…';
+                studentQaSubmitBtn.disabled = true;
+                
+                try {
+                    const url = `${WEB_APP_URL}?action=submitQa&text=${encodeURIComponent(text)}&_=${Date.now()}`;
+                    const res = await fetch(url);
+                    const result = await res.json();
+                    if (result.status === 'success') {
+                        showToast('✅ Question submitted anonymously!');
+                        studentQaInput.value = '';
+                        fetchStudentQaList();
+                    } else {
+                        showToast('❌ Submission failed: ' + result.message, true);
+                    }
+                } catch(e) {
+                    console.error(e);
+                    showToast('❌ Submission network error', true);
+                } finally {
+                    studentQaSubmitBtn.innerHTML = originalText;
+                    studentQaSubmitBtn.disabled = false;
+                }
+            });
+        }
+
+        async function updateStudentUI() {
+            if (isResults) return;
+            
+            if (activeMode !== 'qa') {
+                if (studentQaContainer) studentQaContainer.classList.add('hidden');
+            } else {
+                if (form) form.style.display = 'none';
+                if (studentQaContainer) studentQaContainer.classList.remove('hidden');
+                fetchStudentQaList();
+            }
+
+            checkStudentSubmissionStatus();
+            
+            if (activeMode === 'wordcloud') {
+                studentFormContent.innerHTML = `
+                    <input
+                    type="text"
+                    name="entry.192253551"
+                    id="studentAnswerInput"
+                    class="answer-input"
+                    placeholder="Type your response…"
+                    required
+                    autocomplete="off"
+                    />
+                `;
+                if (studentSubmitBtn) studentSubmitBtn.style.display = 'flex';
+            } 
+            else if (activeMode === 'multichoice') {
+                const options = activeModeConfig ? activeModeConfig.split(',').map(o => o.trim()) : ['Option A', 'Option B'];
+                let html = '<div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">';
+                options.forEach(opt => {
+                    html += `
+                        <label class="btn" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: #fff; padding: 14px 18px; font-size: 1rem; justify-content: flex-start; cursor: pointer; text-shadow: none; box-shadow: none; width: 100%; box-sizing: border-box;">
+                            <input type="radio" name="entry.192253551" value="${opt}" required style="accent-color: var(--gold-light); margin-right: 12px; width: 18px; height: 18px;" />
+                            <span>${opt}</span>
+                        </label>
+                    `;
+                });
+                html += '</div>';
+                studentFormContent.innerHTML = html;
+                if (studentSubmitBtn) studentSubmitBtn.style.display = 'flex';
+            } 
+            else if (activeMode === 'scale') {
+                studentFormContent.innerHTML = `
+                    <input type="hidden" name="entry.192253551" id="studentAnswerInput" value="" required />
+                    <div class="student-scale-row">
+                        <button type="button" class="student-scale-btn" data-val="1">1</button>
+                        <button type="button" class="student-scale-btn" data-val="2">2</button>
+                        <button type="button" class="student-scale-btn" data-val="3">3</button>
+                        <button type="button" class="student-scale-btn" data-val="4">4</button>
+                        <button type="button" class="student-scale-btn" data-val="5">5</button>
+                    </div>
+                `;
+                
+                const btns = studentFormContent.querySelectorAll('.student-scale-btn');
+                const hiddenInput = studentFormContent.querySelector('#studentAnswerInput');
+                btns.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        btns.forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        hiddenInput.value = this.getAttribute('data-val');
+                    });
+                });
+                if (studentSubmitBtn) studentSubmitBtn.style.display = 'flex';
+            } 
+            else if (activeMode === 'slots') {
+                let takenCounts = {};
+                try {
+                    const res = await fetch(WEB_APP_URL + '?_=' + Date.now());
+                    const dataObj = await res.json();
+                    if (dataObj.status === 'success' && dataObj.data) {
+                        dataObj.data.forEach(resp => {
+                            const cleanResp = resp.split('(')[0].trim().toLowerCase();
+                            takenCounts[cleanResp] = (takenCounts[cleanResp] || 0) + 1;
+                        });
+                    }
+                } catch(e) {
+                    console.warn(e);
+                }
+
+                const slotStrings = activeModeConfig ? activeModeConfig.split(',').map(s => s.trim()) : ['Chapter 1:3', 'Chapter 2:3'];
+                
+                let html = `
+                    <div style="margin-bottom: 12px;">
+                        <input type="text" id="studentNameInput" class="answer-input" placeholder="Enter your full name…" required style="margin-top: 0; margin-bottom: 12px;" />
+                    </div>
+                    <input type="hidden" name="entry.192253551" id="studentAnswerInput" value="" required />
+                    <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+                `;
+
+                slotStrings.forEach(s => {
+                    const parts = s.split(':');
+                    const topic = parts[0].trim();
+                    const limit = Number(parts[1]) || 3;
+                    const taken = takenCounts[topic.toLowerCase()] || 0;
+                    const left = Math.max(0, limit - taken);
+                    const isFull = left <= 0;
+                    
+                    html += `
+                        <button type="button" class="btn slot-btn" data-topic="${topic}" ${isFull ? 'disabled' : ''} style="background: ${isFull ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.03)'}; border: 1px solid ${isFull ? 'rgba(255,255,255,0.05)' : 'rgba(212, 175, 55, 0.2)'}; color: ${isFull ? 'rgba(255,255,255,0.2)' : '#fff'}; padding: 14px 18px; font-size: 1rem; justify-content: space-between; cursor: ${isFull ? 'not-allowed' : 'pointer'}; text-shadow: none; box-shadow: none; width: 100%;">
+                            <span>${topic}</span>
+                            <span style="font-weight: 700; color: ${isFull ? 'rgba(255,255,255,0.2)' : 'var(--gold-light)'};">${isFull ? 'FULL' : `${left} / ${limit} left`}</span>
+                        </button>
+                    `;
+                });
+                html += '</div>';
+                studentFormContent.innerHTML = html;
+
+                const btns = studentFormContent.querySelectorAll('.slot-btn');
+                const nameInput = studentFormContent.querySelector('#studentNameInput');
+                const hiddenInput = studentFormContent.querySelector('#studentAnswerInput');
+                
+                btns.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const name = nameInput.value.trim();
+                        if (!name) {
+                            nameInput.focus();
+                            showToast('⚠️ Please enter your name first!', true);
+                            return;
+                        }
+                        btns.forEach(b => b.style.borderColor = 'rgba(212, 175, 55, 0.2)');
+                        this.style.borderColor = 'var(--gold)';
+                        
+                        const selectedTopic = this.getAttribute('data-topic');
+                        hiddenInput.value = `${selectedTopic} (${name})`;
+                    });
+                });
+                
+                if (studentSubmitBtn) studentSubmitBtn.style.display = 'flex';
+            } 
+            else if (activeMode === 'sticky') {
+                const cols = activeModeConfig ? activeModeConfig.split(',').map(c => c.trim()) : ['Crew', 'Weather', 'Maintenance'];
+                let html = `
+                    <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+                        <select id="stickyCategorySelect" class="drawer-select" style="background: rgba(10,22,40,0.8); border-color: rgba(255,255,255,0.15); width: 100%; box-sizing: border-box;">
+                `;
+                cols.forEach(c => {
+                    html += `<option value="${c}">${c}</option>`;
+                });
+                html += `
+                        </select>
+                        <input type="text" id="stickyIdeaInput" class="answer-input" placeholder="Type your idea…" style="margin-top: 4px;" required />
+                        <input type="hidden" name="entry.192253551" id="studentAnswerInput" value="" required />
+                    </div>
+                `;
+                studentFormContent.innerHTML = html;
+
+                const categorySelect = studentFormContent.querySelector('#stickyCategorySelect');
+                const ideaInput = studentFormContent.querySelector('#stickyIdeaInput');
+                const hiddenInput = studentFormContent.querySelector('#studentAnswerInput');
+
+                const syncStickyInput = () => {
+                    hiddenInput.value = `${categorySelect.value}: ${ideaInput.value.trim()}`;
+                };
+
+                categorySelect.addEventListener('change', syncStickyInput);
+                ideaInput.addEventListener('input', syncStickyInput);
+
+                if (studentSubmitBtn) studentSubmitBtn.style.display = 'flex';
+            }
+        }
+
+        // Helper to escape HTML
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
         if (isResults) {
             setTimeout(fetchAndUpdate, 300);
+        } else {
+            setInterval(fetchStudentQaList, 5000);
         }
 
         // Expose for debugging
