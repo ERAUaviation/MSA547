@@ -2,138 +2,68 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>MSA 547 - Trust in Aviation Leadership</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSA 547 · Aviation Leadership</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.1.0/wordcloud2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        :root {
-            --navy: #0a1628;
-            --panel-bg: #111d33;
-            --sky-blue: #4a90d9;
-            --pale-blue: #b8d4f0;
-            --pure-white: #ffffff;
-            --orange: #f4793e;
-            --teal: #34b7a8;
-            --red-accent: #e74c3c;
-            --green-accent: #2ecc71;
-            --glass-border: rgba(255, 255, 255, 0.10);
-            --shadow-lg: 0 25px 60px rgba(0, 0, 0, 0.5);
-            --radius-xl: 24px;
-            --radius-lg: 18px;
-            --radius-md: 12px;
-            --transition: 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            --font-display: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
-            --font-body: 'Segoe UI', 'Inter', 'Helvetica Neue', system-ui, -apple-system, sans-serif;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { font-size: 16px; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; }
-        body {
-            font-family: var(--font-body);
-            background: var(--navy);
-            background-image:
-                radial-gradient(ellipse at 30% 20%, rgba(74, 144, 217, 0.12) 0%, transparent 60%),
-                radial-gradient(ellipse at 70% 60%, rgba(244, 121, 62, 0.07) 0%, transparent 55%),
-                radial-gradient(ellipse at 50% 80%, rgba(52, 183, 168, 0.06) 0%, transparent 50%);
-            min-height: 100vh;
-            color: var(--pure-white);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-            overflow-x: hidden;
-        }
-        .app-container { position: relative; z-index: 1; width: 100%; max-width: 560px; display: flex; flex-direction: column; gap: 20px; }
-        .card {
-            background: var(--panel-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-xl);
-            padding: 28px 24px;
-            box-shadow: var(--shadow-lg);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            position: relative;
-        }
-        .accent-line { width: 60px; height: 3px; border-radius: 3px; background: var(--orange); margin: 6px 0 14px; }
-        .question-text { font-family: var(--font-display); font-size: 1.45rem; font-weight: 400; line-height: 1.35; color: var(--pure-white); }
-        .subtitle { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--sky-blue); font-weight: 600; margin-bottom: 2px; }
-        .label-text { font-size: 0.85rem; color: var(--pale-blue); letter-spacing: 0.03em; font-weight: 500; }
-        .answer-input {
-            width: 100%; padding: 16px 18px; font-size: 1.1rem; font-family: var(--font-body);
-            background: rgba(255, 255, 255, 0.04); border: 2px solid var(--glass-border);
-            border-radius: var(--radius-md); color: var(--pure-white); outline: none; transition: var(--transition);
-        }
-        .answer-input:focus { border-color: var(--sky-blue); background: rgba(74, 144, 217, 0.08); box-shadow: 0 0 0 8px rgba(74, 144, 217, 0.06); }
-        .btn {
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            padding: 14px 28px; font-size: 1rem; font-weight: 600; border-radius: 50px;
-            cursor: pointer; border: none; transition: var(--transition); width: 100%;
-        }
-        .btn-primary { background: var(--orange); color: #fff; box-shadow: 0 8px 24px rgba(244, 121, 62, 0.35); padding: 16px 36px; }
-        .btn-primary:hover { background: #ff8c55; transform: translateY(-2px); }
-        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-        .toast {
-            position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-120px);
-            background: #1a3d2e; border: 1px solid var(--green-accent); color: #d4f7f0;
-            padding: 14px 24px; border-radius: 50px; font-weight: 600; font-size: 0.9rem;
-            z-index: 100; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5); transition: transform 0.4s;
-        }
-        .toast.show { transform: translateX(-50%) translateY(0); }
+        :root { --navy: #0a1628; --orange: #f4793e; --white: #ffffff; }
+        body { background: var(--navy); color: var(--white); font-family: sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; text-align: center; }
+        .card { background: #111d33; padding: 2rem; border-radius: 24px; width: 90%; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .answer-input { width: 100%; padding: 16px; margin: 20px 0; border-radius: 12px; border: 2px solid #334; background: #0a1628; color: #fff; font-size: 1.1rem; }
+        .btn { width: 100%; padding: 18px; border-radius: 50px; border: none; background: var(--orange); color: #fff; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
+        #wordCloudCanvas { width: 100%; height: 80vh; }
+        #qrCode { background: white; padding: 10px; border-radius: 10px; margin: 20px 0; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="toast" id="toast">✅ Answer submitted successfully!</div>
+    <!-- STUDENT INPUT VIEW -->
+    <div id="studentView" class="card">
+        <h1>What makes you trust an aviation leader?</h1>
+        <form id="pollForm" action="https://docs.google.com/forms/d/e/1FAIpQLSf1TqzrUIvGkqz4ektOj4sRyLRaUrNli4bb6LJz4fT-1Ll9zw/formResponse" method="POST" target="hidden_iframe">
+            <input type="text" name="entry.192253551" class="answer-input" placeholder="1–2 words..." required autocomplete="off">
+            <button type="submit" class="btn">✈️ Submit</button>
+        </form>
+    </div>
 
-    <div class="app-container">
-        <div class="card">
-            <span class="subtitle">MSA 547 · Leadership & Critical Decision-Making</span>
-            <div class="accent-line"></div>
-            <h1 class="question-text">In one or two words,<br>what makes you trust an aviation leader?</h1>
-        </div>
-
-        <div class="card">
-            <form id="pollForm" action="https://docs.google.com/forms/d/e/1FAIpQLSf1TqzrUIvGkqz4ektOj4sRyLRaUrNli4bb6LJz4fT-1Ll9zw/formResponse" method="POST" target="hidden_iframe">
-                
-                <div style="display:flex;flex-direction:column;gap:8px;">
-                    <label class="label-text" for="answerInput">Your answer (1–2 words):</label>
-                    
-                    <input type="text" name="entry.192253551" id="answerInput" class="answer-input" placeholder="Enter answer..." required>
-                </div>
-                
-                <div style="height:20px;"></div>
-                <button type="submit" class="btn btn-primary" id="submitBtn">✈️ Submit Answer</button>
-            </form>
-        </div>
+    <!-- INSTRUCTOR RESULTS VIEW -->
+    <div id="resultsView" class="hidden">
+        <div id="qrCode"></div>
+        <p>Scan to participate</p>
+        <canvas id="wordCloudCanvas"></canvas>
     </div>
 
     <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
 
     <script>
-        const form = document.getElementById('pollForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const toast = document.getElementById('toast');
-        const iframe = document.getElementById('hidden_iframe');
+        const PUBLISHED_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTZu3WENFFKzTpkrrgEZrB9KtvJk0RTUJsyhGr0Wys3quuN4RvE5lp4QQnNKR19LRvnHoNySwLGqfx8/pub?gid=370434378&single=true&output=csv';
 
-        // When user clicks submit, change button text
-        form.addEventListener('submit', function() {
-            submitBtn.disabled = true;
-            submitBtn.textContent = '⏳ Submitting...';
-        });
-
-        // When the invisible iframe loads, the submission is complete
-        iframe.onload = function() {
-            if(submitBtn.disabled) { // Checks if we just submitted
-                // Show success message
-                toast.classList.add('show');
-                setTimeout(() => toast.classList.remove('show'), 3500);
-                
-                // Reset form
-                form.reset();
-                submitBtn.disabled = false;
-                submitBtn.textContent = '✈️ Submit Answer';
-                document.getElementById('answerInput').focus();
-            }
+        // Check if we are in "Results" mode via URL: ?view=results
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('view') === 'results') {
+            document.getElementById('studentView').classList.add('hidden');
+            document.getElementById('resultsView').classList.remove('hidden');
+            new QRCode(document.getElementById("qrCode"), window.location.origin + window.location.pathname);
+            updateWordCloud();
+            setInterval(updateWordCloud, 10000);
         }
+
+        async function updateWordCloud() {
+            try {
+                const response = await fetch(PUBLISHED_CSV_URL);
+                const csvText = await response.text();
+                const rows = csvText.split('\n').slice(1);
+                const wordList = rows.filter(r => r.trim()).map(row => [row.split(',')[1], 15]);
+                WordCloud(document.getElementById('wordCloudCanvas'), { list: wordList, color: 'random-light', backgroundColor: '#0a1628' });
+            } catch (e) { console.error(e); }
+        }
+
+        document.getElementById('hidden_iframe').onload = function() {
+            alert('Response submitted!');
+            document.getElementById('pollForm').reset();
+        };
     </script>
 </body>
 </html>
