@@ -823,30 +823,26 @@
             });
 
             fetchAndUpdate();
-            updateInterval = setInterval(fetchAndUpdate, 200);
-        }
-
-        // ─── CSV Parser ───
-        function parseCSVRow(row) {
-            const matches = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-            if (!matches) return [];
-            return matches.map(m => m.replace(/^"|"$/g, ''));
+            updateInterval = setInterval(fetchAndUpdate, 1500);
         }
 
         // ─── Fetch & Update (with cache-busting) ───
         async function fetchAndUpdate() {
             try {
-                // Add cache-busting parameter
-                const url = PUBLISHED_CSV_URL + '?_=' + Date.now();
+                const url = WEB_APP_URL + '?action=get&_=' + Date.now();
                 const response = await fetch(url, {
                     cache: 'no-store',
                     headers: { 'Cache-Control': 'no-cache' }
                 });
                 if (!response.ok) throw new Error('Network error');
-                const csvText = await response.text();
+                const result = await response.json();
 
-                const lines = csvText.split('\n').filter(line => line.trim());
-                if (lines.length < 2) {
+                if (result.status !== 'success') {
+                    throw new Error(result.message || 'Apps Script error');
+                }
+
+                const words = result.data || [];
+                if (words.length === 0) {
                     if (latestValidList) return;
                     showEmptyState(true);
                     responseCount.textContent = '0 responses';
@@ -854,12 +850,8 @@
                     return;
                 }
 
-                const dataRows = lines.slice(1);
                 const wordMap = new Map();
-
-                for (const row of dataRows) {
-                    const cols = parseCSVRow(row);
-                    const word = (cols.length > 1) ? cols[1] : cols[0];
+                for (const word of words) {
                     if (word && word.trim()) {
                         const clean = word.trim();
                         const lower = clean.toLowerCase();
@@ -871,7 +863,7 @@
                     }
                 }
 
-                const totalResponses = dataRows.length;
+                const totalResponses = words.length;
 
                 if (totalResponses >= latestValidCount || latestValidCount === 0) {
                     responseCount.textContent = `${totalResponses} responses`;
