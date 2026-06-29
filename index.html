@@ -830,10 +830,7 @@
         async function fetchAndUpdate() {
             try {
                 const url = WEB_APP_URL + '?action=get&_=' + Date.now();
-                const response = await fetch(url, {
-                    cache: 'no-store',
-                    headers: { 'Cache-Control': 'no-cache' }
-                });
+                const response = await fetch(url);
                 if (!response.ok) throw new Error('Network error');
                 const result = await response.json();
 
@@ -1028,8 +1025,6 @@
                 clearAllBtn.disabled = true;
 
                 const response = await fetch(WEB_APP_URL + '?action=clear&_=' + Date.now(), {
-                    method: 'GET',
-                    cache: 'no-store',
                     signal: AbortSignal.timeout(8000)
                 });
 
