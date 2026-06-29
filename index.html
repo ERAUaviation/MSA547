@@ -547,6 +547,288 @@
             margin-right: 8px;
         }
 
+        /* ─── SETTINGS DRAWER ─── */
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 1999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .drawer-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .settings-drawer {
+            position: fixed;
+            top: 0;
+            right: -420px;
+            width: 400px;
+            height: 100vh;
+            background: rgba(10, 22, 40, 0.95);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            color: #fff;
+        }
+        .settings-drawer.open {
+            right: 0;
+        }
+
+        .drawer-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .drawer-header h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gold-light);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .drawer-close {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 4px;
+            line-height: 1;
+            transition: 0.2s;
+        }
+        .drawer-close:hover {
+            color: #fff;
+        }
+
+        .drawer-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .drawer-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .drawer-section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 4px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 4px;
+        }
+
+        /* Floating Gear Button */
+        .gear-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            color: var(--gold-light);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .gear-btn:hover {
+            transform: rotate(45deg) scale(1.1);
+            background: rgba(212, 175, 55, 0.25);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Timer components */
+        .timer-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .timer-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .timer-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: rgba(255,255,255,0.4);
+        }
+        .timer-countdown {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--gold-light);
+            font-family: monospace;
+        }
+        .timer-bar-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+        .timer-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-light), var(--gold));
+            width: 100%;
+            transition: width 0.1s linear;
+        }
+
+        /* Input Controls inside Drawer */
+        .drawer-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .drawer-input-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.7);
+        }
+        .drawer-text-input {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .drawer-text-input:focus {
+            border-color: var(--gold-light);
+        }
+        .drawer-select {
+            background: rgba(10, 22, 40, 0.9);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .drawer-select:focus {
+            border-color: var(--gold-light);
+        }
+
+        /* Checkbox & Switch style */
+        .switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            padding: 10px 14px;
+            border-radius: 10px;
+        }
+        .switch-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.85);
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: rgba(255,255,255,0.1);
+            transition: .3s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--gold-light);
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Slider range styling */
+        .range-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            padding: 12px 14px;
+            border-radius: 10px;
+        }
+        .range-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.85);
+        }
+        .range-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.1);
+            outline: none;
+            accent-color: var(--gold-light);
+            cursor: pointer;
+        }
+
         /* ─── RESPONSIVE ─── */
         @media (max-width: 820px) {
             .content-row {
@@ -597,6 +879,10 @@
                 flex: none;
                 width: 100%;
                 max-height: 250px;
+            }
+            .settings-drawer {
+                width: 100vw;
+                right: -100vw;
             }
         }
 
@@ -754,6 +1040,19 @@
 
     <!-- ─── STUDENT INPUT VIEW ─── -->
     <div id="studentView" class="card">
+        <!-- Student Timer progress bar -->
+        <div id="studentTimerCard" class="timer-card" style="display: none; margin-bottom: 16px; padding: 10px 14px; background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.05);">
+            <div class="timer-info">
+                <span class="timer-label">⏰ Poll Closing In</span>
+                <span id="studentTimerCountdown" class="timer-countdown" style="font-size: 1.15rem;">00:00</span>
+            </div>
+            <div style="flex: 1;">
+                <div class="timer-bar-container" style="height: 4px; margin-top: 0;">
+                    <div id="studentTimerBar" class="timer-bar"></div>
+                </div>
+            </div>
+        </div>
+
         <h1 id="studentQuestion">What makes you trust an aviation leader?</h1>
         <p class="sub" id="studentSub">Share your insight in one word ✦</p>
 
@@ -787,36 +1086,33 @@
 <!-- ─── INSTRUCTOR RESULTS VIEW ─── -->
 <div id="resultsView" class="card hidden">
 
-    <div class="results-header" style="display: flex; flex-direction: column; align-items: stretch; gap: 12px; margin-bottom: 16px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+    <div class="results-header" style="margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
             <h2>✦ Classroom Cloud</h2>
-            <div class="stats">
+            <div style="display: flex; align-items: center; gap: 14px;">
                 <span class="badge" id="responseCount">0 responses</span>
-                <button class="action-btn" id="exportPngBtn" title="Export Word Cloud as PNG">
-                    <span>📥</span> Export PNG
-                </button>
-                <button class="action-btn" id="toggleCloudBtn" title="Toggle cloud visibility">
-                    <span>👁️</span> Hide Cloud
-                </button>
-                <button class="action-btn" id="manualRefresh" title="Refresh now">
-                    <span>⟳</span>
-                </button>
-                <button class="action-btn clear-btn" id="clearAllBtn" title="Clear all responses">
-                    <span>🗑</span> Clear
-                </button>
+                <div class="live-label" style="margin-top: 0;">
+                    <span class="live-dot"></span> live
+                </div>
             </div>
         </div>
+        
         <!-- Large Question Display for Projector -->
-        <h1 id="resultsQuestion" style="font-size: 1.85rem; color: var(--gold-light); margin: 6px 0 2px; font-weight: 700; text-shadow: 0 0 20px rgba(212,175,55,0.15); line-height: 1.3;">
+        <h1 id="resultsQuestion" style="font-size: 2.3rem; color: var(--gold-light); margin: 16px 0 0; font-weight: 700; text-shadow: 0 0 20px rgba(212,175,55,0.15); line-height: 1.3; text-align: left;">
             Loading active question...
         </h1>
-        <!-- Question Editor Bar -->
-        <div style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 8px 12px; border-radius: 14px;">
-            <span style="font-size: 0.9rem; font-weight: 600; color: var(--gold-light); white-space: nowrap;">Active Question:</span>
-            <input type="text" id="questionInput" style="flex: 1; background: transparent; border: none; outline: none; color: #fff; font-size: 1rem; font-family: inherit;" placeholder="Loading active question..." />
-            <button class="action-btn" id="saveQuestionBtn" style="background: rgba(212, 175, 55, 0.2); border-color: rgba(212, 175, 55, 0.4); color: var(--gold-light); font-weight: 600;" title="Save and publish this question">
-                Publish
-            </button>
+        
+        <!-- Timer Progress Display (only visible when countdown active) -->
+        <div id="resultsTimerCard" class="timer-card" style="display: none; margin-top: 14px; width: 100%; box-sizing: border-box;">
+            <div class="timer-info">
+                <span class="timer-label">⏰ Poll Closing In</span>
+                <span id="resultsTimerCountdown" class="timer-countdown">00:00</span>
+            </div>
+            <div style="flex: 1;">
+                <div class="timer-bar-container">
+                    <div id="resultsTimerBar" class="timer-bar"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -844,30 +1140,145 @@
                 <div style="font-size:0.9rem; margin-top:6px; opacity:0.6;">Responses are still being collected live!</div>
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- Frequency & Moderation Side Panel -->
-        <div class="freq-section" id="freqSection">
-            <div style="font-weight: 600; font-size: 1rem; color: var(--gold-light); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-                <span>📊 Top Responses</span>
-                <span id="uniqueWordsCount" style="font-size: 0.8rem; background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 20px; color: rgba(255,255,255,0.6);">0 words</span>
+<!-- Floating Gear Button -->
+<button id="gearBtn" class="gear-btn" title="Open Settings Drawer">⚙️</button>
+
+<!-- Slide-out Settings Drawer Overlay -->
+<div id="drawerOverlay" class="drawer-overlay"></div>
+
+<!-- Slide-out Settings Drawer -->
+<div id="settingsDrawer" class="settings-drawer">
+    <div class="drawer-header">
+        <h3>⚙️ Presentation Settings</h3>
+        <button id="drawerClose" class="drawer-close">&times;</button>
+    </div>
+    <div class="drawer-content">
+        <!-- Section: Session Control -->
+        <div class="drawer-section">
+            <span class="drawer-section-title">Session Control</span>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="action-btn" id="toggleCloudBtn" style="flex: 1;" title="Toggle cloud visibility">
+                    <span>👁️</span> Hide Cloud
+                </button>
+                <button class="action-btn" id="manualRefresh" style="flex: 0 0 50px;" title="Refresh now">
+                    <span>⟳</span>
+                </button>
+                <button class="action-btn clear-btn" id="clearAllBtn" style="flex: 1;" title="Clear all responses">
+                    <span>🗑</span> Clear Responses
+                </button>
             </div>
-            <div id="freqListContainer" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px;">
-                <div style="text-align: center; color: rgba(255,255,255,0.2); margin-top: 40px; font-size: 0.9rem;">No data yet</div>
+            <button class="action-btn" id="exportPngBtn" style="width: 100%; margin-top: 6px; background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.15);" title="Export Word Cloud as PNG">
+                <span>📥</span> Export Word Cloud PNG
+            </button>
+        </div>
+
+        <!-- Section: Active Question Editor -->
+        <div class="drawer-section">
+            <span class="drawer-section-title">Active Question</span>
+            <div class="drawer-input-group">
+                <input type="text" id="questionInput" class="drawer-text-input" placeholder="Type new question..." />
+                <button class="action-btn" id="saveQuestionBtn" style="background: rgba(212, 175, 55, 0.2); border-color: rgba(212, 175, 55, 0.4); color: var(--gold-light); font-weight: 600;">
+                    Publish Question
+                </button>
             </div>
         </div>
-    </div>
 
-    <!-- Blacklist Moderation Container -->
-    <div id="blacklistContainer" style="display:none; margin-top: 16px; padding: 12px 16px; background: rgba(255, 107, 107, 0.05); border: 1px solid rgba(255, 107, 107, 0.15); border-radius: 14px;">
-        <div style="font-size: 0.85rem; font-weight: 600; color: #ff8e8e; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
-            <span>🛡️ Moderated Words (Hidden from cloud)</span>
-            <button id="clearBlacklistBtn" class="action-btn" style="padding: 1px 8px; font-size: 0.75rem; color: #ff8e8e; border-color: rgba(255, 107, 107, 0.2); background: transparent; cursor: pointer;">Restore All</button>
+        <!-- Section: Countdown Timer -->
+        <div class="drawer-section">
+            <span class="drawer-section-title">Countdown Timer</span>
+            <div style="display: flex; gap: 10px;">
+                <select id="timerDurationSelect" class="drawer-select" style="flex: 1;">
+                    <option value="30">30 Seconds</option>
+                    <option value="60" selected>60 Seconds</option>
+                    <option value="90">90 Seconds</option>
+                    <option value="120">2 Minutes</option>
+                    <option value="300">5 Minutes</option>
+                </select>
+                <button class="action-btn" id="startTimerBtn" style="background: rgba(74, 222, 128, 0.15); border-color: rgba(74, 222, 128, 0.3); color: #4ade80;" title="Start countdown">
+                    Start
+                </button>
+                <button class="action-btn" id="stopTimerBtn" style="background: rgba(255, 107, 107, 0.15); border-color: rgba(255, 107, 107, 0.3); color: #ff6b6b; display: none;" title="Stop countdown">
+                    Stop
+                </button>
+            </div>
+            <!-- Timer countdown bar visible inside drawer too -->
+            <div id="drawerTimerCard" class="timer-card" style="display: none; margin-top: 8px;">
+                <div class="timer-info">
+                    <span class="timer-label">Time Remaining</span>
+                    <span id="drawerTimerCountdown" class="timer-countdown">00:00</span>
+                </div>
+            </div>
         </div>
-        <div id="blacklistTags" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
-    </div>
 
-    <div class="live-label" style="margin-top: 12px;">
-        <span class="live-dot"></span> live
+        <!-- Section: Visual Styles -->
+        <div class="drawer-section">
+            <span class="drawer-section-title">Visual Styling</span>
+            <div class="drawer-input-group">
+                <label class="drawer-input-label">Theme Color Palette</label>
+                <select id="themeSelect" class="drawer-select">
+                    <option value="aviation" selected>Aviation Classic (Navy/Gold)</option>
+                    <option value="glacier">Glacier Blue (Slate/Cyan)</option>
+                    <option value="sunset">Sunset Flight (Purple/Pink)</option>
+                    <option value="radar">Radar Sweep (Black/Green)</option>
+                </select>
+            </div>
+            <div class="drawer-input-group" style="margin-top: 8px;">
+                <label class="drawer-input-label">Cloud Target Shape</label>
+                <select id="shapeSelect" class="drawer-select">
+                    <option value="circle" selected>Circle (Default)</option>
+                    <option value="cardioid">Cardioid (Heart)</option>
+                    <option value="diamond">Diamond</option>
+                    <option value="triangle">Triangle</option>
+                    <option value="star">Star</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Section: Data Filtering -->
+        <div class="drawer-section">
+            <span class="drawer-section-title">Data Filters</span>
+            <div class="switch-container">
+                <span class="switch-label" title="Group words with similar spelling (e.g. spelling typos)">Auto-Merge Typos</span>
+                <label class="switch">
+                    <input type="checkbox" id="fuzzyMergeToggle" />
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="range-container" style="margin-top: 8px;">
+                <div class="range-header">
+                    <span>Noise Reduction</span>
+                    <span id="minFrequencyVal" style="font-weight: 700; color: var(--gold-light);">Min 1 response</span>
+                </div>
+                <input type="range" id="minFrequencySlider" class="range-slider" min="1" max="5" value="1" />
+            </div>
+        </div>
+
+        <!-- Section: Moderation Hub -->
+        <div class="drawer-section">
+            <span class="drawer-section-title">Moderation & Top Responses</span>
+            
+            <div class="freq-section" id="freqSection" style="flex: none; max-height: 260px; height: 260px; width: auto;">
+                <div style="font-weight: 600; font-size: 0.9rem; color: var(--gold-light); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>📊 Ranked Words</span>
+                    <span id="uniqueWordsCount" style="font-size: 0.75rem; background: rgba(255,255,255,0.08); padding: 1px 6px; border-radius: 20px;">0 words</span>
+                </div>
+                <div id="freqListContainer" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px;">
+                    <div style="text-align: center; color: rgba(255,255,255,0.2); margin-top: 20px; font-size: 0.85rem;">No data yet</div>
+                </div>
+            </div>
+
+            <!-- Blacklist Container inside Drawer -->
+            <div id="blacklistContainer" style="display:none; padding: 12px; background: rgba(255, 107, 107, 0.05); border: 1px solid rgba(255, 107, 107, 0.15); border-radius: 12px; margin-top: 8px;">
+                <div style="font-size: 0.8rem; font-weight: 600; color: #ff8e8e; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
+                    <span>🛡️ Hidden Words</span>
+                    <button id="clearBlacklistBtn" style="background: transparent; border: none; color: #ff8e8e; font-size: 0.75rem; cursor: pointer; text-decoration: underline; padding: 0;">Restore All</button>
+                </div>
+                <div id="blacklistTags" style="display: flex; flex-wrap: wrap; gap: 4px;"></div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -931,6 +1342,34 @@
         const studentAnswerInput = document.getElementById('studentAnswerInput');
         const submittedContainer = document.getElementById('submittedContainer');
 
+        // Settings Drawer DOM references
+        const gearBtn = document.getElementById('gearBtn');
+        const settingsDrawer = document.getElementById('settingsDrawer');
+        const drawerClose = document.getElementById('drawerClose');
+        const drawerOverlay = document.getElementById('drawerOverlay');
+
+        // Timer DOM references
+        const timerDurationSelect = document.getElementById('timerDurationSelect');
+        const startTimerBtn = document.getElementById('startTimerBtn');
+        const stopTimerBtn = document.getElementById('stopTimerBtn');
+        const resultsTimerCard = document.getElementById('resultsTimerCard');
+        const resultsTimerCountdown = document.getElementById('resultsTimerCountdown');
+        const resultsTimerBar = document.getElementById('resultsTimerBar');
+        const drawerTimerCard = document.getElementById('drawerTimerCard');
+        const drawerTimerCountdown = document.getElementById('drawerTimerCountdown');
+        const studentTimerCard = document.getElementById('studentTimerCard');
+        const studentTimerCountdown = document.getElementById('studentTimerCountdown');
+        const studentTimerBar = document.getElementById('studentTimerBar');
+
+        // Visual Styling DOM references
+        const themeSelect = document.getElementById('themeSelect');
+        const shapeSelect = document.getElementById('shapeSelect');
+
+        // Data Filters DOM references
+        const fuzzyMergeToggle = document.getElementById('fuzzyMergeToggle');
+        const minFrequencySlider = document.getElementById('minFrequencySlider');
+        const minFrequencyVal = document.getElementById('minFrequencyVal');
+
         let cloudInitialized = false;
         let toastTimer = null;
         let qrVisible = true;
@@ -943,6 +1382,58 @@
         // State variables
         let activeQuestionText = 'What makes you trust an aviation leader?';
         let blacklist = [];
+        let activeTheme = 'aviation';
+        let activeShape = 'circle';
+        let minFrequencyThreshold = 1;
+        let enableFuzzyMerge = false;
+
+        // Timer intervals & state
+        let timerPollingInterval = null;
+        let timerCountdownsActive = false;
+        let timerExpirationTime = null;
+        let timerTotalDuration = 60;
+
+        // Themes configuration
+        const THEMES = {
+            aviation: {
+                bg: '#0a1628',
+                cardBg: 'rgba(10, 22, 40, 0.45)',
+                font: '#d4af37',
+                colors: [
+                    '#d4af37', '#e8c45a', '#f0d080', '#f8dc9e', '#ffe8bc',
+                    '#c9a030', '#b8962f', '#a8862a', '#987625', '#886620'
+                ]
+            },
+            glacier: {
+                bg: '#070d19',
+                cardBg: 'rgba(15, 23, 42, 0.45)',
+                font: '#38bdf8',
+                colors: [
+                    '#38bdf8', '#0ea5e9', '#0284c7', '#0369a1', '#075985',
+                    '#7dd3fc', '#bae6fd', '#e0f2fe', '#0284c7', '#38bdf8'
+                ]
+            },
+            sunset: {
+                bg: '#12020e',
+                cardBg: 'rgba(24, 2, 12, 0.45)',
+                font: '#ff007f',
+                colors: [
+                    '#ff007f', '#ff5e62', '#ff9966', '#ffb347', '#ffcc33',
+                    '#e100ff', '#f78ca0', '#fe9a8b', '#ff7e5f', '#ff007f'
+                ]
+            },
+            radar: {
+                bg: '#020d08',
+                cardBg: 'rgba(2, 44, 34, 0.45)',
+                font: '#10b981',
+                colors: [
+                    '#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#059669',
+                    '#047857', '#065f46', '#064e3b', '#10b981', '#34d399'
+                ]
+            }
+        };
+
+        let currentWordColors = THEMES.aviation.colors;
 
         // Pan & Zoom state variables
         let scale = 1;
@@ -969,6 +1460,11 @@
                 colorDark: '#0a1628',
                 colorLight: '#ffffff',
             });
+
+            // Bind Settings Drawer Events
+            if (gearBtn) gearBtn.addEventListener('click', openDrawer);
+            if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
+            if (drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
 
             fetchQuestion();
             fetchAndUpdate();
@@ -1012,11 +1508,29 @@
                             continue;
                         }
                         
-                        if (wordMap.has(lower)) {
-                            wordMap.get(lower).count += 1;
-                        } else {
-                            wordMap.set(lower, { display: clean, count: 1 });
+                        // If Fuzzy Merge is enabled, try to find a similar word already in the map
+                        let matchedKey = lower;
+                        if (enableFuzzyMerge) {
+                            for (const existingKey of wordMap.keys()) {
+                                if (isSimilar(lower, existingKey)) {
+                                    matchedKey = existingKey;
+                                    break;
+                                }
+                            }
                         }
+                        
+                        if (wordMap.has(matchedKey)) {
+                            wordMap.get(matchedKey).count += 1;
+                        } else {
+                            wordMap.set(matchedKey, { display: clean, count: 1 });
+                        }
+                    }
+                }
+
+                // Apply Noise Reduction Filter (Minimum Frequency)
+                for (const [key, val] of wordMap.entries()) {
+                    if (val.count < minFrequencyThreshold) {
+                        wordMap.delete(key);
                     }
                 }
 
@@ -1116,9 +1630,10 @@
                     fontWeight: '600',
                     color: function(word, weight) {
                         const hash = word.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
-                        const idx = (hash + weight) % WORD_COLORS.length;
-                        return WORD_COLORS[idx];
+                        const idx = (hash + weight) % currentWordColors.length;
+                        return currentWordColors[idx];
                     },
+                    shape: activeShape,
                     rotate: function(word, weight) {
                         const hash = word.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
                         const angle = (hash % 7) / 7;
@@ -1307,12 +1822,13 @@
             }, 300);
         });
 
-        // ─── Dynamic Question API Calls ───
+        // ─── Dynamic Question & Timer API Calls ───
         async function fetchQuestion() {
             try {
                 const response = await fetch(WEB_APP_URL + '?action=getQuestion&_=' + Date.now());
                 if (!response.ok) return;
                 const result = await response.json();
+                
                 if (result.status === 'success' && result.question) {
                     activeQuestionText = result.question;
                     
@@ -1332,8 +1848,32 @@
                         resultsQuestion.textContent = activeQuestionText;
                     }
                     
-                    // Run student submission block check
-                    checkStudentSubmissionStatus();
+                    // Sync active countdown timer
+                    if (result.timerEndTime) {
+                        timerExpirationTime = result.timerEndTime;
+                        timerTotalDuration = result.timerDuration || 60;
+                        
+                        if (isResults) {
+                            if (startTimerBtn) startTimerBtn.style.display = 'none';
+                            if (stopTimerBtn) stopTimerBtn.style.display = 'inline-block';
+                        }
+                        
+                        if (!timerCountdownsActive) {
+                            timerCountdownsActive = true;
+                            updateTimers();
+                        }
+                    } else {
+                        timerExpirationTime = null;
+                        if (isResults) {
+                            if (startTimerBtn) startTimerBtn.style.display = 'inline-block';
+                            if (stopTimerBtn) stopTimerBtn.style.display = 'none';
+                        }
+                    }
+                    
+                    // Run student submission block check (only if timer is not active)
+                    if (!timerExpirationTime) {
+                        checkStudentSubmissionStatus();
+                    }
                 }
             } catch (e) {
                 console.warn('Failed to fetch active question:', e);
@@ -1350,9 +1890,160 @@
                 if (submittedContainer) submittedContainer.style.display = 'block';
             } else {
                 if (form) form.style.display = 'block';
-                if (studentSub) studentSub.style.display = 'block';
+                if (studentSub) {
+                    studentSub.style.display = 'block';
+                    studentSub.textContent = 'Share your insight in one word ✦';
+                }
                 if (submittedContainer) submittedContainer.style.display = 'none';
             }
+        }
+
+        // ─── Timer Animation & Display Sync ───
+        function updateTimers() {
+            if (!timerExpirationTime) {
+                timerCountdownsActive = false;
+                if (resultsTimerCard) resultsTimerCard.style.display = 'none';
+                if (drawerTimerCard) drawerTimerCard.style.display = 'none';
+                if (studentTimerCard) studentTimerCard.style.display = 'none';
+                
+                if (!isResults) {
+                    checkStudentSubmissionStatus();
+                }
+                return;
+            }
+            
+            const now = Date.now();
+            const timeLeft = Math.max(0, timerExpirationTime - now);
+            
+            if (timeLeft <= 0) {
+                timerExpirationTime = null;
+                timerCountdownsActive = false;
+                
+                if (resultsTimerCard) resultsTimerCard.style.display = 'none';
+                if (drawerTimerCard) drawerTimerCard.style.display = 'none';
+                if (studentTimerCard) {
+                    studentTimerCountdown.textContent = "00:00";
+                    studentTimerBar.style.width = "0%";
+                }
+                
+                if (isResults) {
+                    if (startTimerBtn) startTimerBtn.style.display = 'inline-block';
+                    if (stopTimerBtn) stopTimerBtn.style.display = 'none';
+                    showToast('⏰ The countdown timer has expired!');
+                } else {
+                    if (form) form.style.display = 'none';
+                    if (studentSub) {
+                        studentSub.style.display = 'block';
+                        studentSub.innerHTML = '🔒 <strong>Poll Closed!</strong> Submissions are no longer accepted.';
+                    }
+                }
+                return;
+            }
+            
+            // Format timer readout
+            const totalSeconds = Math.ceil(timeLeft / 1000);
+            const mins = Math.floor(totalSeconds / 60);
+            const secs = totalSeconds % 60;
+            const timeString = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            
+            // Calculate visual percentage
+            const pct = Math.min(100, (timeLeft / (timerTotalDuration * 1000)) * 100);
+            
+            if (resultsTimerCard) {
+                resultsTimerCard.style.display = 'flex';
+                resultsTimerCountdown.textContent = timeString;
+                resultsTimerBar.style.width = `${pct}%`;
+            }
+            if (drawerTimerCard) {
+                drawerTimerCard.style.display = 'flex';
+                drawerTimerCountdown.textContent = timeString;
+            }
+            
+            // Student view displays
+            if (studentTimerCard) {
+                studentTimerCard.style.display = 'flex';
+                studentTimerCountdown.textContent = timeString;
+                studentTimerBar.style.width = `${pct}%`;
+                
+                // Unlock form inputs if student hasn't submitted yet
+                const key = 'submitted_' + activeQuestionText.toLowerCase().replace(/[^a-z0-9]/g, '');
+                if (localStorage.getItem(key) !== 'true') {
+                    if (form) form.style.display = 'block';
+                    if (studentSub) {
+                        studentSub.style.display = 'block';
+                        studentSub.textContent = 'Share your insight in one word ✦';
+                    }
+                    if (submittedContainer) submittedContainer.style.display = 'none';
+                }
+            }
+            
+            requestAnimationFrame(updateTimers);
+        }
+
+        // ─── Settings Drawer Open/Close Toggles ───
+        function openDrawer() {
+            if (settingsDrawer && drawerOverlay) {
+                settingsDrawer.classList.add('open');
+                drawerOverlay.classList.add('open');
+            }
+        }
+
+        function closeDrawer() {
+            if (settingsDrawer && drawerOverlay) {
+                settingsDrawer.classList.remove('open');
+                drawerOverlay.classList.remove('open');
+            }
+        }
+
+        // ─── Theme Customizer System ───
+        function applyTheme(themeKey) {
+            const theme = THEMES[themeKey] || THEMES.aviation;
+            activeTheme = themeKey;
+            currentWordColors = theme.colors;
+            
+            // Apply custom CSS variables on document root
+            document.documentElement.style.setProperty('--navy', theme.bg);
+            document.documentElement.style.setProperty('--gold-light', theme.font);
+            document.documentElement.style.setProperty('--gold', theme.colors[0]);
+            document.documentElement.style.setProperty('--gold-glow', theme.colors[0] + '66'); // ~40% opacity glow
+            
+            // Redraw active cloud layout using new colors
+            if (latestValidList) {
+                renderCloud(latestValidList);
+            }
+        }
+
+        // ─── Fuzzy Spelling Match Logic ───
+        function isSimilar(s1, s2) {
+            if (s1 === s2) return true;
+            if (s1.length < 4 || s2.length < 4) return false;
+            
+            // Dist limit: 2 for long words, 1 for short
+            const maxDistance = Math.min(s1.length, s2.length) >= 6 ? 2 : 1;
+            const dist = levenshteinDistance(s1, s2);
+            return dist <= maxDistance;
+        }
+
+        function levenshteinDistance(a, b) {
+            const matrix = [];
+            for (let i = 0; i <= b.length; i++) matrix[0] = [i];
+            for (let i = 0; i <= a.length; i++) matrix[i] = [i];
+            for (let i = 1; i <= a.length; i++) {
+                for (let j = 1; j <= b.length; j++) {
+                    if (a.charAt(i - 1) === b.charAt(j - 1)) {
+                        matrix[i][j] = matrix[i - 1][j - 1];
+                    } else {
+                        matrix[i][j] = Math.min(
+                            matrix[i - 1][j - 1] + 1, // substitution
+                            Math.min(
+                                matrix[i][j - 1] + 1, // insertion
+                                matrix[i - 1][j] + 1  // deletion
+                            )
+                        );
+                    }
+                }
+            }
+            return matrix[a.length][b.length];
         }
 
         // ─── Sidebar & Moderation Sync ───
@@ -1415,6 +2106,106 @@
             });
         }
 
+        // ─── Settings Drawer Bindings ───
+        if (themeSelect) {
+            themeSelect.addEventListener('change', function() {
+                applyTheme(this.value);
+            });
+        }
+
+        if (shapeSelect) {
+            shapeSelect.addEventListener('change', function() {
+                activeShape = this.value;
+                lastWordHash = ''; // Force redraw
+                if (latestValidList) {
+                    renderCloud(latestValidList);
+                }
+            });
+        }
+
+        if (fuzzyMergeToggle) {
+            fuzzyMergeToggle.addEventListener('change', function() {
+                enableFuzzyMerge = this.checked;
+                lastWordHash = ''; // Recalculate hash
+                fetchAndUpdate();
+            });
+        }
+
+        if (minFrequencySlider) {
+            minFrequencySlider.addEventListener('input', function() {
+                minFrequencyThreshold = parseInt(this.value);
+                if (minFrequencyVal) {
+                    minFrequencyVal.textContent = `Min ${minFrequencyThreshold} response${minFrequencyThreshold > 1 ? 's' : ''}`;
+                }
+                lastWordHash = ''; // Recalculate hash
+                fetchAndUpdate();
+            });
+        }
+
+        // ─── Timer Control Event Listeners ───
+        if (startTimerBtn) {
+            startTimerBtn.addEventListener('click', async function() {
+                const duration = timerDurationSelect ? parseInt(timerDurationSelect.value) : 60;
+                try {
+                    startTimerBtn.disabled = true;
+                    
+                    const response = await fetch(WEB_APP_URL + '?action=startTimer&duration=' + duration + '&_=' + Date.now());
+                    if (!response.ok) throw new Error('Network error');
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        timerExpirationTime = Date.now() + (duration * 1000);
+                        timerTotalDuration = duration;
+                        
+                        startTimerBtn.style.display = 'none';
+                        if (stopTimerBtn) stopTimerBtn.style.display = 'inline-block';
+                        
+                        if (!timerCountdownsActive) {
+                            timerCountdownsActive = true;
+                            updateTimers();
+                        }
+                        showToast('✅ Timer started successfully!');
+                    } else {
+                        throw new Error(result.message || 'Apps Script error');
+                    }
+                } catch (e) {
+                    console.error('Failed to start timer:', e);
+                    showToast('❌ Failed to start timer: ' + e.message, true);
+                } finally {
+                    startTimerBtn.disabled = false;
+                }
+            });
+        }
+
+        if (stopTimerBtn) {
+            stopTimerBtn.addEventListener('click', async function() {
+                try {
+                    stopTimerBtn.disabled = true;
+                    
+                    const response = await fetch(WEB_APP_URL + '?action=stopTimer&_=' + Date.now());
+                    if (!response.ok) throw new Error('Network error');
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        timerExpirationTime = null;
+                        
+                        startTimerBtn.style.display = 'inline-block';
+                        stopTimerBtn.style.display = 'none';
+                        
+                        updateTimers();
+                        showToast('🛑 Timer stopped successfully!');
+                    } else {
+                        throw new Error(result.message || 'Apps Script error');
+                    }
+                } catch (e) {
+                    console.error('Failed to stop timer:', e);
+                    showToast('❌ Failed to stop timer: ' + e.message, true);
+                } finally {
+                    stopTimerBtn.disabled = false;
+                }
+            });
+        }
+
         // ─── Question Editor Event Listener ───
         if (saveQuestionBtn && questionInput) {
             saveQuestionBtn.addEventListener('click', async function() {
@@ -1436,7 +2227,6 @@
                         activeQuestionText = newQuestion;
                         showToast('✅ Question published successfully!');
                         
-                        // Update instructor results page question display immediately
                         const resultsQuestion = document.getElementById('resultsQuestion');
                         if (resultsQuestion) {
                             resultsQuestion.textContent = activeQuestionText;
@@ -1453,7 +2243,7 @@
                     showToast('❌ Failed to update question: ' + e.message, true);
                 } finally {
                     saveQuestionBtn.disabled = false;
-                    saveQuestionBtn.textContent = 'Publish';
+                    saveQuestionBtn.textContent = 'Publish Question';
                 }
             });
         }
@@ -1476,7 +2266,8 @@
                         tempCanvas.height = canvas.height;
                         const tempCtx = tempCanvas.getContext('2d');
                         
-                        tempCtx.fillStyle = '#0b1a2e'; // Dark navy matching theme
+                        const activeThemeConfig = THEMES[activeTheme] || THEMES.aviation;
+                        tempCtx.fillStyle = activeThemeConfig.bg;
                         tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
                         tempCtx.drawImage(canvas, 0, 0);
                         exportCanvas = tempCanvas;
@@ -1514,10 +2305,6 @@
             tooltip.style.top = (event.clientY + 15) + 'px';
         }
 
-        function hideTooltip() {
-            if (tooltip) tooltip.style.display = 'none';
-        }
-
         // ─── Pan & Zoom Functions ───
         function applyTransform() {
             if (!canvas) return;
@@ -1544,7 +2331,7 @@
                 startX = e.clientX - panX;
                 startY = e.clientY - panY;
                 cloudWrapper.style.cursor = 'grabbing';
-                hideTooltip();
+                if (tooltip) tooltip.style.display = 'none';
             });
 
             window.addEventListener('mousemove', function(e) {
