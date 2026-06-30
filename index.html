@@ -2208,6 +2208,8 @@
         let localQaVotes = {};
         const qaVotesInProgress = new Set();
         const optimisticQaVotes = {};
+        const qaVoteDebounceTimers = {};
+        const qaInitialVoteStates = {};
         try {
             localQaVotes = JSON.parse(localStorage.getItem('local_qa_votes') || '{}');
         } catch(e) {}
@@ -4002,7 +4004,7 @@
                 const res = await fetch(`${WEB_APP_URL}?action=getQa&_=${Date.now()}`);
                 const result = await res.json();
                 if (result.status === 'success' && result.data && studentQaList) {
-                    const questions = result.data.sort((a,b) => b.votes - a.votes);
+                    const questions = result.data.sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
                     if (questions.length === 0) {
                         studentQaList.innerHTML = `<div style="text-align: center; color: rgba(255,255,255,0.2); font-size: 0.82rem; margin-top: 10px;">No questions asked yet</div>`;
                     } else {
@@ -4023,10 +4025,8 @@
                         }).join('');
                         
                         studentQaList.querySelectorAll('.student-qa-vote-btn').forEach(btn => {
-                            btn.addEventListener('click', async function() {
+                            btn.addEventListener('click', function() {
                                 const id = Number(this.getAttribute('data-id'));
-                                if (qaVotesInProgress.has(id)) return;
-                                qaVotesInProgress.add(id);
                                 
                                 const isUp = this.classList.contains('upvote');
                                 const previousVote = localQaVotes[id];
@@ -4058,7 +4058,6 @@
                                     }
                                 }
                                 
-                                // Temporarily disable buttons & store original state for rollback
                                 const container = this.closest('.student-qa-actions');
                                 const voteSpan = container ? container.querySelector('span') : null;
                                 const originalVotesText = voteSpan ? voteSpan.textContent : '0';
@@ -4068,10 +4067,6 @@
                                 
                                 const hadUpActive = upBtn ? upBtn.classList.contains('active') : false;
                                 const hadDownActive = downBtn ? downBtn.classList.contains('active') : false;
-                                
-                                if (container) {
-                                    container.querySelectorAll('.student-qa-vote-btn').forEach(b => b.disabled = true);
-                                }
                                 
                                 // Perform Optimistic UI Update immediately
                                 if (voteSpan) {
@@ -4090,7 +4085,12 @@
                                     }
                                 }
                                 
-                                // Save local state immediately
+                                // Store the initial state if this click sequence is just starting
+                                if (qaInitialVoteStates[id] === undefined) {
+                                    qaInitialVoteStates[id] = previousVote;
+                                }
+                                
+                                // Update local phone state immediately (our "scoreboard")
                                 if (newVote === null) {
                                     delete localQaVotes[id];
                                 } else {
@@ -4115,27 +4115,56 @@
                                     localStorage.setItem('local_qa_votes', JSON.stringify(localQaVotes));
                                 };
                                 
-                                try {
-                                    const fallbackAction = delta > 0 ? 'upvoteQa' : 'downvoteQa';
-                                    const callsCount = Math.abs(delta);
-                                    for (let c = 0; c < callsCount; c++) {
-                                        if (c > 0) {
-                                            // Sleep 1200ms to allow Google Sheets cells to recalculate and prevent write race condition collisions
-                                            await new Promise(resolve => setTimeout(resolve, 1200));
-                                        }
-                                        await fetch(`${WEB_APP_URL}?action=${fallbackAction}&id=${id}&_=${Date.now()}`);
-                                    }
-                                } catch(e) {
-                                    console.error('Voting failed:', e);
-                                    rollbackLocalState();
-                                    showToast('⚠️ Vote failed. Please try again.', true);
-                                } finally {
-                                    delete optimisticQaVotes[id];
-                                    qaVotesInProgress.delete(id);
-                                    if (container) {
-                                        container.querySelectorAll('.student-qa-vote-btn').forEach(b => b.disabled = false);
-                                    }
+                                // Reset / Clear any existing debounce timer for this item
+                                if (qaVoteDebounceTimers[id]) {
+                                    clearTimeout(qaVoteDebounceTimers[id]);
                                 }
+                                
+                                // Set debounce timer for 1200ms of inactivity
+                                qaVoteDebounceTimers[id] = setTimeout(async () => {
+                                    const finalVote = localQaVotes[id];
+                                    const initialVote = qaInitialVoteStates[id];
+                                    
+                                    delete qaVoteDebounceTimers[id];
+                                    delete qaInitialVoteStates[id];
+                                    
+                                    const valMap = { 'up': 1, 'down': -1, null: 0, undefined: 0 };
+                                    const initialVal = valMap[initialVote];
+                                    const finalVal = valMap[finalVote];
+                                    const netDelta = finalVal - initialVal;
+                                    
+                                    if (netDelta === 0) {
+                                        delete optimisticQaVotes[id];
+                                        return;
+                                    }
+                                    
+                                    // Disable buttons during server write sync
+                                    qaVotesInProgress.add(id);
+                                    if (container) {
+                                        container.querySelectorAll('.student-qa-vote-btn').forEach(b => b.disabled = true);
+                                    }
+                                    
+                                    try {
+                                        const action = netDelta > 0 ? 'upvoteQa' : 'downvoteQa';
+                                        const callsCount = Math.abs(netDelta);
+                                        for (let c = 0; c < callsCount; c++) {
+                                            if (c > 0) {
+                                                await new Promise(resolve => setTimeout(resolve, 1200));
+                                            }
+                                            await fetch(`${WEB_APP_URL}?action=${action}&id=${id}&_=${Date.now()}`);
+                                        }
+                                    } catch(e) {
+                                        console.error('Debounced voting sync failed:', e);
+                                        showToast('⚠️ Vote failed to sync. Reverting...', true);
+                                        rollbackLocalState();
+                                    } finally {
+                                        delete optimisticQaVotes[id];
+                                        qaVotesInProgress.delete(id);
+                                        if (container) {
+                                            container.querySelectorAll('.student-qa-vote-btn').forEach(b => b.disabled = false);
+                                        }
+                                    }
+                                }, 1200);
                             });
                         });
                     }
