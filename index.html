@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <title>Classroom Cloud · Live Feedback</title>
+    <title>Classroom Works · Live Feedback</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.1.0/wordcloud2.min.js">
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
@@ -1350,6 +1350,18 @@
         .student-qa-vote-btn.downvote:hover:not(:disabled) {
             background: rgba(239, 68, 68, 0.25);
         }
+        .student-qa-vote-btn.upvote.active {
+            background: rgba(74, 222, 128, 0.35);
+            border-color: #4ade80;
+            color: #fff;
+            box-shadow: 0 0 10px rgba(74, 222, 128, 0.2);
+        }
+        .student-qa-vote-btn.downvote.active {
+            background: rgba(239, 68, 68, 0.35);
+            border-color: #ef4444;
+            color: #fff;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+        }
         .student-qa-vote-btn:active:not(:disabled) {
             transform: scale(0.92);
         }
@@ -1431,11 +1443,11 @@
 
     <div class="results-header" style="margin-bottom: 24px;">
         <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-            <!-- Brand Logo Mark (Gold Metallic Label Rectangle) -->
+            <!-- Brand Logo Mark (Realistic Deep Gold Metallic Label) -->
             <div class="brand-logo" style="user-select: none;">
-                <div style="background: linear-gradient(135deg, #a8862a 0%, #ffe8bc 25%, #d4af37 50%, #ffe8bc 75%, #886620 100%); border: 1.5px solid #ffe8bc; padding: 4px 10px; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(212,175,55,0.25); text-align: center; border-radius: 0px;">
-                    <span style="font-family: 'Inter', sans-serif; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.25em; color: #0b1a2e; text-transform: uppercase; line-height: 1;">CLASSROOM</span>
-                    <span style="font-family: 'Inter', sans-serif; font-size: 1.15rem; font-weight: 900; letter-spacing: 0.08em; color: #0b1a2e; line-height: 1.1; margin-top: 2px;">CLOUD</span>
+                <div style="background: linear-gradient(135deg, #614d18 0%, #ffe082 25%, #c5a039 50%, #ffe082 75%, #503d10 100%); border: 1.5px solid #ffe082; padding: 5px 12px; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center; border-radius: 0px;">
+                    <span style="font-family: 'Inter', sans-serif; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.22em; color: #0b1a2e; text-transform: uppercase; line-height: 1;">CLASSROOM</span>
+                    <span style="font-family: 'Inter', sans-serif; font-size: 1.15rem; font-weight: 900; letter-spacing: 0.06em; color: #0b1a2e; line-height: 1.1; margin-top: 1px;">WORKS</span>
                 </div>
             </div>
             <div style="display: flex; align-items: center; gap: 14px;">
@@ -1827,8 +1839,20 @@
         let activeModeConfig = '';
         let localQaIdsSubmitted = [];
         let dragOverrides = {};
+        let stickyOverrides = {};
         let allowMultiple = false;
         let currentSessionToken = '';
+        
+        let studentUid = localStorage.getItem('classroom_works_uid');
+        if (!studentUid) {
+            studentUid = 'resp_' + Math.random().toString(36).substring(2, 9);
+            localStorage.setItem('classroom_works_uid', studentUid);
+        }
+        
+        let localQaVotes = {};
+        try {
+            localQaVotes = JSON.parse(localStorage.getItem('local_qa_votes') || '{}');
+        } catch(e) {}
 
         // Timer intervals & state
         let timerPollingInterval = null;
@@ -2068,9 +2092,23 @@
                     const counts = {};
                     options.forEach(o => counts[o.toLowerCase()] = 0);
                     
-                    let totalMCResponses = 0;
+                    // Parse chronologically to resolve duplicate device submissions
+                    const uniqueSelections = {};
                     words.forEach(w => {
-                        const clean = w.trim().toLowerCase();
+                        const clean = w.trim();
+                        const match = clean.match(/^(.*?)\s*\((.*?)\)$/);
+                        if (match) {
+                            const choice = match[1].trim();
+                            const uid = match[2].trim();
+                            uniqueSelections[uid] = choice;
+                        } else {
+                            uniqueSelections[clean] = clean;
+                        }
+                    });
+                    
+                    let totalMCResponses = 0;
+                    Object.values(uniqueSelections).forEach(choice => {
+                        const clean = choice.toLowerCase();
                         options.forEach(opt => {
                             if (clean === opt.toLowerCase()) {
                                 counts[opt.toLowerCase()]++;
@@ -2078,7 +2116,8 @@
                             }
                         });
                     });
-                    responseCount.textContent = `${totalMCResponses} response${totalMCResponses !== 1 ? 's' : ''}`;
+                    
+                    responseCount.textContent = `${totalMCResponses} participant${totalMCResponses !== 1 ? 's' : ''}`;
                     
                     if (totalMCResponses === 0) {
                         showEmptyState(true);
@@ -2086,13 +2125,16 @@
                     } else {
                         showEmptyState(false);
                         barChartContainer.innerHTML = options.map(opt => {
-                            const count = counts[opt.toLowerCase()] || 0;
-                            const pct = totalMCResponses > 0 ? Math.round((count / totalMCResponses) * 100) : 0;
+                            const count = cloudHidden ? '?' : (counts[opt.toLowerCase()] || 0);
+                            const pct = cloudHidden ? 0 : (totalMCResponses > 0 ? Math.round((counts[opt.toLowerCase()] / totalMCResponses) * 100) : 0);
+                            const pctText = cloudHidden ? 'Hidden' : `${pct}%`;
+                            const countText = cloudHidden ? '' : `${count} response${count !== 1 ? 's' : ''}`;
+                            
                             return `
                                 <div class="bar-item">
                                     <div class="bar-header">
                                         <span>${opt}</span>
-                                        <span>${count} response${count !== 1 ? 's' : ''} (${pct}%)</span>
+                                        <span>${pctText} ${countText}</span>
                                     </div>
                                     <div class="bar-outer">
                                         <div class="bar-inner" style="width: ${pct}%;"></div>
@@ -2107,22 +2149,36 @@
                     let totalScaleResponses = 0;
                     let sum = 0;
                     
+                    // Parse chronologically to resolve duplicate device submissions
+                    const uniqueSelections = {};
                     words.forEach(w => {
                         const clean = w.trim();
-                        if (counts.hasOwnProperty(clean)) {
-                            counts[clean]++;
-                            sum += Number(clean);
+                        const match = clean.match(/^(.*?)\s*\((.*?)\)$/);
+                        if (match) {
+                            const val = match[1].trim();
+                            const uid = match[2].trim();
+                            uniqueSelections[uid] = val;
+                        } else {
+                            uniqueSelections[clean] = clean;
+                        }
+                    });
+
+                    Object.values(uniqueSelections).forEach(val => {
+                        if (counts.hasOwnProperty(val)) {
+                            counts[val]++;
+                            sum += Number(val);
                             totalScaleResponses++;
                         }
                     });
-                    responseCount.textContent = `${totalScaleResponses} response${totalScaleResponses !== 1 ? 's' : ''}`;
+                    
+                    responseCount.textContent = `${totalScaleResponses} participant${totalScaleResponses !== 1 ? 's' : ''}`;
                     
                     if (totalScaleResponses === 0) {
                         showEmptyState(true);
                         scaleChartContainer.innerHTML = '';
                     } else {
                         showEmptyState(false);
-                        const avg = (sum / totalScaleResponses).toFixed(1);
+                        const avg = cloudHidden ? 'Hidden' : (sum / totalScaleResponses).toFixed(1);
                         
                         let barsHtml = `
                             <div class="scale-average-box">
@@ -2144,13 +2200,16 @@
                         };
                         
                         for (let i = 1; i <= 5; i++) {
-                            const count = counts[i.toString()] || 0;
-                            const pct = totalScaleResponses > 0 ? Math.round((count / totalScaleResponses) * 100) : 0;
+                            const count = cloudHidden ? '?' : (counts[i.toString()] || 0);
+                            const pct = cloudHidden ? 0 : (totalScaleResponses > 0 ? Math.round((counts[i.toString()] / totalScaleResponses) * 100) : 0);
+                            const pctText = cloudHidden ? 'Hidden' : `${pct}%`;
+                            const countText = cloudHidden ? '' : `${count} response${count !== 1 ? 's' : ''}`;
+                            
                             barsHtml += `
                                 <div class="bar-item">
                                     <div class="bar-header">
                                         <span>${labels[i.toString()]}</span>
-                                        <span>${count} response${count !== 1 ? 's' : ''} (${pct}%)</span>
+                                        <span>${pctText} ${countText}</span>
                                     </div>
                                     <div class="bar-outer">
                                         <div class="bar-inner" style="width: ${pct}%;"></div>
@@ -2212,24 +2271,29 @@
                         slotsBoardContainer.innerHTML = columns.map(col => {
                             const count = col.students.length;
                             const isFull = count >= col.limit;
+                            const countLabel = cloudHidden ? `?/${col.limit}` : `${count}/${col.limit}`;
+                            const studentsListHtml = cloudHidden 
+                                ? `<div style="text-align: center; font-size: 0.85rem; color: rgba(255,255,255,0.2); padding: 14px 0; font-style: italic;">Responses Hidden</div>` 
+                                : col.students.map(st => `
+                                    <div class="slot-student-name" 
+                                         draggable="true" 
+                                         style="cursor: grab;"
+                                         ondragstart="window.__dragStudent(event, '${st.replace(/'/g, "\\'")}', '${col.topic.replace(/'/g, "\\'")}')">
+                                         ${escapeHtml(st)}
+                                    </div>
+                                `).join('');
+                                
                             return `
                                 <div class="slot-column" 
-                                     style="border-color: ${isFull ? 'var(--gold)' : 'rgba(255,255,255,0.06)'}" 
+                                     style="border-color: ${isFull && !cloudHidden ? 'var(--gold)' : 'rgba(255,255,255,0.06)'}" 
                                      ondragover="event.preventDefault()" 
                                      ondrop="window.__dropStudent(event, '${col.topic}')">
                                     <div class="slot-column-header">
                                         <span>${col.topic}</span>
-                                        <span style="color: ${isFull ? 'var(--gold-light)' : 'rgba(255,255,255,0.4)'}">${count}/${col.limit}</span>
+                                        <span style="color: ${isFull && !cloudHidden ? 'var(--gold-light)' : 'rgba(255,255,255,0.4)'}">${countLabel}</span>
                                     </div>
                                     <div class="slot-student-list">
-                                        ${col.students.map(st => `
-                                            <div class="slot-student-name" 
-                                                 draggable="true" 
-                                                 style="cursor: grab;"
-                                                 ondragstart="window.__dragStudent(event, '${st.replace(/'/g, "\\'")}', '${col.topic.replace(/'/g, "\\'")}')">
-                                                 ${escapeHtml(st)}
-                                            </div>
-                                        `).join('')}
+                                        ${studentsListHtml}
                                     </div>
                                 </div>
                             `;
@@ -2237,42 +2301,105 @@
                     }
                 } 
                 else if (activeMode === 'sticky') {
-                    responseCount.textContent = `${totalResponses} note${totalResponses !== 1 ? 's' : ''}`;
-                    const cols = activeModeConfig ? activeModeConfig.split(',').map(c => c.trim()) : ['Crew', 'Weather', 'Maintenance'];
+                    // Default to single 'Ideas' column if config is blank
+                    const cols = activeModeConfig ? activeModeConfig.split(',').map(c => c.trim()).filter(Boolean) : [];
+                    const defaultCols = cols.length > 0 ? cols : ['Ideas'];
+                    
                     const board = {};
-                    cols.forEach(c => board[c.toLowerCase()] = { title: c, notes: [] });
+                    defaultCols.forEach(c => board[c.toLowerCase()] = { title: c, notes: [] });
                     
                     words.forEach(w => {
                         const clean = w.trim();
+                        // Find category prefix
                         const idx = clean.indexOf(':');
                         if (idx !== -1) {
                             const cat = clean.substring(0, idx).trim().toLowerCase();
                             const idea = clean.substring(idx + 1).trim();
-                            if (board[cat]) {
-                                board[cat].notes.push(idea);
-                            }
+                            
+                            // Check if the target column exists
+                            const finalCat = board[cat] ? cat : defaultCols[0].toLowerCase();
+                            board[finalCat].notes.push(idea);
+                        } else {
+                            // Put directly in the first column if no colon
+                            const finalCat = defaultCols[0].toLowerCase();
+                            board[finalCat].notes.push(clean);
                         }
                     });
                     
-                    const hasNotes = Object.values(board).some(b => b.notes.length > 0);
+                    // Apply manual drag overrides on sticky notes
+                    for (const colKey of Object.keys(board)) {
+                        const notesList = board[colKey].notes;
+                        for (let i = notesList.length - 1; i >= 0; i--) {
+                            const noteRaw = notesList[i];
+                            if (stickyOverrides[noteRaw]) {
+                                const targetColKey = stickyOverrides[noteRaw].toLowerCase();
+                                if (board[targetColKey] && targetColKey !== colKey) {
+                                    // Move to override column
+                                    board[targetColKey].notes.push(noteRaw);
+                                    notesList.splice(i, 1);
+                                }
+                            }
+                        }
+                    }
+                    
+                    // For each column, reverse notes so newer ones appear on top
+                    for (const colKey of Object.keys(board)) {
+                        board[colKey].notes.reverse();
+                    }
+
+                    // Count total notes
+                    let totalNotesCount = 0;
+                    Object.values(board).forEach(col => totalNotesCount += col.notes.length);
+                    responseCount.textContent = `${totalNotesCount} note${totalNotesCount !== 1 ? 's' : ''}`;
+                    
+                    const hasNotes = totalNotesCount > 0;
                     
                     if (!hasNotes) {
                         showEmptyState(true);
                         stickyBoardContainer.innerHTML = '';
                     } else {
                         showEmptyState(false);
-                        stickyBoardContainer.innerHTML = cols.map(c => {
+                        
+                        // Hashed pastel sticky note color helper
+                        const getStickyColor = (txt) => {
+                            const pastelColors = ['#fef08a', '#bfdbfe', '#fecaca', '#bbf7d0', '#fed7aa', '#f5d0fe'];
+                            const cleanText = txt.replace(/\s*\(resp_.*?\)\s*$/, '');
+                            const hash = cleanText.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+                            return pastelColors[hash % pastelColors.length];
+                        };
+
+                        stickyBoardContainer.innerHTML = defaultCols.map(c => {
                             const col = board[c.toLowerCase()];
+                            const count = col.notes.length;
+                            
+                            let notesHtml = '';
+                            if (cloudHidden) {
+                                notesHtml = `<div style="text-align: center; font-size: 0.85rem; color: rgba(255,255,255,0.2); padding: 16px 0; font-style: italic;">Notes Hidden</div>`;
+                            } else {
+                                notesHtml = col.notes.map(noteRaw => {
+                                    const displayIdea = noteRaw.replace(/\s*\(resp_.*?\)\s*$/, '');
+                                    return `
+                                        <div class="sticky-note" 
+                                             draggable="true" 
+                                             ondragstart="window.__dragNote(event, '${noteRaw.replace(/'/g, "\\'")}')"
+                                             style="background: ${getStickyColor(noteRaw)} !important; color: #0b1a2e !important; border: 1px solid rgba(0,0,0,0.12); box-shadow: 2px 2px 6px rgba(0,0,0,0.15); font-weight: 550; padding: 12px 14px; border-radius: 0px; cursor: grab;">
+                                             ${escapeHtml(displayIdea)}
+                                        </div>
+                                    `;
+                                }).join('');
+                            }
+                            
                             return `
-                                <div class="sticky-column">
+                                <div class="sticky-column" 
+                                     ondragover="event.preventDefault()" 
+                                     ondrop="window.__dropNote(event, '${col.title}')"
+                                     style="border-color: rgba(255,255,255,0.06);">
                                     <div class="sticky-column-header">
                                         <span>${col.title}</span>
-                                        <span>${col.notes.length}</span>
+                                        <span>${cloudHidden ? '?' : count}</span>
                                     </div>
                                     <div class="sticky-notes-list">
-                                        ${col.notes.map(note => `
-                                            <div class="sticky-note">${escapeHtml(note)}</div>
-                                        `).join('')}
+                                        ${notesHtml}
                                     </div>
                                 </div>
                             `;
@@ -2671,7 +2798,16 @@
             if (localStorage.getItem(key) === 'true' && !allowMultiple && activeMode !== 'sticky') {
                 if (form) form.style.display = 'none';
                 if (studentSub) studentSub.style.display = 'none';
-                if (submittedContainer) submittedContainer.style.display = 'block';
+                if (submittedContainer) {
+                    submittedContainer.style.display = 'block';
+                    if (modifySubmissionBtn) {
+                        if (activeMode === 'slots' || activeMode === 'multichoice' || activeMode === 'scale') {
+                            modifySubmissionBtn.style.display = 'inline-block';
+                        } else {
+                            modifySubmissionBtn.style.display = 'none';
+                        }
+                    }
+                }
             } else {
                 if (form) form.style.display = 'block';
                 if (studentSub) {
@@ -2784,11 +2920,36 @@
                 if (promptEl && inputEl) {
                     promptEl.style.display = 'block';
                     inputEl.value = '';
+                    inputEl.disabled = false;
                     inputEl.focus();
                     
-                    // Listen for enter key
+                    let verifyTimeout = null;
+                    const checkPassword = async () => {
+                        const pw = inputEl.value;
+                        if (pw.length < 4) return;
+                        
+                        try {
+                            const response = await fetch(`${WEB_APP_URL}?action=verifyPassword&password=${encodeURIComponent(pw)}&_=${Date.now()}`);
+                            const result = await response.json();
+                            if (result.status === 'success') {
+                                settingsAuthenticated = true;
+                                promptEl.style.display = 'none';
+                                realOpenDrawer();
+                            }
+                        } catch(err) {
+                            console.warn('Silent password check failed:', err);
+                        }
+                    };
+
+                    inputEl.oninput = function() {
+                        clearTimeout(verifyTimeout);
+                        verifyTimeout = setTimeout(checkPassword, 250);
+                    };
+                    
+                    // Also support enter key for immediate submittal
                     inputEl.onkeydown = async function(e) {
                         if (e.key === 'Enter') {
+                            clearTimeout(verifyTimeout);
                             const pw = inputEl.value;
                             inputEl.disabled = true;
                             try {
@@ -3339,10 +3500,21 @@
 
         function getStudentInputValue() {
             const checkedRadio = studentFormContent.querySelector('input[name="entry.192253551"]:checked');
-            if (checkedRadio) return checkedRadio.value;
+            if (checkedRadio) {
+                if (activeMode === 'multichoice') {
+                    return `${checkedRadio.value} (${studentUid})`;
+                }
+                return checkedRadio.value;
+            }
 
             const input = studentFormContent.querySelector('input[name="entry.192253551"]');
-            return input ? input.value : '';
+            if (input) {
+                if (activeMode === 'scale') {
+                    return `${input.value} (${studentUid})`;
+                }
+                return input.value;
+            }
+            return '';
         }
 
         // Q&A Student List Fetching
@@ -3357,14 +3529,16 @@
                         studentQaList.innerHTML = `<div style="text-align: center; color: rgba(255,255,255,0.2); font-size: 0.82rem; margin-top: 10px;">No questions asked yet</div>`;
                     } else {
                         studentQaList.innerHTML = questions.map(q => {
-                            const hasVoted = localQaIdsSubmitted.includes(q.id);
+                            const currentVote = localQaVotes[q.id];
+                            const upActive = currentVote === 'up' ? 'active' : '';
+                            const downActive = currentVote === 'down' ? 'active' : '';
                             return `
                                 <div class="student-qa-item">
                                     <span class="student-qa-text">${escapeHtml(q.text)}</span>
                                     <div class="student-qa-actions">
                                         <span style="font-size: 0.95rem; font-weight: 750; color: var(--gold-light); margin-right: 6px;">${q.votes}</span>
-                                        <button class="student-qa-vote-btn upvote" data-id="${q.id}" ${hasVoted ? 'disabled style="opacity: 0.3; cursor: not-allowed;"' : ''}>▲</button>
-                                        <button class="student-qa-vote-btn downvote" data-id="${q.id}" ${hasVoted ? 'disabled style="opacity: 0.3; cursor: not-allowed;"' : ''}>▼</button>
+                                        <button class="student-qa-vote-btn upvote ${upActive}" data-id="${q.id}">▲</button>
+                                        <button class="student-qa-vote-btn downvote ${downActive}" data-id="${q.id}">▼</button>
                                     </div>
                                 </div>
                             `;
@@ -3373,28 +3547,61 @@
                         studentQaList.querySelectorAll('.student-qa-vote-btn').forEach(btn => {
                             btn.addEventListener('click', async function() {
                                 const id = Number(this.getAttribute('data-id'));
-                                if (localQaIdsSubmitted.includes(id)) return;
+                                const isUp = this.classList.contains('upvote');
+                                const previousVote = localQaVotes[id];
                                 
-                                const isUpvote = this.classList.contains('upvote');
-                                const action = isUpvote ? 'upvoteQa' : 'downvoteQa';
+                                let delta = 0;
+                                let newVote = null;
                                 
-                                // Disable siblings
+                                if (isUp) {
+                                    if (previousVote === 'up') {
+                                        delta = -1;
+                                        newVote = null;
+                                    } else if (previousVote === 'down') {
+                                        delta = 2;
+                                        newVote = 'up';
+                                    } else {
+                                        delta = 1;
+                                        newVote = 'up';
+                                    }
+                                } else {
+                                    if (previousVote === 'down') {
+                                        delta = 1;
+                                        newVote = null;
+                                    } else if (previousVote === 'up') {
+                                        delta = -2;
+                                        newVote = 'down';
+                                    } else {
+                                        delta = -1;
+                                        newVote = 'down';
+                                    }
+                                }
+                                
+                                // Temporarily disable buttons
                                 const container = this.closest('.student-qa-actions');
                                 if (container) {
                                     container.querySelectorAll('.student-qa-vote-btn').forEach(b => b.disabled = true);
                                 }
                                 
                                 try {
-                                    const url = `${WEB_APP_URL}?action=${action}&id=${id}&_=${Date.now()}`;
+                                    const url = `${WEB_APP_URL}?action=changeVoteQa&id=${id}&delta=${delta}&_=${Date.now()}`;
                                     const res = await fetch(url);
                                     const result = await res.json();
                                     if (result.status === 'success') {
-                                        localQaIdsSubmitted.push(id);
+                                        if (newVote === null) {
+                                            delete localQaVotes[id];
+                                        } else {
+                                            localQaVotes[id] = newVote;
+                                        }
+                                        localStorage.setItem('local_qa_votes', JSON.stringify(localQaVotes));
                                         fetchStudentQaList();
                                     }
                                 } catch(e) {
                                     console.error(e);
-                                    this.disabled = false;
+                                } finally {
+                                    if (container) {
+                                        container.querySelectorAll('.student-qa-vote-btn').forEach(b => b.disabled = false);
+                                    }
                                 }
                             });
                         });
@@ -3503,12 +3710,16 @@
 
                 studentFormContent.innerHTML = `
                     <input type="hidden" name="entry.192253551" id="studentAnswerInput" value="" required />
-                    <div class="student-scale-row">
-                        <button type="button" class="student-scale-btn" data-val="1" style="font-size: 0.9rem; padding: 10px 4px; line-height: 1.25;">1<br><span style="font-size: 0.62rem; font-weight: normal; opacity: 0.8;">${minLabel}</span></button>
+                    <div class="student-scale-row" style="margin-bottom: 8px;">
+                        <button type="button" class="student-scale-btn" data-val="1">1</button>
                         <button type="button" class="student-scale-btn" data-val="2">2</button>
                         <button type="button" class="student-scale-btn" data-val="3">3</button>
                         <button type="button" class="student-scale-btn" data-val="4">4</button>
-                        <button type="button" class="student-scale-btn" data-val="5" style="font-size: 0.9rem; padding: 10px 4px; line-height: 1.25;">5<br><span style="font-size: 0.62rem; font-weight: normal; opacity: 0.8;">${maxLabel}</span></button>
+                        <button type="button" class="student-scale-btn" data-val="5">5</button>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.78rem; color: rgba(255,255,255,0.45); padding: 0 4px 16px; font-weight: 500; font-family: 'Inter', sans-serif;">
+                        <span>1 = ${minLabel}</span>
+                        <span>5 = ${maxLabel}</span>
                     </div>
                 `;
                 
@@ -3577,31 +3788,37 @@
                 if (studentSubmitBtn) studentSubmitBtn.style.display = 'flex';
             } 
             else if (activeMode === 'sticky') {
-                const cols = activeModeConfig ? activeModeConfig.split(',').map(c => c.trim()) : ['Crew', 'Weather', 'Maintenance'];
-                let html = `
-                    <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+                const cols = activeModeConfig ? activeModeConfig.split(',').map(c => c.trim()).filter(Boolean) : [];
+                
+                let selectHtml = '';
+                if (cols.length > 0) {
+                    selectHtml = `
                         <select id="stickyCategorySelect" class="drawer-select" style="background: rgba(10,22,40,0.8); border-color: rgba(255,255,255,0.15); width: 100%; box-sizing: border-box;">
-                `;
-                cols.forEach(c => {
-                    html += `<option value="${c}">${c}</option>`;
-                });
-                html += `
+                            ${cols.map(c => `<option value="${c}">${c}</option>`).join('')}
                         </select>
+                    `;
+                }
+                
+                studentFormContent.innerHTML = `
+                    <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+                        ${selectHtml}
                         <input type="text" id="stickyIdeaInput" class="answer-input" placeholder="Type your idea…" style="margin-top: 4px;" required />
                         <input type="hidden" name="entry.192253551" id="studentAnswerInput" value="" required />
                     </div>
                 `;
-                studentFormContent.innerHTML = html;
 
                 const categorySelect = studentFormContent.querySelector('#stickyCategorySelect');
                 const ideaInput = studentFormContent.querySelector('#stickyIdeaInput');
                 const hiddenInput = studentFormContent.querySelector('#studentAnswerInput');
 
                 const syncStickyInput = () => {
-                    hiddenInput.value = `${categorySelect.value}: ${ideaInput.value.trim()}`;
+                    const cat = categorySelect ? categorySelect.value : 'Ideas';
+                    hiddenInput.value = `${cat}: ${ideaInput.value.trim()} (${studentUid})`;
                 };
 
-                categorySelect.addEventListener('change', syncStickyInput);
+                if (categorySelect) {
+                    categorySelect.addEventListener('change', syncStickyInput);
+                }
                 ideaInput.addEventListener('input', syncStickyInput);
 
                 if (studentSubmitBtn) studentSubmitBtn.style.display = 'flex';
@@ -3634,6 +3851,23 @@
             }
             draggedStudent = null;
             dragSourceTopic = null;
+        };
+
+        // ─── Drag and Drop Handlers for Sticky Notes Board ───
+        let draggedNoteText = null;
+        window.__dragNote = function(event, noteText) {
+            draggedNoteText = noteText;
+            event.dataTransfer.setData("text/plain", noteText);
+        };
+        
+        window.__dropNote = function(event, targetColumn) {
+            event.preventDefault();
+            const noteText = event.dataTransfer.getData("text/plain") || draggedNoteText;
+            if (noteText && targetColumn) {
+                stickyOverrides[noteText] = targetColumn;
+                fetchAndUpdate();
+            }
+            draggedNoteText = null;
         };
 
         // ─── Bind student modify selection button ───
