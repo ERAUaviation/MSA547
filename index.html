@@ -1635,6 +1635,9 @@
         .swatch-gold { background: #e6c875; }
         .swatch-blue { background: #8abedd; }
         .swatch-red { background: #ff8e8e; }
+        .swatch-green { background: #a2e0c1; }
+        .swatch-purple { background: #c6b5f0; }
+        .swatch-orange { background: #ffb88c; }
         .scenario-panel-close {
             position: absolute;
             top: 14px;
@@ -1854,6 +1857,9 @@
         <div class="color-swatch swatch-gold" onclick="window.__execFormat('foreColor', '#e6c875')" title="Gold"></div>
         <div class="color-swatch swatch-blue" onclick="window.__execFormat('foreColor', '#8abedd')" title="Blue"></div>
         <div class="color-swatch swatch-red" onclick="window.__execFormat('foreColor', '#ff8e8e')" title="Red"></div>
+        <div class="color-swatch swatch-green" onclick="window.__execFormat('foreColor', '#a2e0c1')" title="Green"></div>
+        <div class="color-swatch swatch-purple" onclick="window.__execFormat('foreColor', '#c6b5f0')" title="Purple"></div>
+        <div class="color-swatch swatch-orange" onclick="window.__execFormat('foreColor', '#ffb88c')" title="Orange"></div>
     </div>
 </div>
 
@@ -4408,7 +4414,7 @@
                 const attrsToRemove = [];
                 for (let i = 0; i < el.attributes.length; i++) {
                     const attr = el.attributes[i];
-                    if (attr.name !== 'color' && attr.name !== 'style') {
+                    if (attr.name !== 'color' && attr.name !== 'style' && attr.name !== 'size') {
                         attrsToRemove.push(attr.name);
                     }
                 }
