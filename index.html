@@ -2195,7 +2195,8 @@
         let currentSessionUid = '';
         function refreshSessionUid() {
             if (allowMultiple) {
-                currentSessionUid = `${studentUid}_${Math.random().toString(36).substring(2, 7)}`;
+                // Generate a completely random UID to bypass Apps Script duplicate rows filter
+                currentSessionUid = 'resp_' + Math.random().toString(36).substring(2, 9);
             } else {
                 currentSessionUid = studentUid;
             }
@@ -4049,11 +4050,59 @@
                                     }
                                 }
                                 
-                                // Temporarily disable buttons
+                                // Temporarily disable buttons & store original state for rollback
                                 const container = this.closest('.student-qa-actions');
+                                const voteSpan = container ? container.querySelector('span') : null;
+                                const originalVotesText = voteSpan ? voteSpan.textContent : '0';
+                                
+                                const upBtn = container ? container.querySelector('.upvote') : null;
+                                const downBtn = container ? container.querySelector('.downvote') : null;
+                                
+                                const hadUpActive = upBtn ? upBtn.classList.contains('active') : false;
+                                const hadDownActive = downBtn ? downBtn.classList.contains('active') : false;
+                                
                                 if (container) {
                                     container.querySelectorAll('.student-qa-vote-btn').forEach(b => b.disabled = true);
                                 }
+                                
+                                // Perform Optimistic UI Update immediately
+                                if (voteSpan) {
+                                    const currentVal = parseInt(voteSpan.textContent) || 0;
+                                    voteSpan.textContent = currentVal + delta;
+                                }
+                                if (upBtn && downBtn) {
+                                    upBtn.classList.remove('active');
+                                    downBtn.classList.remove('active');
+                                    if (newVote === 'up') {
+                                        upBtn.classList.add('active');
+                                    } else if (newVote === 'down') {
+                                        downBtn.classList.add('active');
+                                    }
+                                }
+                                
+                                // Save local state immediately
+                                if (newVote === null) {
+                                    delete localQaVotes[id];
+                                } else {
+                                    localQaVotes[id] = newVote;
+                                }
+                                localStorage.setItem('local_qa_votes', JSON.stringify(localQaVotes));
+                                
+                                const rollbackLocalState = () => {
+                                    if (voteSpan) voteSpan.textContent = originalVotesText;
+                                    if (upBtn && downBtn) {
+                                        upBtn.classList.remove('active');
+                                        downBtn.classList.remove('active');
+                                        if (hadUpActive) upBtn.classList.add('active');
+                                        if (hadDownActive) downBtn.classList.add('active');
+                                    }
+                                    if (previousVote === undefined || previousVote === null) {
+                                        delete localQaVotes[id];
+                                    } else {
+                                        localQaVotes[id] = previousVote;
+                                    }
+                                    localStorage.setItem('local_qa_votes', JSON.stringify(localQaVotes));
+                                };
                                 
                                 try {
                                     const url = `${WEB_APP_URL}?action=changeVoteQa&id=${id}&delta=${delta}&_=${Date.now()}`;
@@ -4064,14 +4113,6 @@
                                     if (result.status !== 'success' || (result.message && result.message.toLowerCase().includes('action'))) {
                                         throw new Error('Fallback to legacy voting actions');
                                     }
-                                    
-                                    if (newVote === null) {
-                                        delete localQaVotes[id];
-                                    } else {
-                                        localQaVotes[id] = newVote;
-                                    }
-                                    localStorage.setItem('local_qa_votes', JSON.stringify(localQaVotes));
-                                    fetchStudentQaList();
                                 } catch(e) {
                                     console.log('Using legacy fallback voting...', e);
                                     try {
@@ -4080,15 +4121,9 @@
                                         for (let c = 0; c < callsCount; c++) {
                                             await fetch(`${WEB_APP_URL}?action=${fallbackAction}&id=${id}&_=${Date.now()}`);
                                         }
-                                        if (newVote === null) {
-                                            delete localQaVotes[id];
-                                        } else {
-                                            localQaVotes[id] = newVote;
-                                        }
-                                        localStorage.setItem('local_qa_votes', JSON.stringify(localQaVotes));
-                                        fetchStudentQaList();
                                     } catch(err) {
                                         console.error(err);
+                                        rollbackLocalState();
                                         showToast('⚠️ Vote failed. Please try again.', true);
                                     }
                                 } finally {
