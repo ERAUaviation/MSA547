@@ -394,6 +394,7 @@
         .cloud-wrapper {
             flex: 0 0 calc(100% - 358px);
             width: calc(100% - 358px);
+            margin-left: auto; /* Aligns board to the right side when QR collapses */
             position: relative;
             border-radius: 0px;
             overflow: hidden;
@@ -875,7 +876,14 @@
                 right: 8px;
             }
             .cloud-wrapper {
+                flex: none;
+                width: 100%;
+                margin-left: 0;
                 min-height: 200px;
+            }
+            .scenario-panel {
+                left: 0 !important;
+                width: 100% !important;
             }
             .freq-section {
                 flex: none;
