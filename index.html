@@ -3023,7 +3023,7 @@
                         try {
                             const response = await fetch(`${WEB_APP_URL}?action=verifyPassword&password=${encodeURIComponent(pw)}&_=${Date.now()}`);
                             const result = await response.json();
-                            if (result.status === 'success') {
+                            if (result.status === 'success' && result.data === undefined) {
                                 settingsAuthenticated = true;
                                 promptEl.style.display = 'none';
                                 realOpenDrawer();
@@ -3047,7 +3047,7 @@
                             try {
                                 const response = await fetch(`${WEB_APP_URL}?action=verifyPassword&password=${encodeURIComponent(pw)}&_=${Date.now()}`);
                                 const result = await response.json();
-                                if (result.status === 'success') {
+                                if (result.status === 'success' && result.data === undefined) {
                                     settingsAuthenticated = true;
                                     promptEl.style.display = 'none';
                                     realOpenDrawer();
@@ -3680,22 +3680,26 @@
                                     const res = await fetch(url);
                                     let result = await res.json();
                                     
-                                    // Self-healing fallback if their deployed script version is old
-                                    if (result.status === 'success' && result.data !== undefined) {
-                                        const fallbackAction = isUp ? 'upvoteQa' : 'downvoteQa';
-                                        const callsCount = Math.abs(delta);
-                                        for (let c = 0; c < callsCount; c++) {
-                                            await fetch(`${WEB_APP_URL}?action=${fallbackAction}&id=${id}&_=${Date.now()}`);
+                                    if (result.status === 'success') {
+                                        // Self-healing fallback if their deployed script version is old
+                                        if (result.data !== undefined) {
+                                            const fallbackAction = isUp ? 'upvoteQa' : 'downvoteQa';
+                                            const callsCount = Math.abs(delta);
+                                            for (let c = 0; c < callsCount; c++) {
+                                                await fetch(`${WEB_APP_URL}?action=${fallbackAction}&id=${id}&_=${Date.now()}`);
+                                            }
                                         }
-                                    }
-                                    
-                                    if (newVote === null) {
-                                        delete localQaVotes[id];
+                                        
+                                        if (newVote === null) {
+                                            delete localQaVotes[id];
+                                        } else {
+                                            localQaVotes[id] = newVote;
+                                        }
+                                        localStorage.setItem('local_qa_votes', JSON.stringify(localQaVotes));
+                                        fetchStudentQaList();
                                     } else {
-                                        localQaVotes[id] = newVote;
+                                        showToast('⚠️ Vote failed: ' + (result.message || 'Server error'), true);
                                     }
-                                    localStorage.setItem('local_qa_votes', JSON.stringify(localQaVotes));
-                                    fetchStudentQaList();
                                 } catch(e) {
                                     console.error(e);
                                     showToast('⚠️ Vote failed. Please try again.', true);
