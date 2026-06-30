@@ -1143,17 +1143,30 @@
             color: rgba(255,255,255,0.85);
         }
         .sticky-note {
-            background: rgba(212, 175, 55, 0.05);
-            border-left: 3px solid var(--gold);
-            border-top: 1px solid rgba(212, 175, 55, 0.1);
-            border-right: 1px solid rgba(212, 175, 55, 0.1);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
-            padding: 12px 14px;
-            font-size: 0.9rem;
+            aspect-ratio: 1 / 1;
+            min-height: 130px;
+            padding: 16px;
+            font-size: 0.95rem;
             line-height: 1.35;
-            color: #fff;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            color: #0b1a2e !important;
+            box-shadow: 3px 6px 14px rgba(0, 0, 0, 0.4);
             word-break: break-word;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+            font-weight: 650;
+            box-sizing: border-box;
+            border-radius: 0px;
+            background-image: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0) 80%, rgba(0,0,0,0.06) 100%);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .sticky-note:hover {
+            transform: scale(1.06) rotate(0deg) !important;
+            box-shadow: 5px 12px 24px rgba(0, 0, 0, 0.5);
+            z-index: 10;
         }
 
         .qa-board-container {
@@ -1980,20 +1993,28 @@
                                 qaBoardContainer.innerHTML = '';
                             } else {
                                 showEmptyState(false);
-                                qaBoardContainer.innerHTML = questions.map(q => `
-                                    <div class="qa-card">
-                                        <div class="qa-card-left">
-                                            <div class="qa-votes-box">
-                                                <span>${q.votes}</span>
-                                                <span class="qa-votes-label">Votes</span>
+                                if (cloudHidden) {
+                                    qaBoardContainer.innerHTML = `<div style="text-align: center; font-size: 1.1rem; color: rgba(255,255,255,0.25); padding: 32px 0; font-style: italic;">Q&A Board Hidden by Instructor</div>`;
+                                } else {
+                                    qaBoardContainer.innerHTML = questions.map(q => {
+                                        const d = new Date(q.timestamp);
+                                        const timeStr = isNaN(d.getTime()) ? '' : d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                                        return `
+                                            <div class="qa-card">
+                                                <div class="qa-card-left">
+                                                    <div class="qa-votes-box">
+                                                        <span>${q.votes}</span>
+                                                        <span class="qa-votes-label">Votes</span>
+                                                    </div>
+                                                    <span class="qa-text">${escapeHtml(q.text)}</span>
+                                                </div>
+                                                <div style="font-size: 0.72rem; color: rgba(255,255,255,0.35); font-family: monospace;">
+                                                    ${timeStr}
+                                                </div>
                                             </div>
-                                            <span class="qa-text">${escapeHtml(q.text)}</span>
-                                        </div>
-                                        <div style="font-size: 0.72rem; color: rgba(255,255,255,0.35); font-family: monospace;">
-                                            ${new Date(q.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                                        </div>
-                                    </div>
-                                `).join('');
+                                        `;
+                                    }).join('');
+                                }
                             }
                         }
                     } catch(e) {
@@ -2378,11 +2399,15 @@
                             } else {
                                 notesHtml = col.notes.map(noteRaw => {
                                     const displayIdea = noteRaw.replace(/\s*\(resp_.*?\)\s*$/, '');
+                                    // Generate stable random-looking rotation based on text hash to mimic physical board layout
+                                    const hash = noteRaw.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+                                    const rot = ((hash % 7) - 3); // -3deg to 3deg
+                                    
                                     return `
                                         <div class="sticky-note" 
                                              draggable="true" 
                                              ondragstart="window.__dragNote(event, '${noteRaw.replace(/'/g, "\\'")}')"
-                                             style="background: ${getStickyColor(noteRaw)} !important; color: #0b1a2e !important; border: 1px solid rgba(0,0,0,0.12); box-shadow: 2px 2px 6px rgba(0,0,0,0.15); font-weight: 550; padding: 12px 14px; border-radius: 0px; cursor: grab;">
+                                             style="background: ${getStickyColor(noteRaw)} !important; transform: rotate(${rot}deg); cursor: grab;">
                                              ${escapeHtml(displayIdea)}
                                         </div>
                                     `;
@@ -2546,43 +2571,57 @@
         }
 
         // ─── Form submission ───
-        let formSubmitted = false;
-
         if (form) {
-            form.addEventListener('submit', function(e) {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault(); // Always intercept to post over Apps Script Web App API
+                
                 const inputVal = getStudentInputValue();
                 if (!inputVal || !inputVal.trim()) {
-                    e.preventDefault();
                     showToast('⚠️ Please make a selection or enter a value!', true);
                     return;
                 }
                 if (isProfane(inputVal)) {
-                    e.preventDefault();
                     showToast('⚠️ Inappropriate content detected.', true);
                     return;
                 }
-                formSubmitted = true;
+                
+                const originalText = studentSubmitBtn ? studentSubmitBtn.innerHTML : 'Submit ✈️';
+                if (studentSubmitBtn) {
+                    studentSubmitBtn.innerHTML = '⏳ Submitting…';
+                    studentSubmitBtn.disabled = true;
+                }
+                
+                try {
+                    const url = `${WEB_APP_URL}?action=submitResponse&response=${encodeURIComponent(inputVal)}&mode=${activeMode}&_=${Date.now()}`;
+                    const res = await fetch(url);
+                    const result = await res.json();
+                    
+                    if (result.status === 'success') {
+                        // Write to localStorage to prevent double submission
+                        const key = 'submitted_' + activeQuestionText.toLowerCase().replace(/[^a-z0-9]/g, '');
+                        localStorage.setItem(key, 'true');
+                        
+                        showToast('Response submitted — thank you!');
+                        checkStudentSubmissionStatus();
+                        form.reset();
+                        
+                        if (activeMode === 'slots') {
+                            updateStudentUI();
+                        }
+                    } else {
+                        showToast('❌ Submission failed: ' + result.message, true);
+                    }
+                } catch(err) {
+                    console.error(err);
+                    showToast('❌ Submission network error', true);
+                } finally {
+                    if (studentSubmitBtn) {
+                        studentSubmitBtn.innerHTML = originalText;
+                        studentSubmitBtn.disabled = false;
+                    }
+                }
             });
         }
-
-        iframe.onload = function() {
-            if (formSubmitted) {
-                formSubmitted = false;
-                
-                // Write to localStorage to prevent double submission
-                const key = 'submitted_' + activeQuestionText.toLowerCase().replace(/[^a-z0-9]/g, '');
-                localStorage.setItem(key, 'true');
-                
-                showToast('Response submitted — thank you!');
-                checkStudentSubmissionStatus();
-                form.reset();
-
-                // If slots mode, update counters immediately
-                if (activeMode === 'slots') {
-                    updateStudentUI();
-                }
-            }
-        };
 
         // ─── QR Toggle ───
         qrToggle.addEventListener('click', function() {
@@ -3827,7 +3866,8 @@
 
         // Helper to escape HTML
         function escapeHtml(str) {
-            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+            if (str === undefined || str === null) return '';
+            return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
 
         // ─── Drag and Drop Handlers for Slots Column Rebalancing ───
