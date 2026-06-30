@@ -406,11 +406,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: flex-basis 0.4s cubic-bezier(0.16, 1, 0.3, 1), width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .cloud-wrapper.expanded {
-            flex: 0 0 calc(100% - 78px);
-            width: calc(100% - 78px);
         }
 
         .cloud-wrapper canvas {
@@ -1889,30 +1884,7 @@
             </button>
         </div>
 
-        <!-- Section: Scenario Whiteboard Panels -->
-        <div class="drawer-section">
-            <span class="drawer-section-title">Scenario Whiteboard Panels</span>
-            <div class="drawer-input-group">
-                <label class="drawer-input-label">Scenario Panel 1 Text</label>
-                <textarea id="scenarioPanel1Input" class="drawer-text-input" rows="2" style="resize: vertical; font-size: 0.85rem;" placeholder="Enter Scenario 1 content..."></textarea>
-            </div>
-            <div class="drawer-input-group" style="margin-top: 6px;">
-                <label class="drawer-input-label">Scenario Panel 2 Text</label>
-                <textarea id="scenarioPanel2Input" class="drawer-text-input" rows="2" style="resize: vertical; font-size: 0.85rem;" placeholder="Enter Scenario 2 content..."></textarea>
-            </div>
-            <div class="drawer-input-group" style="margin-top: 6px;">
-                <label class="drawer-input-label">Scenario Panel 3 Text</label>
-                <textarea id="scenarioPanel3Input" class="drawer-text-input" rows="2" style="resize: vertical; font-size: 0.85rem;" placeholder="Enter Scenario 3 content..."></textarea>
-            </div>
-            <div style="display: flex; gap: 8px; margin-top: 8px;">
-                <button class="action-btn" id="savePanelsBtn" style="flex: 1; background: rgba(212, 175, 55, 0.2); border-color: rgba(212, 175, 55, 0.4); color: var(--gold-light); font-weight: 600;" title="Save panels content">
-                    Save Panels
-                </button>
-                <button class="action-btn clear-btn" id="clearPanelsBtn" style="flex: 1;" title="Clear all panels content">
-                    Clear All
-                </button>
-            </div>
-        </div>
+
 
         <!-- Section: Moderation Hub -->
         <div class="drawer-section">
@@ -3082,11 +3054,7 @@
                                 }
                             }
                             
-                            // Fill settings inputs, only if they are not actively focused by the instructor!
-                            const inputEl = document.getElementById(`scenarioPanel${i}Input`);
-                            if (inputEl && document.activeElement !== inputEl) {
-                                inputEl.value = pText;
-                            }
+
                         }
                     }
                     
@@ -3539,69 +3507,7 @@
             });
         }
 
-        // ─── Scenario Panels Save & Clear Click Handlers ───
-        const savePanelsBtn = document.getElementById('savePanelsBtn');
-        if (savePanelsBtn) {
-            savePanelsBtn.addEventListener('click', async function() {
-                const p1 = document.getElementById('scenarioPanel1Input').value.trim();
-                const p2 = document.getElementById('scenarioPanel2Input').value.trim();
-                const p3 = document.getElementById('scenarioPanel3Input').value.trim();
-                
-                const originalText = savePanelsBtn.textContent;
-                savePanelsBtn.textContent = '⏳ Saving…';
-                savePanelsBtn.disabled = true;
-                
-                try {
-                    const url = `${WEB_APP_URL}?action=setPanels&panel1=${encodeURIComponent(p1)}&panel2=${encodeURIComponent(p2)}&panel3=${encodeURIComponent(p3)}&_=${Date.now()}`;
-                    const res = await fetch(url);
-                    const result = await res.json();
-                    if (result.status === 'success' && result.data === undefined) {
-                        showToast('✅ Scenario panels saved!');
-                        fetchAndUpdate();
-                    } else {
-                        showToast('❌ Save failed: ' + (result.message || 'Legacy bypass detected'), true);
-                    }
-                } catch(e) {
-                    console.error(e);
-                    showToast('❌ Connection error saving panels', true);
-                } finally {
-                    savePanelsBtn.textContent = originalText;
-                    savePanelsBtn.disabled = false;
-                }
-            });
-        }
-        
-        const clearPanelsBtn = document.getElementById('clearPanelsBtn');
-        if (clearPanelsBtn) {
-            clearPanelsBtn.addEventListener('click', async function() {
-                if (!confirm('Are you sure you want to clear all 3 scenario whiteboard panels?')) return;
-                
-                const originalText = clearPanelsBtn.textContent;
-                clearPanelsBtn.textContent = '⏳ Clearing…';
-                clearPanelsBtn.disabled = true;
-                
-                try {
-                    const url = `${WEB_APP_URL}?action=setPanels&panel1=&panel2=&panel3=&_=${Date.now()}`;
-                    const res = await fetch(url);
-                    const result = await res.json();
-                    if (result.status === 'success' && result.data === undefined) {
-                        document.getElementById('scenarioPanel1Input').value = '';
-                        document.getElementById('scenarioPanel2Input').value = '';
-                        document.getElementById('scenarioPanel3Input').value = '';
-                        showToast('🧹 Scenario panels cleared!');
-                        fetchAndUpdate();
-                    } else {
-                        showToast('❌ Clear failed: ' + (result.message || 'Legacy bypass detected'), true);
-                    }
-                } catch(e) {
-                    console.error(e);
-                    showToast('❌ Connection error clearing panels', true);
-                } finally {
-                    clearPanelsBtn.textContent = originalText;
-                    clearPanelsBtn.disabled = false;
-                }
-            });
-        }
+
 
         // ─── Timer Control Event Listeners ───
         if (startTimerBtn) {
@@ -4360,46 +4266,12 @@
                 tab.classList.remove('active');
                 activeScenarioPanel = null;
                 if (questionEl) questionEl.classList.remove('question-hidden');
-                
-                // Reset expanded cloudWrapper
-                if (cloudWrapper) {
-                    cloudWrapper.classList.remove('expanded');
-                }
-                
-                // Restore QR Code state
-                if (window.__preWhiteboardQrVisible !== undefined) {
-                    qrVisible = window.__preWhiteboardQrVisible;
-                    if (qrSection) {
-                        if (qrVisible) {
-                            qrSection.classList.remove('collapsed');
-                            if (qrToggle) qrToggle.textContent = 'Hide';
-                        } else {
-                            qrSection.classList.add('collapsed');
-                            if (qrToggle) qrToggle.textContent = 'Show';
-                        }
-                    }
-                }
             } else {
                 // Opening
-                // Record current QR state before we change it
-                if (activeScenarioPanel === null) {
-                    window.__preWhiteboardQrVisible = qrVisible;
-                }
-                
                 panel.classList.add('open');
                 tab.classList.add('active');
                 activeScenarioPanel = num;
                 if (questionEl) questionEl.classList.add('question-hidden');
-                
-                // Expand cloudWrapper to take collapsed QR space
-                if (cloudWrapper) {
-                    cloudWrapper.classList.add('expanded');
-                }
-                
-                // Collapse QR Section
-                qrVisible = false;
-                if (qrSection) qrSection.classList.add('collapsed');
-                if (qrToggle) qrToggle.textContent = 'Show';
             }
         };
 
@@ -4441,9 +4313,7 @@
                                 showToast('✅ Whiteboard updated!');
                                 contentEl.setAttribute('data-last-saved', newText);
                                 
-                                // Sync back to drawer textarea
-                                const inputEl = document.getElementById(`scenarioPanel${i}Input`);
-                                if (inputEl) inputEl.value = newText;
+
                                 
                                 fetchAndUpdate();
                             } else {
