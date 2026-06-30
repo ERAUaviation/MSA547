@@ -1429,6 +1429,96 @@
         .student-qa-vote-btn:active:not(:disabled) {
             transform: scale(0.92);
         }
+
+        /* ─── SCENARIO PANELS (WHITEBOARD) ─── */
+        .scenario-tabs-container {
+            position: fixed;
+            right: 0;
+            top: 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 10001;
+            transition: opacity 0.3s ease;
+        }
+        .scenario-tab {
+            background: rgba(10, 22, 40, 0.92);
+            border: 2px solid var(--gold);
+            border-right: none;
+            color: var(--white);
+            padding: 14px 10px;
+            cursor: pointer;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border-radius: 0px 8px 8px 0px; /* Folder tab look */
+            box-shadow: -4px 4px 10px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            user-select: none;
+        }
+        .scenario-tab:hover,
+        .scenario-tab.active {
+            background: var(--gold);
+            color: #0a1628;
+            box-shadow: -6px 6px 15px rgba(212, 175, 55, 0.3);
+        }
+        .scenario-panel {
+            position: fixed;
+            top: 0;
+            right: -60vw;
+            width: 60vw;
+            height: 100vh;
+            background: rgba(10, 22, 40, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-left: 2px solid var(--gold);
+            box-shadow: -15px 0 40px rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px;
+            box-sizing: border-box;
+        }
+        .scenario-panel.open {
+            right: 0;
+        }
+        .scenario-panel-content {
+            font-family: 'Outfit', 'Inter', sans-serif;
+            font-size: 2.3rem;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.4;
+            text-align: center;
+            max-height: 80vh;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            width: 100%;
+        }
+        .scenario-panel-close {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 2.2rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .scenario-panel-close:hover {
+            color: #ffffff;
+        }
+        .question-hidden {
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
     </style>
 </head>
 <body>
@@ -1594,6 +1684,26 @@
     </div>
 </div>
 
+<!-- ─── Whiteboard Scenario Panels ─── -->
+<div id="scenarioTabsContainer" class="scenario-tabs-container hidden">
+    <div class="scenario-tab" id="scenarioTab1" onclick="window.__toggleScenarioPanel(1)">Scenario 1</div>
+    <div class="scenario-tab" id="scenarioTab2" onclick="window.__toggleScenarioPanel(2)">Scenario 2</div>
+    <div class="scenario-tab" id="scenarioTab3" onclick="window.__toggleScenarioPanel(3)">Scenario 3</div>
+</div>
+
+<div id="scenarioPanel1" class="scenario-panel">
+    <button class="scenario-panel-close" onclick="window.__toggleScenarioPanel(1)">&times;</button>
+    <div id="scenarioContent1" class="scenario-panel-content"></div>
+</div>
+<div id="scenarioPanel2" class="scenario-panel">
+    <button class="scenario-panel-close" onclick="window.__toggleScenarioPanel(2)">&times;</button>
+    <div id="scenarioContent2" class="scenario-panel-content"></div>
+</div>
+<div id="scenarioPanel3" class="scenario-panel">
+    <button class="scenario-panel-close" onclick="window.__toggleScenarioPanel(3)">&times;</button>
+    <div id="scenarioContent3" class="scenario-panel-content"></div>
+</div>
+
 <!-- Floating Gear Button -->
 <button id="gearBtn" class="gear-btn" title="Open Settings Drawer">⚙️</button>
 
@@ -1738,6 +1848,31 @@
             <button class="action-btn" id="resetLocksBtn" style="width: 100%; margin-top: 8px; background: rgba(255, 107, 107, 0.12); border-color: rgba(255, 107, 107, 0.2); color: #ff8e8e;" title="Force reset submission locks for all students">
                 <span>🔄</span> Reset Student Locks
             </button>
+        </div>
+
+        <!-- Section: Scenario Whiteboard Panels -->
+        <div class="drawer-section">
+            <span class="drawer-section-title">Scenario Whiteboard Panels</span>
+            <div class="drawer-input-group">
+                <label class="drawer-input-label">Scenario Panel 1 Text</label>
+                <textarea id="scenarioPanel1Input" class="drawer-text-input" rows="2" style="resize: vertical; font-size: 0.85rem;" placeholder="Enter Scenario 1 content..."></textarea>
+            </div>
+            <div class="drawer-input-group" style="margin-top: 6px;">
+                <label class="drawer-input-label">Scenario Panel 2 Text</label>
+                <textarea id="scenarioPanel2Input" class="drawer-text-input" rows="2" style="resize: vertical; font-size: 0.85rem;" placeholder="Enter Scenario 2 content..."></textarea>
+            </div>
+            <div class="drawer-input-group" style="margin-top: 6px;">
+                <label class="drawer-input-label">Scenario Panel 3 Text</label>
+                <textarea id="scenarioPanel3Input" class="drawer-text-input" rows="2" style="resize: vertical; font-size: 0.85rem;" placeholder="Enter Scenario 3 content..."></textarea>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+                <button class="action-btn" id="savePanelsBtn" style="flex: 1; background: rgba(212, 175, 55, 0.2); border-color: rgba(212, 175, 55, 0.4); color: var(--gold-light); font-weight: 600;" title="Save panels content">
+                    Save Panels
+                </button>
+                <button class="action-btn clear-btn" id="clearPanelsBtn" style="flex: 1;" title="Clear all panels content">
+                    Clear All
+                </button>
+            </div>
         </div>
 
         <!-- Section: Moderation Hub -->
@@ -1908,6 +2043,7 @@
         let activeDragNote = null;
         let allowMultiple = false;
         let currentSessionToken = '';
+        let activeScenarioPanel = null;
         
         let studentUid = localStorage.getItem('classroom_works_uid');
         if (!studentUid) {
@@ -2859,6 +2995,59 @@
                         }
                     }
                     
+                    // Sync whiteboard scenario panel texts (projector view only)
+                    if (isResults) {
+                        const hasAnyPanelText = (result.panel1 && result.panel1.trim()) || (result.panel2 && result.panel2.trim()) || (result.panel3 && result.panel3.trim());
+                        const tabsContainer = document.getElementById('scenarioTabsContainer');
+                        
+                        if (tabsContainer) {
+                            if (hasAnyPanelText) {
+                                tabsContainer.classList.remove('hidden');
+                            } else {
+                                tabsContainer.classList.add('hidden');
+                                // Close any open panels
+                                for (let i = 1; i <= 3; i++) {
+                                    const p = document.getElementById(`scenarioPanel${i}`);
+                                    const t = document.getElementById(`scenarioTab${i}`);
+                                    if (p) p.classList.remove('open');
+                                    if (t) t.classList.remove('active');
+                                }
+                                const questionEl = document.getElementById('resultsQuestion');
+                                if (questionEl) questionEl.classList.remove('question-hidden');
+                            }
+                        }
+                        
+                        for (let i = 1; i <= 3; i++) {
+                            const pText = result[`panel${i}`] || '';
+                            const contentEl = document.getElementById(`scenarioContent${i}`);
+                            if (contentEl) {
+                                contentEl.textContent = pText;
+                            }
+                            
+                            const tabEl = document.getElementById(`scenarioTab${i}`);
+                            if (tabEl) {
+                                if (pText.trim()) {
+                                    tabEl.style.display = 'block';
+                                } else {
+                                    tabEl.style.display = 'none';
+                                    const panelEl = document.getElementById(`scenarioPanel${i}`);
+                                    if (panelEl && panelEl.classList.contains('open')) {
+                                        panelEl.classList.remove('open');
+                                        tabEl.classList.remove('active');
+                                        const questionEl = document.getElementById('resultsQuestion');
+                                        if (questionEl) questionEl.classList.remove('question-hidden');
+                                    }
+                                }
+                            }
+                            
+                            // Fill settings inputs, only if they are not actively focused by the instructor!
+                            const inputEl = document.getElementById(`scenarioPanel${i}Input`);
+                            if (inputEl && document.activeElement !== inputEl) {
+                                inputEl.value = pText;
+                            }
+                        }
+                    }
+                    
                     // Run student submission block check (only if timer is not active)
                     if (!timerExpirationTime) {
                         checkStudentSubmissionStatus();
@@ -3279,6 +3468,70 @@
                 } finally {
                     resetLocksBtn.innerHTML = originalText;
                     resetLocksBtn.disabled = false;
+                }
+            });
+        }
+
+        // ─── Scenario Panels Save & Clear Click Handlers ───
+        const savePanelsBtn = document.getElementById('savePanelsBtn');
+        if (savePanelsBtn) {
+            savePanelsBtn.addEventListener('click', async function() {
+                const p1 = document.getElementById('scenarioPanel1Input').value.trim();
+                const p2 = document.getElementById('scenarioPanel2Input').value.trim();
+                const p3 = document.getElementById('scenarioPanel3Input').value.trim();
+                
+                const originalText = savePanelsBtn.textContent;
+                savePanelsBtn.textContent = '⏳ Saving…';
+                savePanelsBtn.disabled = true;
+                
+                try {
+                    const url = `${WEB_APP_URL}?action=setPanels&panel1=${encodeURIComponent(p1)}&panel2=${encodeURIComponent(p2)}&panel3=${encodeURIComponent(p3)}&_=${Date.now()}`;
+                    const res = await fetch(url);
+                    const result = await res.json();
+                    if (result.status === 'success' && result.data === undefined) {
+                        showToast('✅ Scenario panels saved!');
+                        fetchAndUpdate();
+                    } else {
+                        showToast('❌ Save failed: ' + (result.message || 'Legacy bypass detected'), true);
+                    }
+                } catch(e) {
+                    console.error(e);
+                    showToast('❌ Connection error saving panels', true);
+                } finally {
+                    savePanelsBtn.textContent = originalText;
+                    savePanelsBtn.disabled = false;
+                }
+            });
+        }
+        
+        const clearPanelsBtn = document.getElementById('clearPanelsBtn');
+        if (clearPanelsBtn) {
+            clearPanelsBtn.addEventListener('click', async function() {
+                if (!confirm('Are you sure you want to clear all 3 scenario whiteboard panels?')) return;
+                
+                const originalText = clearPanelsBtn.textContent;
+                clearPanelsBtn.textContent = '⏳ Clearing…';
+                clearPanelsBtn.disabled = true;
+                
+                try {
+                    const url = `${WEB_APP_URL}?action=setPanels&panel1=&panel2=&panel3=&_=${Date.now()}`;
+                    const res = await fetch(url);
+                    const result = await res.json();
+                    if (result.status === 'success' && result.data === undefined) {
+                        document.getElementById('scenarioPanel1Input').value = '';
+                        document.getElementById('scenarioPanel2Input').value = '';
+                        document.getElementById('scenarioPanel3Input').value = '';
+                        showToast('🧹 Scenario panels cleared!');
+                        fetchAndUpdate();
+                    } else {
+                        showToast('❌ Clear failed: ' + (result.message || 'Legacy bypass detected'), true);
+                    }
+                } catch(e) {
+                    console.error(e);
+                    showToast('❌ Connection error clearing panels', true);
+                } finally {
+                    clearPanelsBtn.textContent = originalText;
+                    clearPanelsBtn.disabled = false;
                 }
             });
         }
@@ -4005,6 +4258,36 @@
                     activeDragNote = null;
                 }
             };
+        };
+
+        // ─── Scenario Whiteboard Panels Toggling ───
+        window.__toggleScenarioPanel = function(num) {
+            const panel = document.getElementById(`scenarioPanel${num}`);
+            const tab = document.getElementById(`scenarioTab${num}`);
+            const questionEl = document.getElementById('resultsQuestion');
+            if (!panel || !tab) return;
+            
+            // Close other panels
+            for (let i = 1; i <= 3; i++) {
+                if (i !== num) {
+                    const otherPanel = document.getElementById(`scenarioPanel${i}`);
+                    const otherTab = document.getElementById(`scenarioTab${i}`);
+                    if (otherPanel) otherPanel.classList.remove('open');
+                    if (otherTab) otherTab.classList.remove('active');
+                }
+            }
+            
+            if (panel.classList.contains('open')) {
+                panel.classList.remove('open');
+                tab.classList.remove('active');
+                activeScenarioPanel = null;
+                if (questionEl) questionEl.classList.remove('question-hidden');
+            } else {
+                panel.classList.add('open');
+                tab.classList.add('active');
+                activeScenarioPanel = num;
+                if (questionEl) questionEl.classList.add('question-hidden');
+            }
         };
 
         // ─── Bind student modify selection button ───
