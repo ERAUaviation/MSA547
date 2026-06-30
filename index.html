@@ -1126,14 +1126,22 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
-        .slot-student-list,
-        .sticky-notes-list {
+        .slot-student-list {
             display: flex;
             flex-direction: column;
             gap: 8px;
             overflow-y: auto;
             flex: 1;
             padding-right: 2px;
+        }
+        .sticky-notes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 2px;
+            align-items: center;
         }
         .slot-student-name {
             background: rgba(255, 255, 255, 0.03);
@@ -1143,13 +1151,15 @@
             color: rgba(255,255,255,0.85);
         }
         .sticky-note {
+            width: 120px;
+            height: 120px;
+            min-height: 120px;
             aspect-ratio: 1 / 1;
-            min-height: 130px;
-            padding: 16px;
-            font-size: 0.95rem;
-            line-height: 1.35;
+            padding: 12px;
+            font-size: 0.82rem;
+            line-height: 1.25;
             color: #0b1a2e !important;
-            box-shadow: 1px 3px 6px rgba(0, 0, 0, 0.18);
+            box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.15);
             word-break: break-word;
             position: relative;
             display: flex;
@@ -1159,41 +1169,29 @@
             font-family: 'Inter', sans-serif;
             font-weight: 650;
             box-sizing: border-box;
-            border-bottom-right-radius: 60px 4px;
-            border-bottom-left-radius: 4px 60px;
-            background-image: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0) 85%, rgba(0,0,0,0.05) 100%);
+            border-radius: 2px;
+            border-bottom-right-radius: 12px 3px;
+            background-image: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0) 80%, rgba(0,0,0,0.06) 100%);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .sticky-note::before {
-            content: "";
-            position: absolute;
-            z-index: -1;
-            left: 8px;
-            bottom: 8px;
-            width: 70%;
-            height: 12px;
-            box-shadow: 0 10px 10px rgba(0, 0, 0, 0.35);
-            transform: rotate(-3deg);
         }
         .sticky-note::after {
             content: "";
             position: absolute;
             z-index: -1;
-            right: 8px;
-            bottom: 8px;
-            width: 70%;
-            height: 12px;
-            box-shadow: 0 10px 10px rgba(0, 0, 0, 0.38);
-            transform: rotate(3deg);
+            right: 6px;
+            bottom: 6px;
+            width: 80%;
+            height: 10px;
+            box-shadow: 0 8px 10px rgba(0, 0, 0, 0.35);
+            transform: rotate(3deg) skew(5deg);
         }
         .sticky-note:hover {
             transform: scale(1.08) rotate(0deg) !important;
-            box-shadow: 3px 12px 20px rgba(0, 0, 0, 0.4) !important;
+            box-shadow: 2px 8px 15px rgba(0, 0, 0, 0.35) !important;
             z-index: 10;
         }
-        .sticky-note:hover::before,
         .sticky-note:hover::after {
-            box-shadow: 0 14px 12px rgba(0, 0, 0, 0.45);
+            box-shadow: 0 12px 14px rgba(0, 0, 0, 0.45);
         }
 
         .qa-board-container {
@@ -1978,6 +1976,7 @@
             updateInterval = setInterval(fetchAndUpdate, 1500);
         } else {
             // Student View: Fetch and load question, and poll for changes in background
+            if (gearBtn) gearBtn.style.display = 'none';
             fetchQuestion();
             setInterval(fetchQuestion, 5000);
         }
@@ -2319,7 +2318,7 @@
                         slotsBoardContainer.innerHTML = columns.map(col => {
                             const count = col.students.length;
                             const isFull = count >= col.limit;
-                            const countLabel = cloudHidden ? `?/${col.limit}` : `${count}/${col.limit}`;
+                            const countLabel = cloudHidden ? '?' : `${count}`;
                             const studentsListHtml = cloudHidden 
                                 ? `<div style="text-align: center; font-size: 0.85rem; color: rgba(255,255,255,0.2); padding: 14px 0; font-style: italic;">Responses Hidden</div>` 
                                 : col.students.map(st => `
