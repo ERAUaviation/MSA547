@@ -1432,32 +1432,32 @@
 
         /* ─── SCENARIO PANELS (WHITEBOARD) ─── */
         .scenario-tabs-container {
-            position: fixed;
+            position: absolute;
             right: 0;
-            top: 250px;
+            top: 50%;
+            transform: translateY(-50%);
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            z-index: 10001;
+            gap: 8px;
+            z-index: 1001;
             transition: opacity 0.3s ease;
         }
         .scenario-tab {
-            background: rgba(10, 22, 40, 0.92);
-            border: 2px solid var(--gold);
+            background: rgba(10, 22, 40, 0.95);
+            border: 1px solid var(--gold);
             border-right: none;
-            color: var(--white);
-            padding: 14px 10px;
+            color: var(--gold-light);
+            padding: 6px 10px;
             cursor: pointer;
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
-            transform: rotate(180deg);
-            font-size: 0.82rem;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            border-radius: 0px 8px 8px 0px; /* Folder tab look */
-            box-shadow: -4px 4px 10px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            font-weight: 800;
+            border-radius: 6px 0px 0px 6px;
+            box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            height: 32px;
             box-sizing: border-box;
             user-select: none;
         }
@@ -1465,25 +1465,33 @@
         .scenario-tab.active {
             background: var(--gold);
             color: #0a1628;
-            box-shadow: -6px 6px 15px rgba(212, 175, 55, 0.3);
+            box-shadow: -4px 4px 12px rgba(212, 175, 55, 0.3);
+        }
+        .scenario-tab .arrow {
+            display: inline-block;
+            transition: transform 0.3s ease;
+            font-size: 0.72rem;
+        }
+        .scenario-tab.active .arrow {
+            transform: rotate(180deg);
         }
         .scenario-panel {
-            position: fixed;
+            position: absolute;
             top: 0;
-            right: -60vw;
-            width: 60vw;
-            height: 100vh;
+            right: -100%;
+            width: 100%;
+            height: 100%;
             background: rgba(10, 22, 40, 0.98);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             border-left: 2px solid var(--gold);
-            box-shadow: -15px 0 40px rgba(0, 0, 0, 0.8);
-            z-index: 10000;
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.6);
+            z-index: 1000;
             transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 60px;
+            padding: 40px;
             box-sizing: border-box;
         }
         .scenario-panel.open {
@@ -1491,26 +1499,41 @@
         }
         .scenario-panel-content {
             font-family: 'Outfit', 'Inter', sans-serif;
-            font-size: 2.3rem;
+            font-size: 2.2rem;
             font-weight: 700;
             color: #ffffff;
             line-height: 1.4;
             text-align: center;
-            max-height: 80vh;
+            max-height: 100%;
             overflow-y: auto;
             white-space: pre-wrap;
             width: 100%;
+            outline: none;
+            cursor: text;
+            padding: 10px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .scenario-panel-content:focus {
+            background: rgba(255, 255, 255, 0.03);
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.05);
+        }
+        .scenario-panel-content[placeholder]:empty::before {
+            content: attr(placeholder);
+            color: rgba(255, 255, 255, 0.25);
+            font-style: italic;
         }
         .scenario-panel-close {
             position: absolute;
-            top: 24px;
-            left: 24px;
+            top: 14px;
+            left: 14px;
             background: none;
             border: none;
             color: rgba(255, 255, 255, 0.4);
-            font-size: 2.2rem;
+            font-size: 1.6rem;
             cursor: pointer;
             transition: color 0.2s;
+            line-height: 1;
         }
         .scenario-panel-close:hover {
             color: #ffffff;
@@ -1680,28 +1703,28 @@
                 <div style="font-weight: 600; color: var(--gold-light);">Cloud Hidden by Instructor</div>
                 <div style="font-size:0.9rem; margin-top:6px; opacity:0.6;">Responses are still being collected live!</div>
             </div>
+            
+            <!-- ─── Whiteboard Scenario Panels (Embedded Inside cloud-wrapper) ─── -->
+            <div id="scenarioTabsContainer" class="scenario-tabs-container hidden">
+                <div class="scenario-tab" id="scenarioTab1" onclick="window.__toggleScenarioPanel(1)">1 <span class="arrow">◀</span></div>
+                <div class="scenario-tab" id="scenarioTab2" onclick="window.__toggleScenarioPanel(2)">2 <span class="arrow">◀</span></div>
+                <div class="scenario-tab" id="scenarioTab3" onclick="window.__toggleScenarioPanel(3)">3 <span class="arrow">◀</span></div>
+            </div>
+
+            <div id="scenarioPanel1" class="scenario-panel">
+                <button class="scenario-panel-close" onclick="window.__toggleScenarioPanel(1)">&times;</button>
+                <div id="scenarioContent1" class="scenario-panel-content" contenteditable="true" spellcheck="false" placeholder="Type instructions here..."></div>
+            </div>
+            <div id="scenarioPanel2" class="scenario-panel">
+                <button class="scenario-panel-close" onclick="window.__toggleScenarioPanel(2)">&times;</button>
+                <div id="scenarioContent2" class="scenario-panel-content" contenteditable="true" spellcheck="false" placeholder="Type instructions here..."></div>
+            </div>
+            <div id="scenarioPanel3" class="scenario-panel">
+                <button class="scenario-panel-close" onclick="window.__toggleScenarioPanel(3)">&times;</button>
+                <div id="scenarioContent3" class="scenario-panel-content" contenteditable="true" spellcheck="false" placeholder="Type instructions here..."></div>
+            </div>
         </div>
     </div>
-</div>
-
-<!-- ─── Whiteboard Scenario Panels ─── -->
-<div id="scenarioTabsContainer" class="scenario-tabs-container hidden">
-    <div class="scenario-tab" id="scenarioTab1" onclick="window.__toggleScenarioPanel(1)">Scenario 1</div>
-    <div class="scenario-tab" id="scenarioTab2" onclick="window.__toggleScenarioPanel(2)">Scenario 2</div>
-    <div class="scenario-tab" id="scenarioTab3" onclick="window.__toggleScenarioPanel(3)">Scenario 3</div>
-</div>
-
-<div id="scenarioPanel1" class="scenario-panel">
-    <button class="scenario-panel-close" onclick="window.__toggleScenarioPanel(1)">&times;</button>
-    <div id="scenarioContent1" class="scenario-panel-content"></div>
-</div>
-<div id="scenarioPanel2" class="scenario-panel">
-    <button class="scenario-panel-close" onclick="window.__toggleScenarioPanel(2)">&times;</button>
-    <div id="scenarioContent2" class="scenario-panel-content"></div>
-</div>
-<div id="scenarioPanel3" class="scenario-panel">
-    <button class="scenario-panel-close" onclick="window.__toggleScenarioPanel(3)">&times;</button>
-    <div id="scenarioContent3" class="scenario-panel-content"></div>
 </div>
 
 <!-- Floating Gear Button -->
@@ -3021,7 +3044,10 @@
                             const pText = result[`panel${i}`] || '';
                             const contentEl = document.getElementById(`scenarioContent${i}`);
                             if (contentEl) {
-                                contentEl.textContent = pText;
+                                if (document.activeElement !== contentEl) {
+                                    contentEl.textContent = pText;
+                                    contentEl.setAttribute('data-last-saved', pText);
+                                }
                             }
                             
                             const tabEl = document.getElementById(`scenarioTab${i}`);
@@ -3191,72 +3217,97 @@
             requestAnimationFrame(updateTimers);
         }
 
-        // ─── Settings Drawer Open/Close Toggles ───
-        let settingsAuthenticated = false;
+        // ─── Settings Drawer Open/Close Toggles & Authentication ───
+        let settingsAuthenticated = sessionStorage.getItem('settings_authenticated') === 'true';
+        let pendingEditElement = null;
+        window.__authSuccessCallback = null;
         
-        function openDrawer() {
-            if (!settingsAuthenticated) {
-                const promptEl = document.getElementById('settingsPasswordPrompt');
-                const inputEl = document.getElementById('settingsPasswordInput');
-                if (promptEl && inputEl) {
-                    promptEl.style.display = 'block';
-                    inputEl.value = '';
-                    inputEl.disabled = false;
-                    inputEl.focus();
+        window.__requestAuth = function(onSuccess, elementToFocus) {
+            if (settingsAuthenticated) {
+                if (onSuccess) onSuccess();
+                return;
+            }
+            pendingEditElement = elementToFocus;
+            window.__authSuccessCallback = onSuccess;
+            
+            const promptEl = document.getElementById('settingsPasswordPrompt');
+            const inputEl = document.getElementById('settingsPasswordInput');
+            if (promptEl && inputEl) {
+                promptEl.style.display = 'block';
+                inputEl.value = '';
+                inputEl.disabled = false;
+                inputEl.focus();
+                
+                let verifyTimeout = null;
+                const checkPassword = async () => {
+                    const pw = inputEl.value;
+                    if (pw.length < 4) return;
                     
-                    let verifyTimeout = null;
-                    const checkPassword = async () => {
+                    try {
+                        const response = await fetch(`${WEB_APP_URL}?action=verifyPassword&password=${encodeURIComponent(pw)}&_=${Date.now()}`);
+                        const result = await response.json();
+                        if (result.status === 'success' && result.data === undefined) {
+                            settingsAuthenticated = true;
+                            sessionStorage.setItem('settings_authenticated', 'true');
+                            promptEl.style.display = 'none';
+                            if (window.__authSuccessCallback) {
+                                window.__authSuccessCallback();
+                                window.__authSuccessCallback = null;
+                            }
+                            if (pendingEditElement) {
+                                pendingEditElement.focus();
+                                pendingEditElement = null;
+                            }
+                        }
+                    } catch(err) {
+                        console.warn('Silent password check failed:', err);
+                    }
+                };
+
+                inputEl.oninput = function() {
+                    clearTimeout(verifyTimeout);
+                    verifyTimeout = setTimeout(checkPassword, 250);
+                };
+                
+                // Also support enter key for immediate submittal
+                inputEl.onkeydown = async function(e) {
+                    if (e.key === 'Enter') {
+                        clearTimeout(verifyTimeout);
                         const pw = inputEl.value;
-                        if (pw.length < 4) return;
-                        
+                        inputEl.disabled = true;
                         try {
                             const response = await fetch(`${WEB_APP_URL}?action=verifyPassword&password=${encodeURIComponent(pw)}&_=${Date.now()}`);
                             const result = await response.json();
                             if (result.status === 'success' && result.data === undefined) {
                                 settingsAuthenticated = true;
+                                sessionStorage.setItem('settings_authenticated', 'true');
                                 promptEl.style.display = 'none';
-                                realOpenDrawer();
-                            }
-                        } catch(err) {
-                            console.warn('Silent password check failed:', err);
-                        }
-                    };
-
-                    inputEl.oninput = function() {
-                        clearTimeout(verifyTimeout);
-                        verifyTimeout = setTimeout(checkPassword, 250);
-                    };
-                    
-                    // Also support enter key for immediate submittal
-                    inputEl.onkeydown = async function(e) {
-                        if (e.key === 'Enter') {
-                            clearTimeout(verifyTimeout);
-                            const pw = inputEl.value;
-                            inputEl.disabled = true;
-                            try {
-                                const response = await fetch(`${WEB_APP_URL}?action=verifyPassword&password=${encodeURIComponent(pw)}&_=${Date.now()}`);
-                                const result = await response.json();
-                                if (result.status === 'success' && result.data === undefined) {
-                                    settingsAuthenticated = true;
-                                    promptEl.style.display = 'none';
-                                    realOpenDrawer();
-                                } else {
-                                    showToast('❌ Incorrect password!', true);
-                                    inputEl.value = '';
-                                    inputEl.disabled = false;
-                                    inputEl.focus();
+                                if (window.__authSuccessCallback) {
+                                    window.__authSuccessCallback();
+                                    window.__authSuccessCallback = null;
                                 }
-                            } catch(err) {
-                                showToast('❌ Connection error verifying password', true);
+                                if (pendingEditElement) {
+                                    pendingEditElement.focus();
+                                    pendingEditElement = null;
+                                }
+                            } else {
+                                showToast('❌ Incorrect password!', true);
+                                inputEl.value = '';
                                 inputEl.disabled = false;
                                 inputEl.focus();
                             }
+                        } catch(err) {
+                            showToast('❌ Connection error verifying password', true);
+                            inputEl.disabled = false;
+                            inputEl.focus();
                         }
-                    };
-                }
-            } else {
-                realOpenDrawer();
+                    }
+                };
             }
+        };
+
+        function openDrawer() {
+            window.__requestAuth(realOpenDrawer, null);
         }
         
         function realOpenDrawer() {
@@ -4289,6 +4340,61 @@
                 if (questionEl) questionEl.classList.add('question-hidden');
             }
         };
+
+        // ─── Scenario Inline Editing Event Listeners ───
+        if (isResults) {
+            for (let i = 1; i <= 3; i++) {
+                const contentEl = document.getElementById(`scenarioContent${i}`);
+                if (contentEl) {
+                    // Check authentication on focus
+                    contentEl.addEventListener('focus', function() {
+                        if (!settingsAuthenticated) {
+                            contentEl.blur();
+                            window.__requestAuth(() => {
+                                contentEl.focus();
+                            }, contentEl);
+                        }
+                    });
+                    
+                    // Save on blur
+                    contentEl.addEventListener('blur', async function() {
+                        if (!settingsAuthenticated) return;
+                        
+                        const newText = contentEl.textContent.trim();
+                        const lastSaved = contentEl.getAttribute('data-last-saved') || '';
+                        if (newText === lastSaved) return;
+                        
+                        showToast('⏳ Saving panel text...');
+                        
+                        try {
+                            const p1 = i === 1 ? newText : (document.getElementById('scenarioContent1').textContent.trim());
+                            const p2 = i === 2 ? newText : (document.getElementById('scenarioContent2').textContent.trim());
+                            const p3 = i === 3 ? newText : (document.getElementById('scenarioContent3').textContent.trim());
+                            
+                            const url = `${WEB_APP_URL}?action=setPanels&panel1=${encodeURIComponent(p1)}&panel2=${encodeURIComponent(p2)}&panel3=${encodeURIComponent(p3)}&_=${Date.now()}`;
+                            const res = await fetch(url);
+                            const result = await res.json();
+                            
+                            if (result.status === 'success' && result.data === undefined) {
+                                showToast('✅ Whiteboard updated!');
+                                contentEl.setAttribute('data-last-saved', newText);
+                                
+                                // Sync back to drawer textarea
+                                const inputEl = document.getElementById(`scenarioPanel${i}Input`);
+                                if (inputEl) inputEl.value = newText;
+                                
+                                fetchAndUpdate();
+                            } else {
+                                showToast('❌ Save failed: ' + (result.message || 'Legacy bypass detected'), true);
+                            }
+                        } catch(e) {
+                            console.error(e);
+                            showToast('❌ Connection error saving changes', true);
+                        }
+                    });
+                }
+            }
+        }
 
         // ─── Bind student modify selection button ───
         if (modifySubmissionBtn) {
