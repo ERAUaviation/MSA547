@@ -2192,6 +2192,16 @@
             localStorage.setItem('classroom_works_uid', studentUid);
         }
         
+        let currentSessionUid = '';
+        function refreshSessionUid() {
+            if (allowMultiple) {
+                currentSessionUid = `${studentUid}_${Math.random().toString(36).substring(2, 7)}`;
+            } else {
+                currentSessionUid = studentUid;
+            }
+        }
+        refreshSessionUid(); // Initial setup
+
         let localQaVotes = {};
         const qaVotesInProgress = new Set();
         try {
@@ -2945,13 +2955,12 @@
                 localStorage.setItem(key, 'true');
                 
                 showToast('Response submitted — thank you!');
+                refreshSessionUid(); // Get fresh UID for next response if multiple allowed
                 checkStudentSubmissionStatus();
                 form.reset();
 
-                // If slots mode, update counters immediately
-                if (activeMode === 'slots') {
-                    updateStudentUI();
-                }
+                // Update UI immediately (e.g. slots or sticky inputs)
+                updateStudentUI();
             }
         };
 
@@ -3128,7 +3137,11 @@
                     
                     // Sync allowMultiple and sessionToken settings
                     if (result.allowMultiple !== undefined) {
+                        const prevAllowMultiple = allowMultiple;
                         allowMultiple = result.allowMultiple;
+                        if (prevAllowMultiple !== allowMultiple) {
+                            refreshSessionUid();
+                        }
                         if (isResults && allowMultipleToggle) {
                             allowMultipleToggle.checked = allowMultiple;
                         }
@@ -3993,8 +4006,8 @@
                                     <span class="student-qa-text">${escapeHtml(q.text)}</span>
                                     <div class="student-qa-actions">
                                         <span style="font-size: 0.95rem; font-weight: 750; color: var(--gold-light); margin-right: 6px;">${q.votes}</span>
-                                        <button class="student-qa-vote-btn upvote ${upActive}" data-id="${q.id}">▲</button>
-                                        <button class="student-qa-vote-btn downvote ${downActive}" data-id="${q.id}">▼</button>
+                                        <button class="student-qa-vote-btn upvote ${upActive}" data-id="${q.id}">👍</button>
+                                        <button class="student-qa-vote-btn downvote ${downActive}" data-id="${q.id}">👎</button>
                                     </div>
                                 </div>
                             `;
@@ -4047,16 +4060,26 @@
                                     const res = await fetch(url);
                                     let result = await res.json();
                                     
-                                    if (result.status === 'success') {
-                                        // Self-healing fallback if their deployed script version is old
-                                        if (result.data !== undefined) {
-                                            const fallbackAction = isUp ? 'upvoteQa' : 'downvoteQa';
-                                            const callsCount = Math.abs(delta);
-                                            for (let c = 0; c < callsCount; c++) {
-                                                await fetch(`${WEB_APP_URL}?action=${fallbackAction}&id=${id}&_=${Date.now()}`);
-                                            }
+                                    // Trigger legacy fallback if server does not support changeVoteQa action (returns error or unknown action)
+                                    if (result.status !== 'success' || (result.message && result.message.toLowerCase().includes('action'))) {
+                                        throw new Error('Fallback to legacy voting actions');
+                                    }
+                                    
+                                    if (newVote === null) {
+                                        delete localQaVotes[id];
+                                    } else {
+                                        localQaVotes[id] = newVote;
+                                    }
+                                    localStorage.setItem('local_qa_votes', JSON.stringify(localQaVotes));
+                                    fetchStudentQaList();
+                                } catch(e) {
+                                    console.log('Using legacy fallback voting...', e);
+                                    try {
+                                        const fallbackAction = isUp ? 'upvoteQa' : 'downvoteQa';
+                                        const callsCount = Math.abs(delta);
+                                        for (let c = 0; c < callsCount; c++) {
+                                            await fetch(`${WEB_APP_URL}?action=${fallbackAction}&id=${id}&_=${Date.now()}`);
                                         }
-                                        
                                         if (newVote === null) {
                                             delete localQaVotes[id];
                                         } else {
@@ -4064,12 +4087,10 @@
                                         }
                                         localStorage.setItem('local_qa_votes', JSON.stringify(localQaVotes));
                                         fetchStudentQaList();
-                                    } else {
-                                        showToast('⚠️ Vote failed: ' + (result.message || 'Server error'), true);
+                                    } catch(err) {
+                                        console.error(err);
+                                        showToast('⚠️ Vote failed. Please try again.', true);
                                     }
-                                } catch(e) {
-                                    console.error(e);
-                                    showToast('⚠️ Vote failed. Please try again.', true);
                                 } finally {
                                     qaVotesInProgress.delete(id);
                                     if (container) {
@@ -4155,7 +4176,7 @@
                 options.forEach(opt => {
                     html += `
                         <label class="student-mc-card">
-                            <input type="radio" name="entry.192253551" value="${opt} (${studentUid})" required style="accent-color: var(--gold-light); margin-right: 12px; width: 18px; height: 18px;" />
+                            <input type="radio" name="entry.192253551" value="${opt} (${currentSessionUid})" required style="accent-color: var(--gold-light); margin-right: 12px; width: 18px; height: 18px;" />
                             <span>${opt}</span>
                         </label>
                     `;
@@ -4202,7 +4223,7 @@
                     btn.addEventListener('click', function() {
                         btns.forEach(b => b.classList.remove('active'));
                         this.classList.add('active');
-                        hiddenInput.value = `${this.getAttribute('data-val')} (${studentUid})`;
+                        hiddenInput.value = `${this.getAttribute('data-val')} (${currentSessionUid})`;
                     });
                 });
                 if (studentSubmitBtn) studentSubmitBtn.style.display = 'flex';
@@ -4286,7 +4307,7 @@
 
                 const syncStickyInput = () => {
                     const cat = categorySelect ? categorySelect.value : 'Ideas';
-                    hiddenInput.value = `${cat}: ${ideaInput.value.trim()} (${studentUid})`;
+                    hiddenInput.value = `${cat}: ${ideaInput.value.trim()} (${currentSessionUid})`;
                 };
 
                 if (categorySelect) {
