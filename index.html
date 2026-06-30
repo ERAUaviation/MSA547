@@ -2961,12 +2961,17 @@
             const cWrap = document.getElementById('cloudWrapper');
             
             if (visible) {
-                // Restore height
-                if (cWrap) {
-                    cWrap.style.height = '';
-                }
                 if (qSec) qSec.classList.remove('collapsed');
                 if (qTog) qTog.textContent = 'Hide';
+                
+                // Clear the height lock only after the width transition has fully completed
+                if (cWrap) {
+                    setTimeout(() => {
+                        if (qrVisible) {
+                            cWrap.style.height = '';
+                        }
+                    }, 300);
+                }
             } else {
                 // Lock height before collapse to prevent vertical stretching
                 if (cWrap && !cWrap.style.height) {
