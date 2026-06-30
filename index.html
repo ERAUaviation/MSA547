@@ -1538,6 +1538,103 @@
             color: rgba(255, 255, 255, 0.25);
             font-style: italic;
         }
+        /* Context Menu Font Size Overrides */
+        .scenario-panel-content font[size="1"] { font-size: 1.2rem; }
+        .scenario-panel-content font[size="2"] { font-size: 1.6rem; }
+        .scenario-panel-content font[size="3"] { font-size: 2.0rem; }
+        .scenario-panel-content font[size="4"] { font-size: 2.2rem; }
+        .scenario-panel-content font[size="5"] { font-size: 3.2rem; }
+        .scenario-panel-content font[size="6"] { font-size: 4.2rem; }
+        .scenario-panel-content font[size="7"] { font-size: 5.5rem; }
+
+        /* Sleek Context Menu Toolbar Styles */
+        .whiteboard-context-menu {
+            position: fixed;
+            background: rgba(10, 22, 40, 0.96);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            border-radius: 6px;
+            padding: 6px 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 10000;
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+        }
+        .whiteboard-context-menu.visible {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+        .context-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 0.95rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 28px;
+            min-width: 28px;
+            outline: none;
+        }
+        .context-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--gold-light);
+        }
+        .context-separator {
+            width: 1px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .context-select {
+            background: rgba(10, 22, 40, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            padding: 2px 6px;
+            cursor: pointer;
+            outline: none;
+            height: 28px;
+        }
+        .context-select:hover {
+            border-color: var(--gold-light);
+        }
+        .context-select option {
+            background: #0a1628;
+            color: #ffffff;
+        }
+        .context-colors {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .color-swatch {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.15s ease, border-color 0.15s;
+        }
+        .color-swatch:hover {
+            transform: scale(1.2);
+            border-color: #ffffff;
+        }
+        .swatch-white { background: #ffffff; }
+        .swatch-gold { background: #e6c875; }
+        .swatch-blue { background: #8abedd; }
+        .swatch-red { background: #ff8e8e; }
         .scenario-panel-close {
             position: absolute;
             top: 14px;
@@ -1740,6 +1837,26 @@
             <button class="scenario-panel-close" onclick="window.__toggleScenarioPanel(3)">&times;</button>
             <div id="scenarioContent3" class="scenario-panel-content" contenteditable="true" spellcheck="false" placeholder="Type instructions here..."></div>
         </div>
+    </div>
+</div>
+
+<!-- Whiteboard Selection Sleek Mini Context Menu Toolbar -->
+<div id="whiteboardContextMenu" class="whiteboard-context-menu">
+    <button class="context-btn bold-btn" onclick="window.__execFormat('bold')" title="Toggle Bold"><b>B</b></button>
+    <div class="context-separator"></div>
+    <select id="contextSizeSelect" class="context-select" onchange="window.__execFormat('fontSize', this.value); this.selectedIndex = 0;">
+        <option value="" disabled selected>Size</option>
+        <option value="2">Small</option>
+        <option value="4">Normal</option>
+        <option value="5">Large</option>
+        <option value="7">Huge</option>
+    </select>
+    <div class="context-separator"></div>
+    <div class="context-colors">
+        <div class="color-swatch swatch-white" onclick="window.__execFormat('foreColor', '#ffffff')" title="White"></div>
+        <div class="color-swatch swatch-gold" onclick="window.__execFormat('foreColor', '#e6c875')" title="Gold"></div>
+        <div class="color-swatch swatch-blue" onclick="window.__execFormat('foreColor', '#8abedd')" title="Blue"></div>
+        <div class="color-swatch swatch-red" onclick="window.__execFormat('foreColor', '#ff8e8e')" title="Red"></div>
     </div>
 </div>
 
@@ -4295,16 +4412,16 @@
                     contentEl.addEventListener('blur', async function() {
                         if (!settingsAuthenticated) return;
                         
-                        const newText = contentEl.textContent.trim();
+                        const newHTML = contentEl.innerHTML.trim();
                         const lastSaved = contentEl.getAttribute('data-last-saved') || '';
-                        if (newText === lastSaved) return;
+                        if (newHTML === lastSaved) return;
                         
                         showToast('⏳ Saving panel text...');
                         
                         try {
-                            const p1 = i === 1 ? newText : (document.getElementById('scenarioContent1').textContent.trim());
-                            const p2 = i === 2 ? newText : (document.getElementById('scenarioContent2').textContent.trim());
-                            const p3 = i === 3 ? newText : (document.getElementById('scenarioContent3').textContent.trim());
+                            const p1 = i === 1 ? newHTML : (document.getElementById('scenarioContent1').innerHTML.trim());
+                            const p2 = i === 2 ? newHTML : (document.getElementById('scenarioContent2').innerHTML.trim());
+                            const p3 = i === 3 ? newHTML : (document.getElementById('scenarioContent3').innerHTML.trim());
                             
                             const url = `${WEB_APP_URL}?action=setPanels&panel1=${encodeURIComponent(p1)}&panel2=${encodeURIComponent(p2)}&panel3=${encodeURIComponent(p3)}&_=${Date.now()}`;
                             const res = await fetch(url);
@@ -4312,10 +4429,7 @@
                             
                             if (result.status === 'success' && result.data === undefined) {
                                 showToast('✅ Whiteboard updated!');
-                                contentEl.setAttribute('data-last-saved', newText);
-                                
-
-                                
+                                contentEl.setAttribute('data-last-saved', newHTML);
                                 fetchAndUpdate();
                             } else {
                                 showToast('❌ Save failed: ' + (result.message || 'Legacy bypass detected'), true);
@@ -4326,6 +4440,46 @@
                         }
                     });
                 }
+            }
+
+            // ─── Whiteboard Context Menu Formatting ───
+            window.__execFormat = function(cmd, value) {
+                document.execCommand(cmd, false, value);
+                // Manually trigger blur / save check by updating last-saved or force saving
+                if (activeScenarioPanel) {
+                    const contentEl = document.getElementById(`scenarioContent${activeScenarioPanel}`);
+                    if (contentEl) {
+                        contentEl.focus();
+                        // Trigger input or update event to simulate changes
+                        const event = new Event('input', { bubbles: true });
+                        contentEl.dispatchEvent(event);
+                    }
+                }
+            };
+
+            const ctxMenu = document.getElementById('whiteboardContextMenu');
+            if (ctxMenu) {
+                // Show custom context menu on right click inside contenteditable panel
+                document.addEventListener('contextmenu', function(e) {
+                    const contentEl = e.target.closest('.scenario-panel-content');
+                    if (contentEl) {
+                        e.preventDefault();
+                        
+                        // Show menu at click coordinates
+                        ctxMenu.style.left = e.clientX + 'px';
+                        ctxMenu.style.top = e.clientY + 'px';
+                        ctxMenu.classList.add('visible');
+                    } else {
+                        ctxMenu.classList.remove('visible');
+                    }
+                });
+                
+                // Hide menu on clicking anywhere else
+                document.addEventListener('click', function(e) {
+                    if (!e.target.closest('#whiteboardContextMenu')) {
+                        ctxMenu.classList.remove('visible');
+                    }
+                });
             }
         }
 
