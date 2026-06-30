@@ -1092,13 +1092,22 @@
             text-shadow: 0 0 20px var(--gold-glow);
         }
 
-        .slots-grid-container,
-        .sticky-grid-container {
+        .slots-grid-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 16px;
             width: 100%;
             padding: 24px;
+            box-sizing: border-box;
+        }
+        .sticky-grid-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 520px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 20px 20px;
+            overflow: hidden;
             box-sizing: border-box;
         }
         .slot-column,
@@ -1151,47 +1160,65 @@
             color: rgba(255,255,255,0.85);
         }
         .sticky-note {
-            width: 120px;
-            height: 120px;
-            min-height: 120px;
+            width: 140px;
+            height: 140px;
+            min-height: 140px;
             aspect-ratio: 1 / 1;
-            padding: 12px;
-            font-size: 0.82rem;
-            line-height: 1.25;
-            color: #0b1a2e !important;
-            box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.15);
+            padding: 18px 12px 12px;
+            font-size: 0.88rem;
+            line-height: 1.3;
+            color: #1a2a3a !important;
+            box-shadow: 2px 8px 16px rgba(0, 0, 0, 0.35);
             word-break: break-word;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            font-family: 'Inter', sans-serif;
-            font-weight: 650;
+            font-family: 'Outfit', 'Inter', sans-serif;
+            font-weight: 700;
             box-sizing: border-box;
-            border-radius: 2px;
-            border-bottom-right-radius: 12px 3px;
-            background-image: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0) 80%, rgba(0,0,0,0.06) 100%);
+            border-radius: 1px;
+            border-bottom-right-radius: 16px 4px;
+            background-image: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0) 80%, rgba(0,0,0,0.08) 100%);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
+        /* Curled corner lift shadow */
         .sticky-note::after {
             content: "";
             position: absolute;
             z-index: -1;
-            right: 6px;
-            bottom: 6px;
-            width: 80%;
-            height: 10px;
-            box-shadow: 0 8px 10px rgba(0, 0, 0, 0.35);
-            transform: rotate(3deg) skew(5deg);
+            right: 8px;
+            bottom: 8px;
+            width: 75%;
+            height: 15px;
+            box-shadow: 0 12px 15px rgba(0, 0, 0, 0.45);
+            transform: rotate(4deg) skew(8deg);
+        }
+        /* Scotch tape holding the note */
+        .sticky-note::before {
+            content: "";
+            position: absolute;
+            top: -10px;
+            left: 32%;
+            width: 36%;
+            height: 18px;
+            background: rgba(255, 255, 255, 0.28);
+            backdrop-filter: blur(1.5px);
+            -webkit-backdrop-filter: blur(1.5px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            transform: rotate(-1.5deg);
+            border-left: 1px dashed rgba(255,255,255,0.3);
+            border-right: 1px dashed rgba(255,255,255,0.3);
+            pointer-events: none;
         }
         .sticky-note:hover {
             transform: scale(1.08) rotate(0deg) !important;
-            box-shadow: 2px 8px 15px rgba(0, 0, 0, 0.35) !important;
+            box-shadow: 3px 12px 24px rgba(0, 0, 0, 0.45) !important;
             z-index: 10;
         }
         .sticky-note:hover::after {
-            box-shadow: 0 12px 14px rgba(0, 0, 0, 0.45);
+            box-shadow: 0 16px 20px rgba(0, 0, 0, 0.55);
         }
 
         .qa-board-container {
@@ -1551,7 +1578,7 @@
             </div>
 
             <!-- Mode 6: Sticky Note Ideation Board -->
-            <div id="stickyBoardWrapper" class="hidden" style="width: 100%; height: 100%; overflow-y: auto;">
+            <div id="stickyBoardWrapper" class="hidden" style="width: 100%; height: 100%; overflow: hidden;">
                 <div id="stickyBoardContainer" class="sticky-grid-container"></div>
             </div>
 
@@ -1878,6 +1905,7 @@
         let localQaIdsSubmitted = [];
         let dragOverrides = {};
         let stickyOverrides = {};
+        let stickyPositions = {};
         let allowMultiple = false;
         let currentSessionToken = '';
         
@@ -2365,38 +2393,60 @@
                             
                             // Check if the target column exists
                             const finalCat = board[cat] ? cat : defaultCols[0].toLowerCase();
-                            board[finalCat].notes.push(idea);
+                            board[finalCat].notes.push({
+                                raw: w,
+                                text: idea,
+                                category: board[finalCat].title
+                            });
                         } else {
                             // Put directly in the first column if no colon
                             const finalCat = defaultCols[0].toLowerCase();
-                            board[finalCat].notes.push(clean);
+                            board[finalCat].notes.push({
+                                raw: w,
+                                text: clean,
+                                category: board[finalCat].title
+                            });
                         }
                     });
-                    
-                    // Apply manual drag overrides on sticky notes
-                    for (const colKey of Object.keys(board)) {
-                        const notesList = board[colKey].notes;
-                        for (let i = notesList.length - 1; i >= 0; i--) {
-                            const noteRaw = notesList[i];
-                            if (stickyOverrides[noteRaw]) {
-                                const targetColKey = stickyOverrides[noteRaw].toLowerCase();
-                                if (board[targetColKey] && targetColKey !== colKey) {
-                                    // Move to override column
-                                    board[targetColKey].notes.push(noteRaw);
-                                    notesList.splice(i, 1);
-                                }
-                            }
+
+                    // Compile all notes into a single flat list
+                    const allNotes = [];
+                    defaultCols.forEach(c => {
+                        const col = board[c.toLowerCase()];
+                        col.notes.forEach(noteObj => {
+                            allNotes.push(noteObj);
+                        });
+                    });
+
+                    // Sync keys in stickyPositions to prevent memory leaks
+                    const currentKeys = allNotes.map(n => n.raw);
+                    for (const key of Object.keys(stickyPositions)) {
+                        if (!currentKeys.includes(key)) {
+                            delete stickyPositions[key];
                         }
                     }
-                    
-                    // For each column, reverse notes so newer ones appear on top
-                    for (const colKey of Object.keys(board)) {
-                        board[colKey].notes.reverse();
-                    }
+
+                    // Pre-calculate coordinates in a clean grid for any new notes
+                    allNotes.forEach((n, index) => {
+                        if (!stickyPositions[n.raw]) {
+                            const colsCount = 5;
+                            const startX = 24;
+                            const startY = 24;
+                            const gapX = 160;
+                            const gapY = 160;
+                            
+                            const colIndex = index % colsCount;
+                            const rowIndex = Math.floor(index / colsCount);
+                            
+                            stickyPositions[n.raw] = {
+                                x: startX + colIndex * gapX,
+                                y: startY + rowIndex * gapY
+                            };
+                        }
+                    });
 
                     // Count total notes
-                    let totalNotesCount = 0;
-                    Object.values(board).forEach(col => totalNotesCount += col.notes.length);
+                    const totalNotesCount = allNotes.length;
                     responseCount.textContent = `${totalNotesCount} note${totalNotesCount !== 1 ? 's' : ''}`;
                     
                     const hasNotes = totalNotesCount > 0;
@@ -2407,54 +2457,41 @@
                     } else {
                         showEmptyState(false);
                         
-                        // Hashed pastel sticky note color helper
-                        const getStickyColor = (txt) => {
-                            const pastelColors = ['#fef08a', '#bfdbfe', '#fecaca', '#bbf7d0', '#fed7aa', '#f5d0fe'];
-                            const cleanText = txt.replace(/\s*\(resp_.*?\)\s*$/, '');
-                            const hash = cleanText.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
-                            return pastelColors[hash % pastelColors.length];
+                        // Color sticky notes by category name
+                        const getStickyColor = (catName) => {
+                            const colors = {
+                                'ideas': '#fff176', // canary yellow
+                                'crew': '#ff8a80',  // warm red/pink
+                                'weather': '#80d8ff', // sky blue
+                                'maintenance': '#b9f6ca' // mint green
+                            };
+                            const cat = catName.toLowerCase().trim();
+                            if (colors[cat]) return colors[cat];
+                            
+                            const hash = cat.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+                            const list = ['#fff176', '#ff8a80', '#80d8ff', '#b9f6ca', '#ffe082', '#ea80fc'];
+                            return list[hash % list.length];
                         };
 
-                        stickyBoardContainer.innerHTML = defaultCols.map(c => {
-                            const col = board[c.toLowerCase()];
-                            const count = col.notes.length;
-                            
-                            let notesHtml = '';
-                            if (cloudHidden) {
-                                notesHtml = `<div style="text-align: center; font-size: 0.85rem; color: rgba(255,255,255,0.2); padding: 16px 0; font-style: italic;">Notes Hidden</div>`;
-                            } else {
-                                notesHtml = col.notes.map(noteRaw => {
-                                    const displayIdea = noteRaw.replace(/\s*\(resp_.*?\)\s*$/, '');
-                                    // Generate stable random-looking rotation based on text hash to mimic physical board layout
-                                    const hash = noteRaw.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
-                                    const rot = ((hash % 7) - 3); // -3deg to 3deg
-                                    
-                                    return `
-                                        <div class="sticky-note" 
-                                             draggable="true" 
-                                             ondragstart="window.__dragNote(event, '${noteRaw.replace(/'/g, "\\'")}')"
-                                             style="background: ${getStickyColor(noteRaw)} !important; transform: rotate(${rot}deg); cursor: grab;">
-                                             ${escapeHtml(displayIdea)}
-                                        </div>
-                                    `;
-                                }).join('');
-                            }
-                            
-                            return `
-                                <div class="sticky-column" 
-                                     ondragover="event.preventDefault()" 
-                                     ondrop="window.__dropNote(event, '${col.title}')"
-                                     style="border-color: rgba(255,255,255,0.06);">
-                                    <div class="sticky-column-header">
-                                        <span>${col.title}</span>
-                                        <span>${cloudHidden ? '?' : count}</span>
+                        if (cloudHidden) {
+                            stickyBoardContainer.innerHTML = `<div style="text-align: center; font-size: 1.1rem; color: rgba(255,255,255,0.2); padding: 48px 0; font-style: italic; width: 100%;">Notes Hidden</div>`;
+                        } else {
+                            stickyBoardContainer.innerHTML = allNotes.map(n => {
+                                const displayIdea = n.text.replace(/\s*\(resp_.*?\)\s*$/, '');
+                                const hash = n.raw.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+                                const rot = ((hash % 8) - 4); // -4deg to 4deg
+                                const pos = stickyPositions[n.raw];
+                                
+                                return `
+                                    <div class="sticky-note" 
+                                         data-raw="${escapeHtml(n.raw)}"
+                                         onpointerdown="window.__startDragNote(event, this)"
+                                         style="position: absolute; left: ${pos.x}px; top: ${pos.y}px; background: ${getStickyColor(n.category)} !important; transform: rotate(${rot}deg); cursor: move; user-select: none;">
+                                         ${escapeHtml(displayIdea)}
                                     </div>
-                                    <div class="sticky-notes-list">
-                                        ${notesHtml}
-                                    </div>
-                                </div>
-                            `;
-                        }).join('');
+                                `;
+                            }).join('');
+                        }
                     }
                 }
 
@@ -3909,20 +3946,52 @@
         };
 
         // ─── Drag and Drop Handlers for Sticky Notes Board ───
-        let draggedNoteText = null;
-        window.__dragNote = function(event, noteText) {
-            draggedNoteText = noteText;
-            event.dataTransfer.setData("text/plain", noteText);
-        };
+        let activeDragNote = null;
+        let dragOffset = { x: 0, y: 0 };
         
-        window.__dropNote = function(event, targetColumn) {
-            event.preventDefault();
-            const noteText = event.dataTransfer.getData("text/plain") || draggedNoteText;
-            if (noteText && targetColumn) {
-                stickyOverrides[noteText] = targetColumn;
-                fetchAndUpdate();
-            }
-            draggedNoteText = null;
+        window.__startDragNote = function(event, element) {
+            if (event.button !== 0 && event.pointerType === 'mouse') return;
+            
+            activeDragNote = element;
+            const rect = element.getBoundingClientRect();
+            
+            // Offset between click coordinates and top-left of note
+            dragOffset.x = event.clientX - rect.left;
+            dragOffset.y = event.clientY - rect.top;
+            
+            element.style.zIndex = 1000;
+            element.setPointerCapture(event.pointerId);
+            
+            element.onpointermove = function(e) {
+                if (!activeDragNote) return;
+                const parentRect = element.parentElement.getBoundingClientRect();
+                
+                let x = e.clientX - parentRect.left - dragOffset.x;
+                let y = e.clientY - parentRect.top - dragOffset.y;
+                
+                // Keep note bounds checked inside the container
+                x = Math.max(0, Math.min(x, parentRect.width - rect.width));
+                y = Math.max(0, Math.min(y, parentRect.height - rect.height));
+                
+                element.style.left = x + 'px';
+                element.style.top = y + 'px';
+            };
+            
+            element.onpointerup = function(e) {
+                if (activeDragNote) {
+                    const noteRaw = element.getAttribute('data-raw');
+                    const finalX = parseFloat(element.style.left);
+                    const finalY = parseFloat(element.style.top);
+                    
+                    stickyPositions[noteRaw] = { x: finalX, y: finalY };
+                    
+                    element.style.zIndex = '';
+                    element.onpointermove = null;
+                    element.onpointerup = null;
+                    element.releasePointerCapture(e.pointerId);
+                    activeDragNote = null;
+                }
+            };
         };
 
         // ─── Bind student modify selection button ───
