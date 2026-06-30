@@ -2609,11 +2609,11 @@
                             updateStudentUI();
                         }
                     } else {
-                        showToast('❌ Submission failed: ' + result.message, true);
+                        showToast('❌ Submission failed: Apps Script action submitResponse not found. Please redeploy script!', true);
                     }
                 } catch(err) {
                     console.error(err);
-                    showToast('❌ Submission network error', true);
+                    showToast('❌ Submission failed: Make sure Apps Script is deployed successfully.', true);
                 } finally {
                     if (studentSubmitBtn) {
                         studentSubmitBtn.innerHTML = originalText;
@@ -3634,9 +3634,12 @@
                                         }
                                         localStorage.setItem('local_qa_votes', JSON.stringify(localQaVotes));
                                         fetchStudentQaList();
+                                    } else {
+                                        showToast('❌ Vote failed: Apps Script action changeVoteQa not found. Please redeploy script!', true);
                                     }
                                 } catch(e) {
                                     console.error(e);
+                                    showToast('❌ Vote failed: Make sure Apps Script is deployed successfully.', true);
                                 } finally {
                                     if (container) {
                                         container.querySelectorAll('.student-qa-vote-btn').forEach(b => b.disabled = false);
