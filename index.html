@@ -1827,7 +1827,7 @@
             </div>
             
             <!-- ─── Whiteboard Scenario Panels (Embedded Inside cloud-wrapper) ─── -->
-            <div id="scenarioTabsContainer" class="scenario-tabs-container">
+            <div id="scenarioTabsContainer" class="scenario-tabs-container" data-html2canvas-ignore="true">
                 <div class="scenario-tab" id="scenarioTab1" onclick="window.__toggleScenarioPanel(1)">1 <span class="arrow">◀</span></div>
                 <div class="scenario-tab" id="scenarioTab2" onclick="window.__toggleScenarioPanel(2)">2 <span class="arrow">◀</span></div>
                 <div class="scenario-tab" id="scenarioTab3" onclick="window.__toggleScenarioPanel(3)">3 <span class="arrow">◀</span></div>
@@ -2207,6 +2207,7 @@
 
         let localQaVotes = {};
         const qaVotesInProgress = new Set();
+        const optimisticQaVotes = {};
         try {
             localQaVotes = JSON.parse(localStorage.getItem('local_qa_votes') || '{}');
         } catch(e) {}
@@ -3836,7 +3837,7 @@
                     const exportCanvas = await html2canvas(boardEl, options);
                     
                     const link = document.createElement('a');
-                    link.download = `ClassroomLive_${activeMode}_${activeQuestionText.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
+                    link.download = 'Image 1.png';
                     link.href = exportCanvas.toDataURL('image/png');
                     link.click();
                     
@@ -4013,7 +4014,7 @@
                                 <div class="student-qa-item">
                                     <span class="student-qa-text">${escapeHtml(q.text)}</span>
                                     <div class="student-qa-actions">
-                                        <span style="font-size: 0.95rem; font-weight: 750; color: var(--gold-light); margin-right: 6px;">${q.votes}</span>
+                                        <span style="font-size: 0.95rem; font-weight: 750; color: var(--gold-light); margin-right: 6px;">${(optimisticQaVotes[q.id] !== undefined) ? optimisticQaVotes[q.id] : q.votes}</span>
                                         <button class="student-qa-vote-btn upvote ${upActive}" data-id="${q.id}">👍</button>
                                         <button class="student-qa-vote-btn downvote ${downActive}" data-id="${q.id}">👎</button>
                                     </div>
@@ -4075,7 +4076,9 @@
                                 // Perform Optimistic UI Update immediately
                                 if (voteSpan) {
                                     const currentVal = parseInt(voteSpan.textContent) || 0;
-                                    voteSpan.textContent = currentVal + delta;
+                                    const optimisticVal = currentVal + delta;
+                                    voteSpan.textContent = optimisticVal;
+                                    optimisticQaVotes[id] = optimisticVal;
                                 }
                                 if (upBtn && downBtn) {
                                     upBtn.classList.remove('active');
@@ -4096,6 +4099,7 @@
                                 localStorage.setItem('local_qa_votes', JSON.stringify(localQaVotes));
                                 
                                 const rollbackLocalState = () => {
+                                    delete optimisticQaVotes[id];
                                     if (voteSpan) voteSpan.textContent = originalVotesText;
                                     if (upBtn && downBtn) {
                                         upBtn.classList.remove('active');
@@ -4115,6 +4119,10 @@
                                     const fallbackAction = delta > 0 ? 'upvoteQa' : 'downvoteQa';
                                     const callsCount = Math.abs(delta);
                                     for (let c = 0; c < callsCount; c++) {
+                                        if (c > 0) {
+                                            // Sleep 1200ms to allow Google Sheets cells to recalculate and prevent write race condition collisions
+                                            await new Promise(resolve => setTimeout(resolve, 1200));
+                                        }
                                         await fetch(`${WEB_APP_URL}?action=${fallbackAction}&id=${id}&_=${Date.now()}`);
                                     }
                                 } catch(e) {
@@ -4122,6 +4130,7 @@
                                     rollbackLocalState();
                                     showToast('⚠️ Vote failed. Please try again.', true);
                                 } finally {
+                                    delete optimisticQaVotes[id];
                                     qaVotesInProgress.delete(id);
                                     if (container) {
                                         container.querySelectorAll('.student-qa-vote-btn').forEach(b => b.disabled = false);
