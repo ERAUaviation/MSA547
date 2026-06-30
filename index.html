@@ -1104,7 +1104,6 @@
             position: relative;
             width: 100%;
             height: 100%;
-            min-height: 520px;
             background: radial-gradient(circle, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
             background-size: 20px 20px;
             overflow: hidden;
@@ -1906,6 +1905,7 @@
         let dragOverrides = {};
         let stickyOverrides = {};
         let stickyPositions = {};
+        let activeDragNote = null;
         let allowMultiple = false;
         let currentSessionToken = '';
         
@@ -2376,6 +2376,10 @@
                     }
                 } 
                 else if (activeMode === 'sticky') {
+                    // Skip polling redraw if the user is actively dragging a note to prevent snapping back
+                    if (activeDragNote !== null) {
+                        return;
+                    }
                     // Default to single 'Ideas' column if config is blank
                     const cols = activeModeConfig ? activeModeConfig.split(',').map(c => c.trim()).filter(Boolean) : [];
                     const defaultCols = cols.length > 0 ? cols : ['Ideas'];
@@ -3674,18 +3678,24 @@
                                 try {
                                     const url = `${WEB_APP_URL}?action=changeVoteQa&id=${id}&delta=${delta}&_=${Date.now()}`;
                                     const res = await fetch(url);
-                                    const result = await res.json();
-                                    if (result.status === 'success') {
-                                        if (newVote === null) {
-                                            delete localQaVotes[id];
-                                        } else {
-                                            localQaVotes[id] = newVote;
+                                    let result = await res.json();
+                                    
+                                    // Self-healing fallback if their deployed script version is old
+                                    if (result.status === 'success' && result.data !== undefined) {
+                                        const fallbackAction = isUp ? 'upvoteQa' : 'downvoteQa';
+                                        const callsCount = Math.abs(delta);
+                                        for (let c = 0; c < callsCount; c++) {
+                                            await fetch(`${WEB_APP_URL}?action=${fallbackAction}&id=${id}&_=${Date.now()}`);
                                         }
-                                        localStorage.setItem('local_qa_votes', JSON.stringify(localQaVotes));
-                                        fetchStudentQaList();
-                                    } else {
-                                        showToast('⚠️ Vote failed. Please try again.', true);
                                     }
+                                    
+                                    if (newVote === null) {
+                                        delete localQaVotes[id];
+                                    } else {
+                                        localQaVotes[id] = newVote;
+                                    }
+                                    localStorage.setItem('local_qa_votes', JSON.stringify(localQaVotes));
+                                    fetchStudentQaList();
                                 } catch(e) {
                                     console.error(e);
                                     showToast('⚠️ Vote failed. Please try again.', true);
@@ -3946,7 +3956,6 @@
         };
 
         // ─── Drag and Drop Handlers for Sticky Notes Board ───
-        let activeDragNote = null;
         let dragOffset = { x: 0, y: 0 };
         
         window.__startDragNote = function(event, element) {
