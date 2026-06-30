@@ -3140,7 +3140,7 @@
                             const contentEl = document.getElementById(`scenarioContent${i}`);
                             if (contentEl) {
                                 if (document.activeElement !== contentEl) {
-                                    contentEl.textContent = pText;
+                                    contentEl.innerHTML = pText;
                                     contentEl.setAttribute('data-last-saved', pText);
                                 }
                             }
@@ -4459,6 +4459,11 @@
 
             const ctxMenu = document.getElementById('whiteboardContextMenu');
             if (ctxMenu) {
+                // Prevent context menu clicks from stealing text selection focus
+                ctxMenu.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                });
+                
                 // Show custom context menu on right click inside contenteditable panel
                 document.addEventListener('contextmenu', function(e) {
                     const contentEl = e.target.closest('.scenario-panel-content');
