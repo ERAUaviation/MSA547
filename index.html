@@ -1844,13 +1844,10 @@
 <div id="whiteboardContextMenu" class="whiteboard-context-menu">
     <button class="context-btn bold-btn" onclick="window.__execFormat('bold')" title="Toggle Bold"><b>B</b></button>
     <div class="context-separator"></div>
-    <select id="contextSizeSelect" class="context-select" onchange="window.__execFormat('fontSize', this.value); this.selectedIndex = 0;">
-        <option value="" disabled selected>Size</option>
-        <option value="2">Small</option>
-        <option value="4">Normal</option>
-        <option value="5">Large</option>
-        <option value="7">Huge</option>
-    </select>
+    <button class="context-btn size-btn" onclick="window.__execFormat('fontSize', '2')" title="Small Size" style="font-size: 0.72rem; width: 22px; min-width: 22px; padding: 0;">A</button>
+    <button class="context-btn size-btn" onclick="window.__execFormat('fontSize', '4')" title="Normal Size" style="font-size: 0.9rem; width: 22px; min-width: 22px; padding: 0;">A</button>
+    <button class="context-btn size-btn" onclick="window.__execFormat('fontSize', '5')" title="Large Size" style="font-size: 1.1rem; width: 22px; min-width: 22px; padding: 0; font-weight: 600;">A</button>
+    <button class="context-btn size-btn" onclick="window.__execFormat('fontSize', '7')" title="Huge Size" style="font-size: 1.35rem; width: 22px; min-width: 22px; padding: 0; font-weight: 800;">A</button>
     <div class="context-separator"></div>
     <div class="context-colors">
         <div class="color-swatch swatch-white" onclick="window.__execFormat('foreColor', '#ffffff')" title="White"></div>
@@ -3140,8 +3137,9 @@
                             const contentEl = document.getElementById(`scenarioContent${i}`);
                             if (contentEl) {
                                 if (document.activeElement !== contentEl) {
-                                    contentEl.innerHTML = pText;
-                                    contentEl.setAttribute('data-last-saved', pText);
+                                    const decoded = decodeHTML(pText);
+                                    contentEl.innerHTML = decoded;
+                                    contentEl.setAttribute('data-last-saved', decoded);
                                 }
                             }
                             
@@ -4393,6 +4391,34 @@
             }
         };
 
+        // ─── Whiteboard Sanitization & Decoding Helpers ───
+        function decodeHTML(html) {
+            const txt = document.createElement('textarea');
+            txt.innerHTML = html;
+            return txt.value;
+        }
+
+        function sanitizeWhiteboardHTML(html) {
+            const temp = document.createElement('div');
+            temp.innerHTML = html;
+            
+            // Clean elements of non-styling extension attributes
+            const allElements = temp.getElementsByTagName('*');
+            for (let el of allElements) {
+                const attrsToRemove = [];
+                for (let i = 0; i < el.attributes.length; i++) {
+                    const attr = el.attributes[i];
+                    if (attr.name !== 'color' && attr.name !== 'style') {
+                        attrsToRemove.push(attr.name);
+                    }
+                }
+                for (let attrName of attrsToRemove) {
+                    el.removeAttribute(attrName);
+                }
+            }
+            return temp.innerHTML;
+        }
+
         // ─── Scenario Inline Editing Event Listeners ───
         if (isResults) {
             for (let i = 1; i <= 3; i++) {
@@ -4412,16 +4438,17 @@
                     contentEl.addEventListener('blur', async function() {
                         if (!settingsAuthenticated) return;
                         
-                        const newHTML = contentEl.innerHTML.trim();
+                        const rawHTML = contentEl.innerHTML.trim();
+                        const newHTML = sanitizeWhiteboardHTML(rawHTML);
                         const lastSaved = contentEl.getAttribute('data-last-saved') || '';
                         if (newHTML === lastSaved) return;
                         
                         showToast('⏳ Saving panel text...');
                         
                         try {
-                            const p1 = i === 1 ? newHTML : (document.getElementById('scenarioContent1').innerHTML.trim());
-                            const p2 = i === 2 ? newHTML : (document.getElementById('scenarioContent2').innerHTML.trim());
-                            const p3 = i === 3 ? newHTML : (document.getElementById('scenarioContent3').innerHTML.trim());
+                            const p1 = i === 1 ? newHTML : sanitizeWhiteboardHTML(document.getElementById('scenarioContent1').innerHTML.trim());
+                            const p2 = i === 2 ? newHTML : sanitizeWhiteboardHTML(document.getElementById('scenarioContent2').innerHTML.trim());
+                            const p3 = i === 3 ? newHTML : sanitizeWhiteboardHTML(document.getElementById('scenarioContent3').innerHTML.trim());
                             
                             const url = `${WEB_APP_URL}?action=setPanels&panel1=${encodeURIComponent(p1)}&panel2=${encodeURIComponent(p2)}&panel3=${encodeURIComponent(p3)}&_=${Date.now()}`;
                             const res = await fetch(url);
