@@ -1149,7 +1149,7 @@
             font-size: 0.95rem;
             line-height: 1.35;
             color: #0b1a2e !important;
-            box-shadow: 3px 6px 14px rgba(0, 0, 0, 0.4);
+            box-shadow: 1px 3px 6px rgba(0, 0, 0, 0.18);
             word-break: break-word;
             position: relative;
             display: flex;
@@ -1159,14 +1159,41 @@
             font-family: 'Inter', sans-serif;
             font-weight: 650;
             box-sizing: border-box;
-            border-radius: 0px;
-            background-image: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0) 80%, rgba(0,0,0,0.06) 100%);
+            border-bottom-right-radius: 60px 4px;
+            border-bottom-left-radius: 4px 60px;
+            background-image: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0) 85%, rgba(0,0,0,0.05) 100%);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
+        .sticky-note::before {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            left: 8px;
+            bottom: 8px;
+            width: 70%;
+            height: 12px;
+            box-shadow: 0 10px 10px rgba(0, 0, 0, 0.35);
+            transform: rotate(-3deg);
+        }
+        .sticky-note::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            right: 8px;
+            bottom: 8px;
+            width: 70%;
+            height: 12px;
+            box-shadow: 0 10px 10px rgba(0, 0, 0, 0.38);
+            transform: rotate(3deg);
+        }
         .sticky-note:hover {
-            transform: scale(1.06) rotate(0deg) !important;
-            box-shadow: 5px 12px 24px rgba(0, 0, 0, 0.5);
+            transform: scale(1.08) rotate(0deg) !important;
+            box-shadow: 3px 12px 20px rgba(0, 0, 0, 0.4) !important;
             z-index: 10;
+        }
+        .sticky-note:hover::before,
+        .sticky-note:hover::after {
+            box-shadow: 0 14px 12px rgba(0, 0, 0, 0.45);
         }
 
         .qa-board-container {
