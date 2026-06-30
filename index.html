@@ -2193,6 +2193,7 @@
         }
         
         let localQaVotes = {};
+        const qaVotesInProgress = new Set();
         try {
             localQaVotes = JSON.parse(localStorage.getItem('local_qa_votes') || '{}');
         } catch(e) {}
@@ -2708,12 +2709,13 @@
                     }
 
                     // Pre-calculate coordinates in a clean grid for any new notes
+                    const boardWidth = stickyBoardContainer.clientWidth || 800;
                     allNotes.forEach((n, index) => {
                         if (!stickyPositions[n.raw]) {
                             const colsCount = 5;
                             const startX = 24;
                             const startY = 24;
-                            const gapX = 160;
+                            const gapX = Math.floor((boardWidth - 2 * startX - 120) / (colsCount - 1)) || 160;
                             const gapY = 160;
                             
                             const colIndex = index % colsCount;
@@ -2964,11 +2966,12 @@
                 if (qSec) qSec.classList.remove('collapsed');
                 if (qTog) qTog.textContent = 'Hide';
                 
-                // Clear the height lock only after the width transition has fully completed
+                // Clear the height lock and trigger layout recalculations after width transition completes
                 if (cWrap) {
                     setTimeout(() => {
                         if (qrVisible) {
                             cWrap.style.height = '';
+                            if (isResults) fetchAndUpdate();
                         }
                     }, 300);
                 }
@@ -2982,6 +2985,13 @@
                 }
                 if (qSec) qSec.classList.add('collapsed');
                 if (qTog) qTog.textContent = 'Show';
+                
+                // Trigger layout recalculations after width transition completes
+                setTimeout(() => {
+                    if (!qrVisible) {
+                        if (isResults) fetchAndUpdate();
+                    }
+                }, 300);
             }
         };
 
@@ -3993,6 +4003,9 @@
                         studentQaList.querySelectorAll('.student-qa-vote-btn').forEach(btn => {
                             btn.addEventListener('click', async function() {
                                 const id = Number(this.getAttribute('data-id'));
+                                if (qaVotesInProgress.has(id)) return;
+                                qaVotesInProgress.add(id);
+                                
                                 const isUp = this.classList.contains('upvote');
                                 const previousVote = localQaVotes[id];
                                 
@@ -4058,6 +4071,7 @@
                                     console.error(e);
                                     showToast('⚠️ Vote failed. Please try again.', true);
                                 } finally {
+                                    qaVotesInProgress.delete(id);
                                     if (container) {
                                         container.querySelectorAll('.student-qa-vote-btn').forEach(b => b.disabled = false);
                                     }
