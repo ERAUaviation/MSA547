@@ -2953,16 +2953,36 @@
             }
         };
 
+        // ─── Unified QR Visibility & Cloud Height Lock ───
+        window.__setQrVisibility = function(visible) {
+            qrVisible = visible;
+            const qSec = document.getElementById('qrSection');
+            const qTog = document.getElementById('qrToggle');
+            const cWrap = document.getElementById('cloudWrapper');
+            
+            if (visible) {
+                // Restore height
+                if (cWrap) {
+                    cWrap.style.height = '';
+                }
+                if (qSec) qSec.classList.remove('collapsed');
+                if (qTog) qTog.textContent = 'Hide';
+            } else {
+                // Lock height before collapse to prevent vertical stretching
+                if (cWrap && !cWrap.style.height) {
+                    const rect = cWrap.getBoundingClientRect();
+                    if (rect.height > 0) {
+                        cWrap.style.height = rect.height + 'px';
+                    }
+                }
+                if (qSec) qSec.classList.add('collapsed');
+                if (qTog) qTog.textContent = 'Show';
+            }
+        };
+
         // ─── QR Toggle ───
         qrToggle.addEventListener('click', function() {
-            qrVisible = !qrVisible;
-            if (qrVisible) {
-                qrSection.classList.remove('collapsed');
-                qrToggle.textContent = 'Hide';
-            } else {
-                qrSection.classList.add('collapsed');
-                qrToggle.textContent = 'Show';
-            }
+            window.__setQrVisibility(!qrVisible);
         });
 
         // ─── Cloud Hide/Show Toggle ───
@@ -4372,16 +4392,7 @@
                 
                 // Restore QR Code state
                 if (window.__preWhiteboardQrVisible !== undefined) {
-                    qrVisible = window.__preWhiteboardQrVisible;
-                    if (qrSection) {
-                        if (qrVisible) {
-                            qrSection.classList.remove('collapsed');
-                            if (qrToggle) qrToggle.textContent = 'Hide';
-                        } else {
-                            qrSection.classList.add('collapsed');
-                            if (qrToggle) qrToggle.textContent = 'Show';
-                        }
-                    }
+                    window.__setQrVisibility(window.__preWhiteboardQrVisible);
                 }
             } else {
                 // Opening
@@ -4396,9 +4407,7 @@
                 if (questionEl) questionEl.classList.add('question-hidden');
                 
                 // Collapse QR Section
-                qrVisible = false;
-                if (qrSection) qrSection.classList.add('collapsed');
-                if (qrToggle) qrToggle.textContent = 'Show';
+                window.__setQrVisibility(false);
             }
         };
 
