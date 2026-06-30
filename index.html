@@ -9,6 +9,8 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
+    </script>
     <style>
         /* ─── Reset & Base ─── */
         * {
@@ -1895,8 +1897,8 @@
                     <span>🗑</span> Clear Responses
                 </button>
             </div>
-            <button class="action-btn" id="exportPngBtn" style="width: 100%; margin-top: 6px; background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.15);" title="Export Word Cloud as PNG">
-                <span>📥</span> Export Word Cloud PNG
+            <button class="action-btn" id="exportPngBtn" style="width: 100%; margin-top: 6px; background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.15);" title="Export current Live Board as PNG">
+                <span>📥</span> Export PNG
             </button>
         </div>
 
@@ -3805,34 +3807,39 @@
         }
 
         // ─── PNG Export Event Listener ───
-        if (exportPngBtn && canvas) {
-            exportPngBtn.addEventListener('click', function() {
+        if (exportPngBtn) {
+            exportPngBtn.addEventListener('click', async function() {
                 try {
-                    if (latestValidCount === 0) {
-                        showToast('⚠️ No responses to export!', true);
+                    const boardEl = document.getElementById('cloudWrapper');
+                    if (!boardEl) {
+                        showToast('⚠️ Live board element not found!', true);
                         return;
                     }
                     
-                    const transparent = confirm('Export with a transparent background (best for inserting into slides)?');
-                    let exportCanvas = canvas;
+                    showToast('⏳ Generating PNG...');
                     
-                    if (!transparent) {
-                        const tempCanvas = document.createElement('canvas');
-                        tempCanvas.width = canvas.width;
-                        tempCanvas.height = canvas.height;
-                        const tempCtx = tempCanvas.getContext('2d');
-                        
+                    const transparent = confirm('Export with a transparent background (best for inserting into slides)?');
+                    
+                    const options = {
+                        scale: 2, // Higher scale for crisp images
+                        useCORS: true,
+                        logging: false
+                    };
+                    
+                    if (transparent) {
+                        options.backgroundColor = null;
+                    } else {
                         const activeThemeConfig = THEMES[activeTheme] || THEMES.aviation;
-                        tempCtx.fillStyle = activeThemeConfig.bg;
-                        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-                        tempCtx.drawImage(canvas, 0, 0);
-                        exportCanvas = tempCanvas;
+                        options.backgroundColor = activeThemeConfig.bg;
                     }
                     
+                    const exportCanvas = await html2canvas(boardEl, options);
+                    
                     const link = document.createElement('a');
-                    link.download = `ClassroomCloud_${activeQuestionText.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
+                    link.download = `ClassroomLive_${activeMode}_${activeQuestionText.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
                     link.href = exportCanvas.toDataURL('image/png');
                     link.click();
+                    
                     showToast('📥 PNG Exported successfully!');
                 } catch (e) {
                     console.error('PNG export failed:', e);
@@ -4105,27 +4112,15 @@
                                 };
                                 
                                 try {
-                                    const url = `${WEB_APP_URL}?action=changeVoteQa&id=${id}&delta=${delta}&_=${Date.now()}`;
-                                    const res = await fetch(url);
-                                    let result = await res.json();
-                                    
-                                    // Trigger legacy fallback if server does not support changeVoteQa action (returns error or unknown action)
-                                    if (result.status !== 'success' || (result.message && result.message.toLowerCase().includes('action'))) {
-                                        throw new Error('Fallback to legacy voting actions');
+                                    const fallbackAction = delta > 0 ? 'upvoteQa' : 'downvoteQa';
+                                    const callsCount = Math.abs(delta);
+                                    for (let c = 0; c < callsCount; c++) {
+                                        await fetch(`${WEB_APP_URL}?action=${fallbackAction}&id=${id}&_=${Date.now()}`);
                                     }
                                 } catch(e) {
-                                    console.log('Using legacy fallback voting...', e);
-                                    try {
-                                        const fallbackAction = isUp ? 'upvoteQa' : 'downvoteQa';
-                                        const callsCount = Math.abs(delta);
-                                        for (let c = 0; c < callsCount; c++) {
-                                            await fetch(`${WEB_APP_URL}?action=${fallbackAction}&id=${id}&_=${Date.now()}`);
-                                        }
-                                    } catch(err) {
-                                        console.error(err);
-                                        rollbackLocalState();
-                                        showToast('⚠️ Vote failed. Please try again.', true);
-                                    }
+                                    console.error('Voting failed:', e);
+                                    rollbackLocalState();
+                                    showToast('⚠️ Vote failed. Please try again.', true);
                                 } finally {
                                     qaVotesInProgress.delete(id);
                                     if (container) {
