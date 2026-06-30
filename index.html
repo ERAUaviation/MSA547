@@ -3737,7 +3737,7 @@
                 options.forEach(opt => {
                     html += `
                         <label class="student-mc-card">
-                            <input type="radio" name="entry.192253551" value="${opt}" required style="accent-color: var(--gold-light); margin-right: 12px; width: 18px; height: 18px;" />
+                            <input type="radio" name="entry.192253551" value="${opt} (${studentUid})" required style="accent-color: var(--gold-light); margin-right: 12px; width: 18px; height: 18px;" />
                             <span>${opt}</span>
                         </label>
                     `;
@@ -3784,7 +3784,7 @@
                     btn.addEventListener('click', function() {
                         btns.forEach(b => b.classList.remove('active'));
                         this.classList.add('active');
-                        hiddenInput.value = this.getAttribute('data-val');
+                        hiddenInput.value = `${this.getAttribute('data-val')} (${studentUid})`;
                     });
                 });
                 if (studentSubmitBtn) studentSubmitBtn.style.display = 'flex';
