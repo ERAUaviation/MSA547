@@ -2571,57 +2571,43 @@
         }
 
         // ─── Form submission ───
+        let formSubmitted = false;
+
         if (form) {
-            form.addEventListener('submit', async function(e) {
-                e.preventDefault(); // Always intercept to post over Apps Script Web App API
-                
+            form.addEventListener('submit', function(e) {
                 const inputVal = getStudentInputValue();
                 if (!inputVal || !inputVal.trim()) {
+                    e.preventDefault();
                     showToast('⚠️ Please make a selection or enter a value!', true);
                     return;
                 }
                 if (isProfane(inputVal)) {
+                    e.preventDefault();
                     showToast('⚠️ Inappropriate content detected.', true);
                     return;
                 }
-                
-                const originalText = studentSubmitBtn ? studentSubmitBtn.innerHTML : 'Submit ✈️';
-                if (studentSubmitBtn) {
-                    studentSubmitBtn.innerHTML = '⏳ Submitting…';
-                    studentSubmitBtn.disabled = true;
-                }
-                
-                try {
-                    const url = `${WEB_APP_URL}?action=submitResponse&response=${encodeURIComponent(inputVal)}&mode=${activeMode}&_=${Date.now()}`;
-                    const res = await fetch(url);
-                    const result = await res.json();
-                    
-                    if (result.status === 'success') {
-                        // Write to localStorage to prevent double submission
-                        const key = 'submitted_' + activeQuestionText.toLowerCase().replace(/[^a-z0-9]/g, '');
-                        localStorage.setItem(key, 'true');
-                        
-                        showToast('Response submitted — thank you!');
-                        checkStudentSubmissionStatus();
-                        form.reset();
-                        
-                        if (activeMode === 'slots') {
-                            updateStudentUI();
-                        }
-                    } else {
-                        showToast('⚠️ Submission failed. Please try again.', true);
-                    }
-                } catch(err) {
-                    console.error(err);
-                    showToast('⚠️ Submission failed. Please try again.', true);
-                } finally {
-                    if (studentSubmitBtn) {
-                        studentSubmitBtn.innerHTML = originalText;
-                        studentSubmitBtn.disabled = false;
-                    }
-                }
+                formSubmitted = true;
             });
         }
+
+        iframe.onload = function() {
+            if (formSubmitted) {
+                formSubmitted = false;
+                
+                // Write to localStorage to prevent double submission
+                const key = 'submitted_' + activeQuestionText.toLowerCase().replace(/[^a-z0-9]/g, '');
+                localStorage.setItem(key, 'true');
+                
+                showToast('Response submitted — thank you!');
+                checkStudentSubmissionStatus();
+                form.reset();
+
+                // If slots mode, update counters immediately
+                if (activeMode === 'slots') {
+                    updateStudentUI();
+                }
+            }
+        };
 
         // ─── QR Toggle ───
         qrToggle.addEventListener('click', function() {
