@@ -2855,10 +2855,11 @@
             const minWeight = sorted[sorted.length - 1]?.[1] || 10;
             const weightRange = Math.max(maxWeight - minWeight, 1);
 
-            const weightFactor = function(w) {
-                const normalized = (w - minWeight) / weightRange;
-                const size = 32 + normalized * 78; // Much larger word sizes on screen!
-                return Math.min(Math.max(size, 20), 120);
+            const sizeScale = Math.min(Math.max(w / 1200, 0.45), 1.4);
+            const weightFactor = function(wVal) {
+                const normalized = (wVal - minWeight) / weightRange;
+                const size = (32 + normalized * 78) * sizeScale;
+                return Math.min(Math.max(size, 12), 120 * sizeScale);
             };
 
             const gridSize = Math.max(8, Math.min(20, Math.round(44 / Math.sqrt(sorted.length))));
