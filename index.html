@@ -2843,7 +2843,8 @@
             canvas.style.width = w + 'px';
             canvas.style.height = h + 'px';
             const ctx = canvas.getContext('2d');
-            ctx.scale(dpr, dpr);
+            // Do NOT call ctx.scale(dpr, dpr) here. wordcloud2.js draws relative to canvas.width/height directly.
+            // High-DPI crisp text is handled by scaling font sizes by dpr.
 
             const sorted = list;
             if (sorted.length === 0) {
@@ -2855,11 +2856,12 @@
             const minWeight = sorted[sorted.length - 1]?.[1] || 10;
             const weightRange = Math.max(maxWeight - minWeight, 1);
 
-            const sizeScale = Math.min(Math.max(w / 1200, 0.45), 1.4);
+            // Incorporate devicePixelRatio (dpr) directly into the font size scaling factor
+            const sizeScale = Math.min(Math.max(w / 1200, 0.45), 1.4) * dpr;
             const weightFactor = function(wVal) {
                 const normalized = (wVal - minWeight) / weightRange;
                 const size = (32 + normalized * 78) * sizeScale;
-                return Math.min(Math.max(size, 12), 120 * sizeScale);
+                return Math.min(Math.max(size, 12 * dpr), 120 * sizeScale);
             };
 
             const gridSize = Math.max(8, Math.min(20, Math.round(44 / Math.sqrt(sorted.length))));
